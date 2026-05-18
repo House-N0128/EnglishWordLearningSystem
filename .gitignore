@@ -1,0 +1,19 @@
+# ===== Backend (Spring Boot) =====
+word-learning-backend/target/
+word-learning-backend/.idea/
+
+# ===== Android App =====
+word-learning-app/.gradle/
+word-learning-app/build/
+word-learning-app/app/build/
+word-learning-app/local.properties
+word-learning-app/.idea/
+
+# ===== Web Frontend =====
+word-learning-web/.idea/
+
+# ===== Common =====
+*.iml
+.DS_Store
+Thumbs.db
+.vscode/

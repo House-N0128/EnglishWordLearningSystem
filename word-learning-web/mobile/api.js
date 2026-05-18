@@ -1,4 +1,8 @@
-// ========== API 工具库 ==========
+// ========== 移动端 API 工具库 ==========
+// 修改此地址指向你的后端服务器
+var BASE_URL = 'http://localhost:8080';
+
+function apiUrl(path) { return BASE_URL + path; }
 
 function authHeaders() {
     var userId = localStorage.getItem('userId') || '';
@@ -10,13 +14,13 @@ function authHeaders() {
     };
 }
 
-async function apiGet(url) {
-    var res = await fetch(url, { headers: authHeaders() });
+async function apiGet(path) {
+    var res = await fetch(apiUrl(path), { headers: authHeaders() });
     return res.json();
 }
 
-async function apiPost(url, body) {
-    var res = await fetch(url, {
+async function apiPost(path, body) {
+    var res = await fetch(apiUrl(path), {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(body)
@@ -24,8 +28,8 @@ async function apiPost(url, body) {
     return res.json();
 }
 
-async function apiPut(url, body) {
-    var res = await fetch(url, {
+async function apiPut(path, body) {
+    var res = await fetch(apiUrl(path), {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify(body)
@@ -33,10 +37,10 @@ async function apiPut(url, body) {
     return res.json();
 }
 
-async function apiDelete(url, body) {
+async function apiDelete(path, body) {
     var opts = { method: 'DELETE', headers: authHeaders() };
     if (body) { opts.body = JSON.stringify(body); }
-    var res = await fetch(url, opts);
+    var res = await fetch(apiUrl(path), opts);
     return res.json();
 }
 
@@ -48,18 +52,18 @@ function setAuth(userId, role) {
 function clearAuth() {
     localStorage.removeItem('userId');
     localStorage.removeItem('userRole');
-    window.location.href = '/index.html';
+    window.location.href = '/mobile/普通用户/登录.html';
 }
 
 function requireAuth(expectedRole) {
     var userId = localStorage.getItem('userId');
     var role = localStorage.getItem('userRole');
     if (!userId || !role) {
-        window.location.href = '/index.html';
+        window.location.href = '/mobile/普通用户/登录.html';
         return false;
     }
     if (expectedRole && role !== expectedRole) {
-        window.location.href = '/index.html';
+        window.location.href = '/mobile/普通用户/登录.html';
         return false;
     }
     return true;
