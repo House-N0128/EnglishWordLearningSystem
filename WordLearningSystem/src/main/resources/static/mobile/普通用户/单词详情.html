@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词详情</title>
+  <style>
+    body {
+      margin:0;
+      background:linear-gradient(135deg,#eaf1ff,#fafeff,#f6f8fc);
+      font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+      min-height:100vh;
+      color:#273245;
+    }
+    .top-bar {
+      display:flex;
+      align-items:center;
+      background:#318af8;
+      color:#fff;
+      padding:14px 20px;
+      border-bottom-left-radius:18px;
+      border-bottom-right-radius:18px;
+      box-shadow:0 2px 12px #318af82a;
+      font-size:18px;
+      font-weight:600;
+      gap:10px;
+    }
+    .back-btn {
+      background:none;
+      border:none;
+      cursor:pointer;
+      padding:4px;
+    }
+    .back-btn svg { width:28px; height:28px; }
+    .main-area {
+      padding:25px 16px 30px 16px;
+    }
+    .section-title {
+      font-size:18px;
+      color:#318af8;
+      font-weight:700;
+      margin-bottom:18px;
+      text-align:center;
+    }
+    .info-card {
+      background:#fff;
+      border-radius:16px;
+      padding:18px 16px;
+      box-shadow:0 2px 10px #dce8fa40;
+      margin-bottom:20px;
+    }
+    .info-row {
+      margin-bottom:14px;
+    }
+    .info-label {
+      font-size:14px;
+      color:#47a1e6;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+    .info-value {
+      font-size:16px;
+      color:#273245;
+      font-weight:500;
+    }
+    .word-image {
+      width:100%;
+      max-height:220px;
+      object-fit:cover;
+      border-radius:14px;
+      margin-top:8px;
+      box-shadow:0 2px 10px #b9d7ff50;
+    }
+    .play-audio {
+      margin-top:10px;
+      padding:10px 16px;
+      background:#318af8;
+      color:#fff;
+      border:none;
+      border-radius:18px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 1px 6px #a7c8fa60;
+    }
+    .btn-collect {
+      margin-top:16px;
+      width:100%;
+      padding:13px 0;
+      background:linear-gradient(90deg,#52e8bc 60%,#039c83 100%);
+      color:#fff;
+      border:none;
+      border-radius:25px;
+      font-size:17px;
+      font-weight:600;
+      cursor:pointer;
+    }
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.history.back()">
+      <svg viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    单词详情
+  </div>
+
+  <div class="main-area">
+    <div class="section-title" id="word-title">加载中...</div>
+    <div class="info-card">
+      <div class="info-row">
+        <div class="info-label">英文拼写</div>
+        <div class="info-value" id="englishSpelling">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">中文释义</div>
+        <div class="info-value" id="chineseDefinition">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">音标</div>
+        <div class="info-value" id="phoneticSymbol">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">例句</div>
+        <div class="info-value" id="exampleSentence">-</div>
+      </div>
+      <div class="info-row" id="audio-row" style="display:none;">
+        <div class="info-label">单词音频</div>
+        <button class="play-audio" onclick="playAudio()">▶ 点击播放</button>
+        <audio id="wordAudio"></audio>
+      </div>
+      <div class="info-row" id="image-row" style="display:none;">
+        <div class="info-label">示意图</div>
+        <img id="wordImage" class="word-image" src="" alt="Word Image">
+      </div>
+    </div>
+    <button class="btn-collect" id="btn-collect" onclick="collectWord()">⭐ 收藏单词</button>
+  </div>
+
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var params = new URLSearchParams(window.location.search);
+    var wordId = params.get('wordId');
+    var currentWord = null;
+
+    if (!wordId) {
+      document.getElementById('word-title').innerText = '参数错误';
+    } else {
+      (async function() {
+        var res = await apiGet('/api/words/' + wordId);
+        if (res.code === 200 && res.data) {
+          currentWord = res.data;
+          document.getElementById('word-title').innerText = currentWord.englishSpelling || '';
+          document.getElementById('englishSpelling').innerText = currentWord.englishSpelling || '-';
+          document.getElementById('chineseDefinition').innerText = currentWord.chineseDefinition || '-';
+          document.getElementById('phoneticSymbol').innerText = currentWord.phoneticSymbol || '-';
+          document.getElementById('exampleSentence').innerText = currentWord.exampleSentence || '-';
+          if (currentWord.wordPronunciation) {
+            document.getElementById('audio-row').style.display = '';
+            document.getElementById('wordAudio').src = currentWord.wordPronunciation;
+          }
+          if (currentWord.wordImage) {
+            document.getElementById('image-row').style.display = '';
+            document.getElementById('wordImage').src = currentWord.wordImage;
+          }
+        } else {
+          document.getElementById('word-title').innerText = '单词不存在';
+        }
+      })();
+    }
+
+    function playAudio() {
+      document.getElementById('wordAudio').play();
+    }
+
+    function collectWord() {
+      if (!currentWord) return;
+      apiPost('/api/collections/add', { wordId: currentWord.wordId }).then(function(res) {
+        if (res.code === 200) {
+          alert('收藏成功');
+        } else {
+          alert(res.message || '收藏失败');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.WordLearningApp" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">#318af8</item>
+        <item name="colorPrimaryVariant">#2363cf</item>
+        <item name="colorOnPrimary">#ffffff</item>
+        <item name="colorSecondary">#52e8bc</item>
+        <item name="colorSecondaryVariant">#039c83</item>
+        <item name="android:statusBarColor">#2363cf</item>
+    </style>
+</resources>

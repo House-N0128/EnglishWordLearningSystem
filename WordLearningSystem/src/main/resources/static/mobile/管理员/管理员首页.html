@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<title>管理员首页(App端)</title>
+<script src="/mobile/api.js"></script>
+<style>
+body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
+.top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.admin-user {font-weight:bold;}
+.btn-logout {background:#fff;color:#318af8;font-weight:600;font-size:15px;border:none;border-radius:16px;padding:7px 20px;}
+.main-panel {padding:0 12px;}
+.dashboard-title {font-size:19px;color:#318af8;font-weight:700;margin:20px 0 10px 0;}
+.info-grid {display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.info-card {background:#fff;border-radius:13px;box-shadow:0 1px 6px #dde6fa19;padding:13px 0;text-align:center;}
+.num {font-size:19px;font-weight:bold;color:#318af8;}
+.section-block {background:#fff;border-radius:11px;padding:15px 10px;margin:18px 0 10px 0;box-shadow:0 1px 8px #dde6fa19;}
+.section-title {font-size:16px;color:#318af8;font-weight:600;margin-bottom:14px;}
+.top-books-list {display:flex;flex-direction:column;gap:12px;}
+.top-book-item {background:#318af81a;border-radius:7px;padding:10px 13px;font-size:15px;}
+.book-name {font-weight:600;color:#318af8;font-size:15px;}
+.count {margin-left:7px;font-size:13px;color:#276bab;}
+.admin-navbar{position:fixed;left:0;bottom:0;width:100vw;height:61px;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:14px;border-top-right-radius:14px;display:flex;justify-content:space-around;align-items:center;}
+.admin-nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.admin-nav-btn.active{color:#17c2ae;}
+.admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <span class="admin-user">管理员：<span id="display-name">admin001</span></span>
+    <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+  </div>
+  <main class="main-panel">
+    <div class="dashboard-title">平台数据总览</div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="num" id="stat-users">-</span>
+        <span>总用户数</span>
+      </div>
+      <div class="info-card">
+        <span class="num" id="stat-books">-</span>
+        <span>总词书数</span>
+      </div>
+      <div class="info-card">
+        <span class="num" id="stat-words">-</span>
+        <span>总单词数</span>
+      </div>
+      <div class="info-card">
+        <span class="num" id="stat-today">-</span>
+        <span>今日新增学习记录</span>
+      </div>
+    </div>
+    <div class="section-block">
+      <div class="section-title">热门词书TOP3</div>
+      <div class="top-books-list" id="top-books">
+        <div style="text-align:center;color:#8899aa;padding:10px;">加载中...</div>
+      </div>
+    </div>
+  </main>
+  <div class="admin-navbar">
+    <button class="admin-nav-btn active" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+  </div>
+<script>
+if (!requireAuth('admin')) { throw new Error('unauthorized'); }
+document.getElementById('display-name').innerText = localStorage.getItem('userId') || 'admin';
+
+(async function() {
+  // Load admin stats
+  try {
+    var statsRes = await apiGet('/api/admin/stats');
+    if (statsRes.code === 200 && statsRes.data) {
+      var s = statsRes.data;
+      document.getElementById('stat-users').innerText = s.userCount || 0;
+      document.getElementById('stat-books').innerText = s.wordBookCount || 0;
+      document.getElementById('stat-words').innerText = s.wordCount || 0;
+      document.getElementById('stat-today').innerText = s.todayRecordCount || 0;
+    }
+  } catch(e) {}
+
+  // Load top books
+  try {
+    var booksRes = await apiGet('/api/wordbooks');
+    var box = document.getElementById('top-books');
+    if (booksRes.code === 200 && booksRes.data && booksRes.data.length > 0) {
+      var books = booksRes.data.slice(0, 3);
+      box.innerHTML = books.map(function(b) {
+        return '<div class="top-book-item"><span class="book-name">' + (b.wordBookName || '') + '</span><span class="count">' + (b.wordCount || 0) + '词</span></div>';
+      }).join('');
+    } else {
+      box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:10px;">暂无词书</div>';
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

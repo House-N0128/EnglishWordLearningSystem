@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>学习进度</title>
+
+<style>
+body {
+  margin:0;
+  background:linear-gradient(135deg,#f2f8fc 0%,#eaf4ff 100%);
+  font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  color:#273245; padding-bottom:20px;
+}
+
+/* 顶部栏 */
+.top-bar {
+  display:flex;align-items:center;
+  background:#318af8;color:#fff;
+  padding:14px 16px;font-size:18px;font-weight:600;
+  border-bottom-left-radius:18px;border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  gap:10px;
+}
+
+.back-btn {
+  border:none;background:none;cursor:pointer;padding:4px;
+}
+.back-btn svg { width:28px;height:28px; }
+
+/* 主体 */
+.main-area { padding:24px 16px; }
+
+/* 词书信息卡片 */
+.info-box {
+  background:#fff;padding:16px;border-radius:14px;
+  box-shadow:0 1px 8px #d0ddf650;font-size:15px;
+  margin-bottom:22px;line-height:1.65;
+}
+
+/* 进度条标题 */
+.section-title {
+  font-size:18px;font-weight:600;color:#318af8;margin-bottom:10px;
+}
+
+/* 进度条外框 */
+.progress-container {
+  background:#e6efff;
+  width:100%;
+  height:20px;
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+
+/* 内部条 */
+.progress-bar {
+  height:100%;
+  width:0%;
+  background:#318af8;
+  border-radius:14px;
+  transition:width .4s ease;
+}
+
+/* 百分比文字 */
+.progress-text {
+  font-size:15px;
+  font-weight:500;
+  color:#318af8;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 顶部栏 -->
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 28 28" fill="none">
+      <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  学习进度
+</div>
+
+<div class="main-area">
+
+  <!-- 学习词书信息 -->
+  <div class="info-box" id="infoBox">
+    学习词书：<strong>英语四级</strong><br>
+    总单词数：<strong>100</strong><br>
+    已学习：<strong id="learnedCount">25</strong> 个
+  </div>
+
+  <!-- 进度条 -->
+  <div class="section-title">当前学习进度</div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="progress-text" id="progressText">25%</div>
+
+</div>
+
+<script>
+// 进度值（后端可替换成动态数据）
+let learned = 25;   // 已学
+let total = 100;    // 总词数
+
+let percent = Math.round((learned / total) * 100);
+
+document.getElementById("progressBar").style.width = percent + "%";
+document.getElementById("progressText").innerText = percent + "%";
+</script>
+
+</body>
+</html>

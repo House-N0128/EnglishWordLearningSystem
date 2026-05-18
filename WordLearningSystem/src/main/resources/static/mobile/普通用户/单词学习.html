@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词学习</title>
+  <style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
+.top-bar {
+  display:flex;align-items:center;background:#318af8;color:#fff;
+  padding:13px 18px 13px 6px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;font-size:18px;font-weight:600;gap:11px;}
+.back-btn {
+  background:none;border:none;outline:none;cursor:pointer;padding:5px;display:flex;align-items:center;}
+.back-icon {width:28px;height:28px;display:inline-block;}
+.main-area {padding:30px 14px 14px 14px;}
+.study-title {font-size:19px;font-weight:600;color:#318af8;letter-spacing:1px;margin-bottom:18px;}
+.word-card {background:#fff;border-radius:14px;box-shadow:0 2px 12px #dde6fa24;padding:26px;margin-bottom:24px;}
+.word-main-row {display:flex; align-items:center; gap:10px;}
+.word-main {font-size:22px;font-weight:600;color:#318af8;}
+.audio-btn {
+  width:38px; height:38px; border:none;
+  border-radius:50%; background:#eaf4ff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  margin-left:7px; box-shadow:0 2px 8px #dde6fa30;transition:.14s;
+}
+.audio-btn:hover {background:#d1e7ff;}
+.audio-btn svg {width:28px; height:28px;}
+.pos {font-size:15px;color:#47b1eb; margin-left:9px;}
+.phonetic {font-size:15px;color:#547bbc;}
+.chinese {font-size:15px;color:#273245;margin-top:6px;}
+.example {font-size:14px;color:#6578a0;margin-top:7px;}
+.study-btns {display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;}
+.btn {flex:1;min-width:70px;background:#318af8;color:#fff;border:none;border-radius:21px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px #e3f3ff30;letter-spacing:1px;}
+.btn.collected {background:#52e8bc;}
+.progress-wrap {margin:16px 0 10px 0;}
+.progress-bar-bg {background:#e5eeff;height:9px;border-radius:6px;width:100%;}
+.progress-bar {background:#318af8;height:9px;border-radius:6px;transition:width .365s;}
+.progress-label {font-size:13px;color:#6578a0;margin:4px 0 0 0;}
+.empty-msg {text-align:center;color:#8899aa;padding:40px;font-size:16px;}
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.history.back()">
+      <span class="back-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </button>
+    单词学习
+  </div>
+
+  <div class="main-area" id="main-area">
+    <div class="study-title" id="book-title">加载中...</div>
+    <div class="empty-msg">加载中...</div>
+  </div>
+
+  <audio id="wordAudio" style="display:none;"></audio>
+
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var params = new URLSearchParams(window.location.search);
+    var bookId = params.get('bookId');
+    var words = [];
+    var currentIndex = 0;
+    var learnedWords = {}; // wordId -> true
+
+    function playAudio(url) {
+      var audio = document.getElementById('wordAudio');
+      audio.src = url || '';
+      audio.play();
+    }
+
+    function showWord(index) {
+      if (words.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= words.length) index = words.length - 1;
+      currentIndex = index;
+      var w = words[currentIndex];
+
+      var audioHtml = '';
+      if (w.wordPronunciation) {
+        audioHtml = '<button class="audio-btn" title="播放音频" onclick="playAudio(\'' + w.wordPronunciation + '\')">' +
+          '<svg width="28" height="28" viewBox="0 0 28 28" fill="none">' +
+          '<path d="M7 11c0-1.1.9-2 2-2h3l5-4v18l-5-4H9c-1.1 0-2-.9-2-2v-6z" fill="#318af8"/>' +
+          '<path d="M20.5 10.5c1 1 1.5 2.35 1.5 3.75s-.5 2.75-1.5 3.75" stroke="#318af8" stroke-width="2" stroke-linecap="round"/>' +
+          '<path d="M22.5 8.5c1.45 1.45 2.25 3.45 2.25 5.75S24 18.8 22.5 20.25" stroke="#318af8" stroke-width="1.6" stroke-linecap="round"/>' +
+          '</svg></button>';
+      }
+
+      var isLearned = learnedWords[w.wordId];
+      var collectedClass = isLearned ? 'btn collected' : 'btn';
+
+      var progress = words.length > 0 ? Math.round((currentIndex + 1) / words.length * 100) : 0;
+
+      document.getElementById('main-area').innerHTML =
+        '<div class="study-title" id="book-title">学习 - 进度 ' + (currentIndex + 1) + '/' + words.length + '</div>' +
+        '<div class="word-card">' +
+        '<div class="word-main-row">' +
+        '<div class="word-main">' + (w.englishSpelling || '') + '</div>' +
+        audioHtml +
+        '<span class="pos">' + (w.phoneticSymbol || '') + '</span>' +
+        '</div>' +
+        '<div class="chinese">' + (w.chineseDefinition || '') + '</div>' +
+        '<div class="example">' + (w.exampleSentence ? '例句：' + w.exampleSentence : '') + '</div>' +
+        '<div class="study-btns">' +
+        '<button class="btn" onclick="collectWord(\'' + w.wordId + '\')">⭐ 收藏</button>' +
+        '<button class="btn" onclick="showWord(' + (currentIndex - 1) + ')">上一个</button>' +
+        '<button class="btn" onclick="showWord(' + (currentIndex + 1) + ')">下一个</button>' +
+        '<button class="' + collectedClass + '" onclick="markLearned(\'' + w.wordId + '\')">' + (isLearned ? '✓ 已掌握' : '标记已掌握') + '</button>' +
+        '</div>' +
+        '<div class="progress-wrap">' +
+        '<div class="progress-bar-bg"><div class="progress-bar" style="width:' + progress + '%;"></div></div>' +
+        '<div class="progress-label">已学 ' + (currentIndex + 1) + ' / 总 ' + words.length + ' 单词</div>' +
+        '</div>' +
+        '</div>';
+    }
+
+    function collectWord(wordId) {
+      apiPost('/api/collections/add', { wordId: wordId }).then(function(res) {
+        alert(res.code === 200 ? '收藏成功' : (res.message || '收藏失败'));
+      });
+    }
+
+    function markLearned(wordId) {
+      if (learnedWords[wordId]) return;
+      apiPost('/api/records/add', { wordId: wordId, learnedWordBookId: bookId }).then(function(res) {
+        if (res.code === 200) {
+          learnedWords[wordId] = true;
+          alert('已标记为掌握');
+          showWord(currentIndex);
+        } else {
+          alert(res.message || '操作失败');
+        }
+      });
+    }
+
+    function onKeyDown(e) {
+      if (e.key === 'ArrowLeft') { showWord(currentIndex - 1); }
+      if (e.key === 'ArrowRight') { showWord(currentIndex + 1); }
+    }
+
+    if (!bookId) {
+      document.getElementById('main-area').innerHTML = '<div class="empty-msg">缺少词书参数</div>';
+    } else {
+      document.addEventListener('keydown', onKeyDown);
+      (async function() {
+        var res = await apiGet('/api/words?wordBookId=' + bookId);
+        if (res.code === 200 && res.data && res.data.length > 0) {
+          words = res.data;
+          showWord(0);
+        } else {
+          document.getElementById('main-area').innerHTML = '<div class="empty-msg">该词书暂无单词</div>';
+        }
+      })();
+    }
+  </script>
+</body>
+</html>

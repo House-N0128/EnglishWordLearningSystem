@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词学习平台 - 用户注册</title>
+  <style>
+    body {
+      margin:0;
+      background:linear-gradient(135deg,#47e5bc 0%, #3577ef 100%);
+      font-family:'PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+      min-height:100vh;
+    }
+    .container {
+      max-width:370px;
+      margin:0 auto;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 6px 32px rgba(53,119,239,0.10);
+      padding:34px 20px 26px 20px;
+      position:relative;
+      top:36px;
+    }
+    h2 {
+      text-align:center;
+      margin-top:8px;
+      margin-bottom:18px;
+      font-size:23px;
+      font-weight:600;
+      color:#3577ef;
+      letter-spacing:2px;
+    }
+    form {margin-bottom:10px;}
+    .form-wrap {
+      display:flex;
+      flex-direction:column;
+      gap:13px;
+      margin-bottom:14px;
+    }
+    .input-group {
+      display:flex;
+      align-items:center;
+      background:#f6f8fc;
+      border-radius:9px;
+      padding: 9px 14px;
+      border:1px solid #e1e6ed;
+    }
+    .input-group input {
+      border:none;
+      background:transparent;
+      outline:none;
+      width:100%;
+      font-size:16px;
+      padding:7px;
+      color:#222;
+    }
+    .input-group input::placeholder {
+      color:#97adc0;
+      font-size:15px;
+    }
+    .form-tips {
+      font-size:12px; color:#97adc0; margin:2px 0 0 4px;
+    }
+    .password-visual {
+      margin:6px 0 0 0;
+      height:18px;
+      display:flex;
+      align-items:center;
+      gap:9px;
+    }
+    .pw-bar {
+      flex:1;
+      height:7px;
+      border-radius:5px;
+      background:#eceffc;
+      overflow:hidden;
+      position:relative;
+      margin-right:7px;
+      transition:background .2s;
+    }
+    .pw-bar-inner {
+      height:100%;
+      border-radius:5px;
+      transition:width .3s, background .2s;
+    }
+    .pw-text {
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:1px;
+      color:#96adc0;
+      min-width:33px;
+      text-align:left;
+    }
+    .pw-weak { background:#f08282;}
+    .pw-medium { background:#fbc252;}
+    .pw-strong { background:#38d999;}
+    .checkbox {
+      display:flex;
+      align-items:center;
+      margin:10px 0 7px 2px;
+      font-size:14px;
+      color:#555;
+    }
+    .checkbox input { margin-right:7px;}
+    .btn {
+      display:block;
+      width:100%;
+      margin:7px 0 4px 0;
+      padding:13px 0;
+      border-radius:25px;
+      border:none;
+      background:linear-gradient(90deg,#3577ef 60%, #47e5bc 100%);
+      color:#fff; font-weight:600; font-size:17px;
+      box-shadow:0 2px 8px #e3f2fd;
+      letter-spacing:2px; cursor:pointer;
+      transition:background .2s, box-shadow .2s;
+    }
+    .btn-back {
+      background: linear-gradient(90deg, #52e8bc 60%, #039c83 100%);
+    }
+    .btn:disabled { opacity:.65; cursor:not-allowed; }
+    .actions {
+      text-align:right; font-size:15px; margin:12px 0 0 0; color:#3577ef;
+    }
+    .actions a { color:#3577ef; opacity:.9; text-decoration:none; margin:0 6px; }
+    .error-msg {
+      display:none;
+      text-align:center;
+      margin:8px 0;
+      padding:10px;
+      border-radius:8px;
+      font-size:14px;
+      background:#fff0f0;
+      color:#d93025;
+    }
+    .success-msg {
+      display:none;
+      text-align:center;
+      margin:8px 0;
+      padding:10px;
+      border-radius:8px;
+      font-size:14px;
+      background:#e8f5e9;
+      color:#1b8a2e;
+    }
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>单词学习平台 - 用户注册</h2>
+    <form autocomplete="off">
+      <div class="form-wrap">
+        <div class="input-group">
+          <input type="text" placeholder="登录账号" id="reg-userid" required>
+        </div>
+        <div class="input-group">
+          <input type="password" placeholder="登录密码" id="reg-password" required>
+        </div>
+        <div class="form-tips">密码强度：至少6位，字母+数字</div>
+        <div class="password-visual">
+          <div class="pw-bar"><div id="pwBar" class="pw-bar-inner"></div></div>
+          <div id="pwText" class="pw-text">-</div>
+        </div>
+        <div class="input-group">
+          <input type="password" placeholder="确认密码" id="reg-confirm-password" required>
+        </div>
+        <div class="input-group">
+          <input type="text" placeholder="用户昵称" id="reg-nickname" required>
+        </div>
+        <div class="input-group">
+          <input type="tel" placeholder="联系电话" id="reg-phone" required>
+        </div>
+        <div class="form-tips">手机号：11位数字</div>
+        <div class="input-group">
+          <input type="email" placeholder="邮箱地址" id="reg-email" required>
+        </div>
+        <div class="form-tips">邮箱：如 xxx@xxx.com</div>
+        <div class="checkbox">
+          <input type="checkbox" id="agree" required>
+          <label for="agree">我已阅读并同意《用户服务协议》</label>
+        </div>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg"></div>
+      <button type="button" class="btn" id="register-btn">注册</button>
+      <button type="button" class="btn btn-back" id="back-btn">返回登录</button>
+    </form>
+    <div class="actions">
+      <a href="#">账号问题咨询</a> | <a href="#">隐私政策</a>
+    </div>
+  </div>
+  <script>
+    var pwInput = document.getElementById('reg-password');
+    var pwBar = document.getElementById('pwBar');
+    var pwText = document.getElementById('pwText');
+    pwInput.oninput = function() {
+      var val = pwInput.value;
+      var score = 0;
+      if(val.length >= 6) score++;
+      if(/[A-Za-z]/.test(val) && /\d/.test(val)) score++;
+      if(/[^A-Za-z0-9]/.test(val)) score++;
+      if(val.length < 1) {
+        pwBar.style.width = '0%';
+        pwBar.className = 'pw-bar-inner';
+        pwText.innerText = '-';
+        pwText.style.color='#96adc0';
+        return;
+      }
+      if(score === 1) {
+        pwBar.style.width = '33%';
+        pwBar.className = 'pw-bar-inner pw-weak';
+        pwText.innerText = '弱';
+        pwText.style.color='#f08282';
+      } else if(score === 2) {
+        pwBar.style.width = '66%';
+        pwBar.className = 'pw-bar-inner pw-medium';
+        pwText.innerText = '中';
+        pwText.style.color='#fbc252';
+      } else {
+        pwBar.style.width = '100%';
+        pwBar.className = 'pw-bar-inner pw-strong';
+        pwText.innerText = '强';
+        pwText.style.color='#38d999';
+      }
+    };
+
+    function showError(msg) {
+      var el = document.getElementById('error-msg');
+      el.innerText = msg;
+      el.style.display = 'block';
+      document.getElementById('success-msg').style.display = 'none';
+    }
+
+    document.getElementById('register-btn').onclick = async function() {
+      var userId = document.getElementById('reg-userid').value.trim();
+      var password = document.getElementById('reg-password').value.trim();
+      var confirmPw = document.getElementById('reg-confirm-password').value.trim();
+      var nickname = document.getElementById('reg-nickname').value.trim();
+      var phone = document.getElementById('reg-phone').value.trim();
+      var email = document.getElementById('reg-email').value.trim();
+      var agree = document.getElementById('agree').checked;
+
+      if (!userId || !password || !confirmPw || !nickname || !phone || !email) {
+        showError('请填写所有必填字段');
+        return;
+      }
+      if (password !== confirmPw) {
+        showError('两次输入的密码不一致');
+        return;
+      }
+      if (password.length < 6) {
+        showError('密码长度至少6位');
+        return;
+      }
+      if (!/^\d{11}$/.test(phone)) {
+        showError('请输入正确的11位手机号');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('请输入正确的邮箱地址');
+        return;
+      }
+      if (!agree) {
+        showError('请先同意用户服务协议');
+        return;
+      }
+
+      var btn = document.getElementById('register-btn');
+      btn.disabled = true;
+      btn.innerText = '注册中...';
+      document.getElementById('error-msg').style.display = 'none';
+
+      var result = await apiPost('/api/user/register', {
+        userId: userId,
+        loginPassword: password,
+        userName: nickname,
+        phoneNumber: phone,
+        email: email
+      });
+
+      btn.disabled = false;
+      btn.innerText = '注册';
+
+      if (result.code === 200) {
+        var succ = document.getElementById('success-msg');
+        succ.innerText = '注册成功！即将跳转到登录页...';
+        succ.style.display = 'block';
+        setTimeout(function() {
+          window.location.href = '/mobile/普通用户/登录.html';
+        }, 1500);
+      } else {
+        showError(result.message || '注册失败，请重试');
+      }
+    };
+
+    document.getElementById('back-btn').onclick = function() {
+      window.location.href = '/mobile/普通用户/登录.html';
+    };
+  </script>
+</body>
+</html>

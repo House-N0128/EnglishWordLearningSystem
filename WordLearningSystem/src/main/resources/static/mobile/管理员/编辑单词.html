@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑单词(App端)</title>
+<style>
+html, body {height:100%;margin:0;padding:0;}
+body {
+  font-family:'PingFang SC',Arial,sans-serif;
+  background: linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  display:flex;
+  flex-direction:column;
+  color:#273245;
+}
+
+/* 顶栏 */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:15px 18px 14px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:11px;
+}
+.back-btn {
+  background:none;border:none;outline:none;cursor:pointer;
+  padding:5px;display:flex;align-items:center;
+}
+.back-icon {width:30px;height:30px;display:inline-block;}
+
+/* 主体内容 */
+.main-panel {
+  flex-grow:1;
+  overflow-y:auto;
+  padding:16px;
+  padding-bottom:20px;
+}
+
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin-bottom:14px;}
+
+.form-group {margin-bottom:12px; display:flex; flex-direction:column;}
+.form-group label {margin-bottom:4px; font-weight:600; color:#318af8;}
+.form-group input, .form-group select, .form-group textarea {
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #c7d9ee;
+  font-size:15px;
+  background:#f6f8fc;
+  outline:none;
+}
+textarea {resize:vertical; min-height:60px;}
+
+.btn-add {
+  width:100%;
+  padding:12px 0;
+  background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);
+  color:#fff;
+  font-weight:600;
+  font-size:17px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  margin-top:10px;
+  box-shadow:0 2px 8px #e3f2fd;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.history.back()">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  编辑单词
+</div>
+
+<div class="main-panel">
+  <div class="page-title">编辑单词信息</div>
+
+  <form id="editWordForm">
+    <div class="form-group">
+      <label>单词 ID</label>
+      <input type="text" id="wordId" value="W1058" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>所属词书</label>
+      <input type="text" id="bookName" value="英语四级词书" required>
+    </div>
+
+    <div class="form-group">
+      <label>英文拼写</label>
+      <input type="text" id="spelling" value="mock" required>
+    </div>
+
+    <div class="form-group">
+      <label>音标</label>
+      <input type="text" id="phonetic" value="[mɒk]">
+    </div>
+
+    <div class="form-group">
+      <label>词性</label>
+      <select id="partOfSpeech" required>
+        <option value="">请选择</option>
+        <option value="n" selected>名词</option>
+        <option value="v">动词</option>
+        <option value="adj">形容词</option>
+        <option value="adv">副词</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>中文释义</label>
+      <textarea id="meaning">嘲笑，模仿</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>例句</label>
+      <textarea id="example">He mocked the teacher's accent.</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>音频链接</label>
+      <input type="text" id="audioLink" value="https://example.com/mock.mp3">
+    </div>
+
+    <div class="form-group">
+      <label>单词状态</label>
+      <select id="status" required>
+        <option value="">请选择</option>
+        <option value="已上架" selected>已上架</option>
+        <option value="未上架">未上架</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-add">保存修改</button>
+  </form>
+</div>
+
+<script>
+const form = document.getElementById('editWordForm');
+
+form.onsubmit = function(e){
+  e.preventDefault();
+
+  const wordId = document.getElementById('wordId').value;
+  const bookName = document.getElementById('bookName').value.trim();
+  const spelling = document.getElementById('spelling').value.trim();
+  const phonetic = document.getElementById('phonetic').value.trim();
+  const pos = document.getElementById('partOfSpeech').value;
+  const meaning = document.getElementById('meaning').value.trim();
+  const example = document.getElementById('example').value.trim();
+  const audio = document.getElementById('audioLink').value.trim();
+  const status = document.getElementById('status').value;
+
+  if(!bookName || !spelling || !pos || !meaning || !status){
+    alert('请填写所有必填字段！');
+    return;
+  }
+
+  alert(`单词 ${spelling} 信息已保存！\n所属词书: ${bookName}\n词性: ${pos}\n状态: ${status}`);
+  // TODO: 这里可以添加 AJAX 提交到后端
+};
+</script>
+
+</body>
+</html>

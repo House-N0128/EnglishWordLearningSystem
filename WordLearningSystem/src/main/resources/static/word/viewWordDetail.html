@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 单词详情</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
+        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
+        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
+        .nav-title { font-size:18px; font-weight:600; }
+        .user-area { display:flex; align-items:center; gap:15px; }
+        .user-name { font-size:15px; }
+        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
+        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
+        .main-container { display:flex; flex:1; }
+        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
+        .sidebar-menu { list-style:none; }
+        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; display:flex; align-items:center; gap:8px; transition:background-color 0.2s; }
+        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
+        .content-area { flex:1; padding:30px; }
+        .page-title { font-size:20px; color:#333; font-weight:600; margin-bottom:30px; }
+        .detail-card { background-color:white; width:600px; margin:0 auto; border-radius:8px; padding:35px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+        .word-header { text-align:center; margin-bottom:30px; }
+        .word-name { font-size:28px; color:#333; font-weight:600; margin-bottom:10px; }
+        .phonetic { font-size:16px; color:#666; margin-bottom:15px; }
+        .section { margin-bottom:25px; }
+        .section-title { font-size:16px; color:#333; font-weight:600; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #eee; }
+        .meaning-item { background-color:#f8f9fa; padding:12px; border-left:3px solid #007bff; border-radius:4px; font-size:14px; color:#555; }
+        .example-item { background-color:#f8f9fa; padding:12px; border-left:3px solid #28a745; border-radius:4px; margin-bottom:10px; }
+        .example-en { font-size:14px; color:#333; margin-bottom:5px; }
+        .example-cn { font-size:13px; color:#666; }
+        .btn-group { display:flex; gap:15px; justify-content:center; margin-top:35px; }
+        .btn { padding:10px 30px; border:none; border-radius:4px; cursor:pointer; font-size:14px; }
+        .btn-favorite { background-color:#ffc107; color:white; }
+        .btn-back { background-color:#007bff; color:white; }
+        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
+        .footer-links { margin-bottom:8px; }
+        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
+        .footer-links a:hover { color:white; }
+    </style>
+</head>
+<body>
+<div class="top-nav">
+    <div class="nav-title">单词学习平台</div>
+    <div class="user-area">
+        <span class="user-name" id="display-name">用户名：-</span>
+        <button class="btn-nav" onclick="window.location.href='../user/getUserInfo.html'">个人中心</button>
+        <button class="btn-nav" onclick="clearAuth()">退出登录</button>
+    </div>
+</div>
+<div class="main-container">
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li onclick="window.location.href='../user/index.html'">首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
+            <li onclick="window.location.href='searchWord.html'">单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+        </ul>
+    </div>
+    <div class="content-area">
+        <div class="page-title" id="page-title">单词详情</div>
+        <div class="detail-card" id="detail-content">
+            <div class="empty-tip" style="text-align:center;color:#999;padding:40px;">请从查询页面搜索单词后查看详情</div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
+    <div>版权所有 &copy; 2025 单词学习平台</div>
+</footer>
+<script src="../api.js"></script>
+<script>
+if (!requireAuth('user')) { /* redirect */ }
+document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
+
+var params = new URLSearchParams(window.location.search);
+var wordId = params.get('id');
+if (wordId) {
+    apiGet('/api/words/' + wordId).then(function(r) {
+        if (r.code === 200) {
+            var w = r.data;
+            document.getElementById('page-title').textContent = '单词详情 - ' + w.englishSpelling;
+            document.getElementById('detail-content').innerHTML =
+                '<div class="word-header"><div class="word-name">' + w.englishSpelling + '</div>' +
+                '<div class="phonetic">' + (w.phoneticSymbol || '') + '</div></div>' +
+                '<div class="section"><div class="section-title">中文释义</div>' +
+                '<div class="meaning-item">' + (w.chineseDefinition || '暂无释义') + '</div></div>' +
+                (w.exampleSentence ? '<div class="section"><div class="section-title">例句</div>' +
+                '<div class="example-item"><div class="example-en">' + w.exampleSentence + '</div></div></div>' : '') +
+                '<div class="btn-group"><button class="btn btn-favorite" onclick="collectWord(\'' + w.wordId + '\')">收藏单词</button>' +
+                '<button class="btn btn-back" onclick="history.back()">返回</button></div>';
+        }
+    });
+}
+
+function collectWord(wordId) {
+    apiPost('/api/collections/add', { wordId: wordId }).then(function(r) {
+        alert(r.code === 200 ? '收藏成功' : r.message);
+    });
+}
+</script>
+</body>
+</html>

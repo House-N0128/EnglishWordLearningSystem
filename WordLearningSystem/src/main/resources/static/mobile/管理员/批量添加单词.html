@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批量上传单词(App端)</title>
+<style>
+html, body {height:100%;margin:0;padding:0;}
+body {
+  font-family:'PingFang SC',Arial,sans-serif;
+  background: linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  display:flex;
+  flex-direction:column;
+  color:#273245;
+}
+
+/* 顶栏 */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:15px 18px 14px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:11px;
+}
+.back-btn {
+  background:none;border:none;outline:none;cursor:pointer;
+  padding:5px;display:flex;align-items:center;
+}
+.back-icon {width:30px;height:30px;display:inline-block;}
+
+/* 主体 */
+.main-panel {
+  flex-grow:1;
+  overflow-y:auto;
+  padding:16px;
+  padding-bottom:20px;
+}
+
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin-bottom:14px;}
+
+.form-group {margin-bottom:12px; display:flex; flex-direction:column;}
+.form-group label {margin-bottom:4px; font-weight:600; color:#318af8;}
+
+.upload-btn {
+  display:block;
+  width:100%;
+  padding:14px;
+  text-align:center;
+  background:#f6f8fc;
+  border:1px solid #c7d9ee;
+  border-radius:12px;
+  font-size:15px;
+  cursor:pointer;
+  transition: background .2s, border-color .2s;
+}
+.upload-btn:hover {
+  background:#e0f0ff;
+  border-color:#318af8;
+}
+
+#fileInput {display:none;}
+
+.word-list {
+  margin-top:14px;
+  max-height:200px;
+  overflow-y:auto;
+  border:1px solid #c7d9ee;
+  border-radius:8px;
+  padding:8px;
+  background:#fff;
+  font-size:14px;
+}
+
+.btn-add {
+  width:100%;
+  padding:12px 0;
+  background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);
+  color:#fff;
+  font-weight:600;
+  font-size:17px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  margin-top:10px;
+  box-shadow:0 2px 8px #e3f2fd;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.history.back()">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  批量上传单词
+</div>
+
+<div class="main-panel">
+  <div class="page-title">选择要上传的 Excel 文件</div>
+
+  <div class="form-group">
+    <label>所属词书</label>
+    <input type="text" id="bookName" placeholder="请输入所属词书" required>
+  </div>
+
+  <div class="form-group">
+    <label>上传文件</label>
+    <button type="button" class="upload-btn" id="uploadBtn">点击选择 Excel 文件</button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls">
+  </div>
+
+  <div class="word-list" id="wordList">
+    <!-- Excel解析结果会显示在这里 -->
+  </div>
+
+  <button class="btn-add" id="submitBtn">确认批量添加</button>
+</div>
+
+<!-- SheetJS库 -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const wordList = document.getElementById('wordList');
+
+uploadBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+let parsedData = [];
+
+function handleFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, {type:'array'});
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    parsedData = XLSX.utils.sheet_to_json(firstSheet, {header:1});
+    displayWords(parsedData);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function displayWords(data){
+  wordList.innerHTML = '';
+  data.forEach((row, idx) => {
+    if(row.length === 0) return;
+    const text = `${idx+1}. ${row.join(' | ')}`;
+    const div = document.createElement('div');
+    div.textContent = text;
+    wordList.appendChild(div);
+  });
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const book = document.getElementById('bookName').value.trim();
+  if(!book){
+    alert('请填写所属词书！');
+    return;
+  }
+  if(parsedData.length === 0){
+    alert('请先选择 Excel 文件！');
+    return;
+  }
+  alert(`成功将 ${parsedData.length} 条单词添加到词书：${book}`);
+  // TODO: 这里可以加 AJAX 提交到后端
+});
+</script>
+
+</body>
+</html>

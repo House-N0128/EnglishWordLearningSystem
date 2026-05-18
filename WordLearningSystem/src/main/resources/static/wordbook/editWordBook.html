@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 编辑词书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主体布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 45px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .sidebar-menu .sub-item:hover {
+            background-color: #fff5f5;
+            color: #dc3545;
+        }
+
+        /* 右侧主内容区 */
+        .content-area {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* 表单卡片 */
+        .form-card {
+            background-color: white;
+            width: 520px;
+            margin: 0 auto;
+            border-radius: 8px;
+            padding: 35px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #007bff;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            min-height: 100px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: #007bff;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus {
+            border-color: #007bff;
+        }
+
+        .input-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+
+        .btn {
+            padding: 10px 35px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name">管理员账号：admin</span>
+        <button class="btn-logout">退出登录</button>
+    </div>
+</div>
+
+<!-- 主体内容 -->
+<div class="main-container">
+    <!-- 左侧侧边栏 -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li>管理员首页</li>
+            <li>用户管理</li>
+            <li class="sub-item">用户管理</li>
+            <li>词书管理</li>
+            <li class="sub-item">添加词书</li>
+            <li class="sub-item">管理词书</li>
+            <li>单词管理</li>
+            <li class="sub-item">添加单词</li>
+            <li class="sub-item">批量添加单词</li>
+            <li class="sub-item">管理单词</li>
+            <li>学习记录查询</li>
+        </ul>
+    </div>
+
+    <!-- 右侧主内容区 -->
+    <div class="content-area">
+        <div class="page-title">编辑词书</div>
+        <div class="form-card">
+            <div class="form-group">
+                <label class="form-label">词书名称</label>
+                <input type="text" class="form-input" value="四级核心词汇">
+                <div class="input-tip">词书名称应简洁明了，便于用户识别</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">难度等级</label>
+                <select class="form-select">
+                    <option>初级</option>
+                    <option selected>中级</option>
+                    <option>高级</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">词书描述</label>
+                <textarea class="form-textarea">包含英语四级考试最核心的3000个词汇，系统化分类，科学记忆，帮助考生高效备考。涵盖听力、阅读、写作等各个方面的必备词汇。</textarea>
+                <div class="input-tip">描述词书的特点、适用人群和学习目标</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">单词数量</label>
+                <input type="number" class="form-input" value="3000">
+                <div class="input-tip">词书包含的单词总数</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">词书状态</label>
+                <select class="form-select">
+                    <option selected>已上架</option>
+                    <option>未上架</option>
+                </select>
+                <div class="input-tip">未上架的词书用户无法看到</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-save">保存修改</button>
+                <button class="btn btn-cancel">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

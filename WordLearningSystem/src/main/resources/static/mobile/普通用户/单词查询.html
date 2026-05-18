@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词查询</title>
+  <style>
+    body {
+      margin:0;
+      background:linear-gradient(135deg,#eaf1ff,#fafeff,#f6f8fc);
+      font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+      min-height:100vh;
+      position:relative;
+      padding-bottom:82px;
+      color:#273245;
+    }
+    .top-bar {
+      display:flex;
+      align-items:center;
+      background:#318af8;
+      color:#fff;
+      padding:14px 22px;
+      border-bottom-left-radius:18px;
+      border-bottom-right-radius:18px;
+      box-shadow:0 2px 12px #318af82a;
+      font-size:18px;
+      font-weight:600;
+    }
+    .main-area {
+      padding:30px 14px 17px 14px;
+    }
+    .title {
+      font-size:18px;
+      font-weight:600;
+      color:#318af8;
+      margin-bottom:20px;
+    }
+    .search-row {
+      display:flex;
+      gap:11px;
+      margin-bottom:17px;
+    }
+    .search-row input {
+      flex:1;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #c7d9ee;
+      font-size:15px;
+      background:#f6f8fc;
+      color:#234;
+    }
+    .search-row button {
+      padding:10px 20px;
+      background:#318af8;
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .collection-list {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .collection-item {
+      background:#fff;
+      border-radius:13px;
+      box-shadow:0 1px 4px #c8e6fa22;
+      padding:15px 13px;
+    }
+    .collection-item .word-name {
+      font-size:16px;
+      font-weight:600;
+      color:#318af8;
+      margin-bottom:4px;
+    }
+    .collection-item .word-pos {
+      font-size:13px;
+      color:#47b1eb;
+      margin-bottom:6px;
+    }
+    .collection-item .word-meaning {
+      font-size:15px;
+      color:#273245;
+    }
+    .action-btn {
+      margin-top:8px;
+      padding:7px 14px;
+      background:#318af8;
+      color:#fff;
+      border:none;
+      border-radius:18px;
+      font-size:14px;
+      font-weight:500;
+      cursor:pointer;
+      box-shadow:0 1px 4px #e7f0fd;
+      transition:background .2s;
+    }
+    .navbar {
+      position:fixed;
+      left:0;
+      bottom:0;
+      width:100vw;
+      background:#fff;
+      box-shadow:0 -2px 18px #b4cafab8;
+      border-top-left-radius:16px;
+      border-top-right-radius:16px;
+      height:62px;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      z-index:10;
+    }
+    .nav-btn {
+      flex:1;
+      text-align:center;
+      color:#318af8;
+      font-size:15px;
+      font-weight:600;
+      padding:0;
+      border:none;
+      background:transparent;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      transition:color .18s;
+      gap:2px;
+    }
+    .nav-btn.active { color:#17c2ae;}
+    .navbar i {
+      font-style:normal;
+      font-size:21px;
+      margin-bottom:2px;
+      font-family:'Arial','PingFang SC';
+      display:block;
+    }
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">单词查询</div>
+  <div class="main-area">
+    <div class="title">单词查询</div>
+    <div class="search-row">
+      <input type="text" placeholder="输入英文/中文查找单词" id="keyword">
+      <button id="search-btn">搜索</button>
+    </div>
+    <div class="collection-list" id="result-list">
+      <div style="text-align:center;color:#8899aa;padding:16px;">输入关键词开始搜索</div>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/词书浏览.html'">📚<br>词书浏览</button>
+    <button class="nav-btn active">🔍<br>单词查询</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/收藏.html'">⭐<br>我的收藏</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/学习记录.html'">📝<br>学习记录</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/个人中心.html'">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    function doSearch() {
+      var keyword = document.getElementById('keyword').value.trim();
+      var box = document.getElementById('result-list');
+      if (!keyword) {
+        box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">输入关键词开始搜索</div>';
+        return;
+      }
+      box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">搜索中...</div>';
+      apiGet('/api/words/search?keyword=' + encodeURIComponent(keyword)).then(function(res) {
+        if (res.code === 200 && res.data && res.data.length > 0) {
+          box.innerHTML = res.data.map(function(w) {
+            return '<div class="collection-item">' +
+              '<div class="word-name">' + (w.englishSpelling || '') + ' <span class="word-pos">' + (w.phoneticSymbol || '') + '</span></div>' +
+              '<div class="word-meaning">' + (w.chineseDefinition || '') + '</div>' +
+              '<button class="action-btn" onclick="location.href=\'/mobile/普通用户/单词详情.html?wordId=' + w.wordId + '\'">查看详情</button>' +
+              '</div>';
+          }).join('');
+        } else {
+          box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到相关单词</div>';
+        }
+      });
+    }
+
+    document.getElementById('search-btn').onclick = doSearch;
+    document.getElementById('keyword').onkeydown = function(e) {
+      if (e.key === 'Enter') { doSearch(); }
+    };
+  </script>
+</body>
+</html>

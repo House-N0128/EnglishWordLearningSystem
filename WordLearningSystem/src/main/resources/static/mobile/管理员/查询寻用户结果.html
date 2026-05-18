@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>查询用户结果(App端)</title>
+<style>
+body {
+  margin:0;
+  padding-bottom:65px;
+  font-family:'PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  color:#273245;
+}
+
+/* 顶部栏（和你提供的注销页面一模一样） */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:15px 16px 14px 8px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:10px;
+  justify-content:space-between;
+}
+
+/* 返回按钮 */
+.left-part {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.back-btn {
+  background:none;
+  border:none;
+  outline:none;
+  cursor:pointer;
+  padding:5px;
+  display:flex;
+  align-items:center;
+}
+
+.back-icon {
+  width:30px;
+  height:30px;
+  display:inline-block;
+}
+
+/* 退出按钮 */
+.btn-logout {
+  background:#fff;
+  color:#318af8;
+  font-weight:600;
+  font-size:15px;
+  border:none;
+  border-radius:16px;
+  padding:7px 20px;
+  cursor:pointer;
+}
+
+.main-panel {padding:8px 12px;}
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin:15px 0;}
+
+.user-card {
+  background:#fff;
+  margin-bottom:13px;
+  border-radius:12px;
+  box-shadow:0 1px 6px #dde6fa16;
+  padding:13px;
+}
+.user-card .row{margin-bottom:3px;}
+.status-normal {color:#25cb75;}
+.status-blocked {color:#e37b4b;}
+
+.action-area {
+  display:flex;
+  gap:12px;
+  margin-top:7px;
+  flex-wrap:wrap;
+}
+
+.action-btn {
+  background:#318af8;
+  color:#fff;
+  border:none;
+  border-radius:11px;
+  padding:6px 18px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.action-btn.cancel {
+  background:#e0e6f2;
+  color:#318af8;
+}
+
+.action-btn.record {
+  background:#ff9f00;
+  color:#fff;
+}
+
+.pager {
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin:10px 0;
+}
+
+.pager-btn {
+  background:#318af8;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:5px 13px;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+  <!-- 顶部栏：加入“返回箭头” -->
+  <div class="top-bar">
+    <div class="left-part">
+      <button class="back-btn" onclick="history.back()">
+        <span class="back-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      <span>查询结果</span>
+    </div>
+
+    <button class="btn-logout" onclick="window.location.href='signin.html'">退出登录</button>
+  </div>
+
+  <div class="main-panel">
+
+    <!-- 用户卡片 -->
+    <div class="user-card">
+      <div class="row">用户ID: 1021 | 账号: xiaoming2021 | 昵称: 小明</div>
+      <div class="row">电话: 13888888888 | 邮箱: xiaoming@example.com</div>
+      <div class="row">注册时间: 2025-02-02</div>
+      <div class="row status-normal">账号状态: 正常</div>
+      <div class="action-area">
+        <button class="action-btn" onclick="editUser(1021)">修改信息</button>
+        <button class="action-btn cancel" onclick="toggleStatus(1021,'disable')">禁用账号</button>
+        <button class="action-btn record" onclick="viewRecord(1021)">查看学习记录</button>
+      </div>
+    </div>
+
+    <div class="user-card">
+      <div class="row">用户ID: 1058 | 账号: langlang | 昵称: 浪浪</div>
+      <div class="row">电话: 13111111111 | 邮箱: lang@test.com</div>
+      <div class="row">注册时间: 2025-03-01</div>
+      <div class="row status-blocked">账号状态: 禁用</div>
+      <div class="action-area">
+        <button class="action-btn" onclick="editUser(1058)">修改信息</button>
+        <button class="action-btn" onclick="toggleStatus(1058,'enable')">启用账号</button>
+        <button class="action-btn record" onclick="viewRecord(1058)">查看学习记录</button>
+      </div>
+    </div>
+
+    <div class="pager">
+      <button class="pager-btn">上一页</button>
+      <span>第1页/共2页</span>
+      <button class="pager-btn">下一页</button>
+    </div>
+  </div>
+
+<script>
+function editUser(userId){
+  alert('修改用户信息: ' + userId);
+}
+function toggleStatus(userId, action){
+  if(action==='disable'){
+    alert('禁用用户: ' + userId);
+  }else{
+    alert('启用用户: ' + userId);
+  }
+}
+function viewRecord(userId){
+  window.location.href = 'study_record.html?userId=' + userId;
+}
+</script>
+
+</body>
+</html>

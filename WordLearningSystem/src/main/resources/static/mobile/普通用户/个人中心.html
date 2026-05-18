@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
+<title>个人中心</title>
+<style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
+.top-bar {display:flex;align-items:center;background:#318af8;color:#fff;padding:15px 22px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;box-shadow:0 2px 12px #318af82a;font-size:18px;font-weight:600;}
+.main-area{padding:32px 14px 20px 14px;}
+.center-card{background:#fff;border-radius:20px;box-shadow:0 2px 14px #dde6fa20;padding:32px 20px 20px;margin-bottom:30px;}
+.info-row{font-size:17px;color:#234;margin-bottom:19px;display:flex;justify-content:space-between;font-family:'Inter','PingFang SC',Arial,sans-serif;}
+.info-label{color:#318af8;font-weight:600;letter-spacing:0.5px;}
+.btn-group{display:flex;flex-direction:column;gap:18px;margin-top:9px;}
+.btn{background:#318af8;color:#fff;border:none;border-radius:23px;padding:13px 0;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px #e3f3ff30;letter-spacing:1px;transition:.2s;}
+.btn.cancel{background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
+.navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
+.nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;font-family:'Inter','PingFang SC',Arial,sans-serif;}
+.nav-btn.active { color:#17c2ae;}
+.navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family:'Arial','PingFang SC';display:block;}
+</style>
+<script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">个人中心</div>
+  <div class="main-area">
+    <div class="center-card" id="profile-card">
+      <div style="text-align:center;color:#8899aa;padding:20px;">加载中...</div>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/词书浏览.html'">📚<br>词书浏览</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/单词查询.html'">🔍<br>单词查询</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/收藏.html'">⭐<br>我的收藏</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/学习记录.html'">📝<br>学习记录</button>
+    <button class="nav-btn active">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    (async function() {
+      var res = await apiGet('/api/user/profile');
+      var card = document.getElementById('profile-card');
+      if (res.code === 200 && res.data) {
+        var u = res.data;
+        card.innerHTML =
+          '<div class="info-row"><span class="info-label">用户昵称</span><span>' + (u.userName || '-') + '</span></div>' +
+          '<div class="info-row"><span class="info-label">登录账号</span><span>' + (u.userId || '-') + '</span></div>' +
+          '<div class="info-row"><span class="info-label">联系电话</span><span>' + (u.phoneNumber || '-') + '</span></div>' +
+          '<div class="info-row"><span class="info-label">邮箱地址</span><span>' + (u.email || '-') + '</span></div>' +
+          '<div class="info-row"><span class="info-label">注册时间</span><span>' + (u.registerTime || '').substring(0,10) + '</span></div>' +
+          '<div class="info-row"><span class="info-label">最后登录时间</span><span>' + (u.lastLoginTime || '').substring(0,16) + '</span></div>' +
+          '<div class="info-row"><span class="info-label">账号状态</span><span>' + (u.accountStatus || '-') + '</span></div>' +
+          '<div class="btn-group">' +
+          '<button class="btn" onclick="location.href=\'/mobile/普通用户/修改个人信息.html\'">修改信息</button>' +
+          '<button class="btn" onclick="location.href=\'/mobile/普通用户/修改密码验证码.html\'">修改密码</button>' +
+          '<button class="btn" onclick="location.href=\'/mobile/普通用户/注销账号.html\'">注销账号</button>' +
+          '<button class="btn cancel" onclick="clearAuth()">退出登录</button>' +
+          '</div>';
+      } else {
+        card.innerHTML = '<div style="text-align:center;color:#d93025;padding:20px;">加载失败</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

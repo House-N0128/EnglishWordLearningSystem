@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
+<title>修改密码</title>
+<style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;}
+.container {max-width:370px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:0 6px 32px rgba(53,119,239,0.08);padding:34px 20px 26px 20px;position:relative;top:36px;}
+h2 {text-align:center;margin:8px 0 16px;font-size:23px;font-weight:600;color:#3577ef;letter-spacing:2px;}
+.form-wrap {display:flex;flex-direction:column;gap:14px;margin-bottom:16px;}
+.input-group {display:flex;align-items:center;background:#f6f8fc;border-radius:9px;padding: 9px 14px;border:1px solid #e1e6ed;}
+.input-group input {border:none;background:transparent;outline:none;width:100%;font-size:16px;padding:5px;color:#222;}
+.input-group input::placeholder {color:#97adc0;font-size:15px;}
+.btn {display:block;width:100%;margin:12px 0 3px 0;padding:13px 0;border-radius:25px;border:none;background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);color:#fff;font-weight:600;font-size:17px;box-shadow:0 2px 8px #e3f2fd;letter-spacing:2px;cursor:pointer;transition:background .2s, box-shadow .2s;}
+.actions {text-align:center;margin-top:16px;font-size:15px;color:#3577ef;}
+.actions a {color:#3577ef;opacity:.85;text-decoration:none;margin:0 5px;transition:opacity .2s;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>设置新密码</h2>
+  <form id="resetForm">
+    <div class="form-wrap">
+      <div class="input-group">
+        <input type="password" placeholder="请输入新密码" name="newPassword" required>
+      </div>
+      <div class="input-group">
+        <input type="password" placeholder="确认新密码" name="confirmPassword" required>
+      </div>
+    </div>
+    <button type="submit" class="btn">重置密码</button>
+  </form>
+  <div class="actions">
+    <a href="personalCenter.html">返回个人中心</a>
+  </div>
+</div>
+
+<script>
+const resetForm = document.getElementById('resetForm');
+resetForm.onsubmit = function(e){
+  e.preventDefault();
+  const pw = resetForm.newPassword.value.trim();
+  const cpw = resetForm.confirmPassword.value.trim();
+  if(pw && cpw && pw === cpw){
+    alert("密码修改成功！");
+    location.href = "personalCenter.html";
+  } else {
+    alert("两次密码输入不一致或为空！");
+  }
+}
+</script>
+</body>
+</html>
