@@ -28,12 +28,28 @@ public class CollectionController {
     @PostMapping("/add")
     public Result<String> add(@RequestHeader("X-User-Id") String userId,
                               @RequestBody Map<String, String> body) {
+        String wordId = body.get("wordId");
+        Collection exist = collectionMapper.findByUserIdAndWordId(userId, wordId);
+        if (exist != null) {
+            return Result.error(400, "该单词已收藏");
+        }
         Collection c = new Collection();
         c.setCollectionId(UUID.randomUUID().toString().substring(0, 20));
         c.setUserId(userId);
-        c.setWordId(body.get("wordId"));
+        c.setWordId(wordId);
         c.setCollectionTime(LocalDateTime.now());
         collectionMapper.insert(c);
         return Result.success("收藏成功");
+    }
+
+    @DeleteMapping("/remove")
+    public Result<String> remove(@RequestHeader("X-User-Id") String userId,
+                                  @RequestBody Map<String, String> body) {
+        String wordId = body.get("wordId");
+        int n = collectionMapper.deleteByUserIdAndWordId(userId, wordId);
+        if (n > 0) {
+            return Result.success("已取消收藏");
+        }
+        return Result.error(404, "未找到该收藏");
     }
 }

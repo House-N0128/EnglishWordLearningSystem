@@ -73,16 +73,36 @@
 <script>
 if (!requireAuth('user')) { /* redirect */ }
 document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
-apiGet('/api/collections').then(function(r) {
+
+function loadCollections() {
+  apiGet('/api/collections').then(function(r) {
     var el = document.getElementById('list');
     if (r.code === 200 && r.data.length > 0) {
-        var html = '';
-        r.data.forEach(function(c) {
-            html += '<div class="word-item"><span class="word-spelling">' + (c.englishSpelling || '-') + '</span><span class="word-phonetic">' + (c.phoneticSymbol || '') + '</span><span class="word-meaning">' + (c.chineseDefinition || '') + '</span><span class="word-time">' + (c.collectionTime ? c.collectionTime.substring(0,10) : '') + '</span><button class="btn-detail" onclick="window.location.href=\'../word/viewWordDetail.html?id=' + c.wordId + '\'">详情</button></div>';
-        });
-        el.innerHTML = html;
+      var html = '';
+      r.data.forEach(function(c) {
+        html += '<div class="word-item">' +
+          '<span class="word-spelling">' + (c.englishSpelling || '-') + '</span>' +
+          '<span class="word-phonetic">' + (c.phoneticSymbol || '') + '</span>' +
+          '<span class="word-meaning">' + (c.chineseDefinition || '') + '</span>' +
+          '<span class="word-time">' + (c.collectionTime ? c.collectionTime.substring(0,10) : '') + '</span>' +
+          '<button class="btn-detail" style="margin-right:6px" onclick="window.location.href=\'../word/viewWordDetail.html?id=' + c.wordId + '\'">详情</button>' +
+          '<button class="btn-detail" style="background-color:#dc3545" onclick="cancelCollect(\'' + c.wordId + '\')">取消收藏</button>' +
+          '</div>';
+      });
+      el.innerHTML = html;
     } else { el.innerHTML = '<div class="empty-hint">暂无收藏</div>'; }
-});
+  });
+}
+
+function cancelCollect(wordId) {
+  if (!confirm('确定取消收藏吗？')) return;
+  apiDelete('/api/collections/remove', { wordId: wordId }).then(function(r) {
+    alert(r.message || '操作失败');
+    loadCollections();
+  });
+}
+
+loadCollections();
 </script>
 </body>
 </html>

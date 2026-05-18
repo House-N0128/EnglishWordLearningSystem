@@ -22,4 +22,10 @@ public interface CollectionMapper {
     @Insert("INSERT INTO t_collection (collectionId, userId, wordId, collectionTime) " +
             "VALUES (#{collectionId}, #{userId}, #{wordId}, #{collectionTime})")
     void insert(Collection collection);
+
+    @Select("SELECT * FROM t_collection WHERE userId = #{userId} AND wordId = #{wordId}")
+    Collection findByUserIdAndWordId(@Param("userId") String userId, @Param("wordId") String wordId);
+
+    @Delete("DELETE FROM t_collection WHERE userId = #{userId} AND wordId = #{wordId}")
+    int deleteByUserIdAndWordId(@Param("userId") String userId, @Param("wordId") String wordId);
 }
