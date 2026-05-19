@@ -39,5 +39,6 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".AdminMainActivity" />
         <activity android:name=".UserManageActivity" />
+        <activity android:name=".UserRecordActivity" />
     </application>
 </manifest>

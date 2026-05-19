@@ -3,8 +3,10 @@ package com.example.wordlearningapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -28,7 +30,7 @@ public class WordSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        ((TextView) findViewById(R.id.toolbar_title)).setText("单词查询");
+        ((TextView) findViewById(R.id.toolbar_title)).setText("单词管理");
         findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
 
         etSearch = findViewById(R.id.et_search);
@@ -41,11 +43,19 @@ public class WordSearchActivity extends AppCompatActivity {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; }
             return false;
         });
+
+        // Load all words initially
+        etSearch.setText("");
+        doSearch();
     }
 
     private void doSearch() {
         String keyword = etSearch.getText().toString().trim();
-        if (keyword.isEmpty()) return;
+        if (keyword.isEmpty()) {
+            tvEmpty.setText("输入关键词搜索单词");
+            tvEmpty.setVisibility(View.VISIBLE);
+            return;
+        }
         tvEmpty.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
 
@@ -75,17 +85,45 @@ public class WordSearchActivity extends AppCompatActivity {
         private final JsonArray data;
         WordAdapter(JsonArray data) { this.data = data; }
 
-        @Override public VH onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(android.R.layout.simple_list_item_2, parent, false);
-            return new VH(v);
+        @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+            LinearLayout card = new LinearLayout(parent.getContext());
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setBackgroundColor(0xFFFFFFFF);
+            card.setPadding(24, 20, 24, 20);
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, 0, 0, 18);
+            card.setLayoutParams(lp);
+            card.setElevation(4);
+
+            TextView nameTv = new TextView(parent.getContext());
+            nameTv.setId(View.generateViewId());
+            nameTv.setTextSize(18);
+            nameTv.setTextColor(0xFF318af8);
+            card.addView(nameTv);
+
+            TextView infoTv = new TextView(parent.getContext());
+            infoTv.setId(View.generateViewId());
+            infoTv.setTextSize(14);
+            infoTv.setTextColor(0xFF47b1eb);
+            infoTv.setPadding(0, 6, 0, 6);
+            card.addView(infoTv);
+
+            TextView chnTv = new TextView(parent.getContext());
+            chnTv.setId(View.generateViewId());
+            chnTv.setTextSize(15);
+            chnTv.setTextColor(0xFF273245);
+            card.addView(chnTv);
+
+            return new VH(card, nameTv, infoTv, chnTv);
         }
 
         @Override public void onBindViewHolder(VH holder, int pos) {
             JsonObject w = data.get(pos).getAsJsonObject();
-            String eng = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
-            String chn = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
-            holder.title.setText(eng);
-            holder.subtitle.setText(chn);
+            holder.name.setText(w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "");
+            holder.info.setText("音标: " + (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull() ? w.get("phoneticSymbol").getAsString() : "无"));
+            holder.chn.setText(w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "");
+
             String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(WordSearchActivity.this, WordDetailActivity.class);
@@ -97,11 +135,12 @@ public class WordSearchActivity extends AppCompatActivity {
         @Override public int getItemCount() { return data.size(); }
 
         class VH extends RecyclerView.ViewHolder {
-            TextView title, subtitle;
-            VH(View v) {
+            TextView name, info, chn;
+            VH(View v, TextView name, TextView info, TextView chn) {
                 super(v);
-                title = v.findViewById(android.R.id.text1);
-                subtitle = v.findViewById(android.R.id.text2);
+                this.name = name;
+                this.info = info;
+                this.chn = chn;
             }
         }
     }
