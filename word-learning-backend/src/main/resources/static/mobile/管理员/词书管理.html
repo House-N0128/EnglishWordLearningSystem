@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<title>词书管理(App端)</title>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family:'PingFang SC',Arial,sans-serif;
+        background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .top-bar {
+        height:48px;
+        background:#318af8;
+        color:#fff;
+        font-size:16px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:0 16px;
+        flex-shrink: 0;
+    }
+    .admin-user {font-weight:bold;}
+    .btn-logout {
+        background:#fff;
+        color:#318af8;
+        font-weight:600;
+        font-size:15px;
+        border:none;
+        border-radius:16px;
+        padding:7px 20px;
+    }
+
+    .main-panel {
+        padding:8px 12px;
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom:70px;
+    }
+
+    .page-title {
+        font-size:19px;
+        color:#318af8;
+        font-weight:700;
+        margin:15px 0;
+    }
+
+    .search-row {
+        display:flex;
+        gap:8px;
+        margin-bottom:14px;
+    }
+    .search-row input,
+    .search-row select {
+        padding:6px 8px;
+        border-radius:7px;
+        border:1px solid #c7d9ee;
+        font-size:14px;
+        background:#f6f8fc;
+    }
+    .search-btn {
+        background:#318af8;
+        color:#fff;
+        border:none;
+        border-radius:12px;
+        font-size:14px;
+        padding:8px 20px;
+    }
+
+    .add-btn {
+        background:#318af8;
+        color:#fff;
+        border:none;
+        border-radius:12px;
+        padding:9px 0;
+        font-size:15px;
+        width:100%;
+        margin-bottom:11px;
+    }
+
+    .book-card {
+        background:#fff;
+        margin-bottom:13px;
+        border-radius:12px;
+        box-shadow:0 1px 6px #dde6fa16;
+        padding:13px;
+    }
+    .book-card .row {margin-bottom:4px;}
+
+    .action-btn {
+        background:#318af8;
+        color:#fff;
+        border:none;
+        border-radius:11px;
+        padding:6px 14px;
+        font-size:13px;
+        margin-right:4px;
+    }
+    .action-btn.cancel {
+        background:#e0e6f2;
+        color:#318af8;
+    }
+
+    .admin-navbar {
+        position:fixed;
+        bottom:0;
+        left:0;
+        width:100vw;
+        height:61px;
+        background:#fff;
+        box-shadow:0 -2px 18px #b4cafab8;
+        border-top-left-radius:14px;
+        border-top-right-radius:14px;
+        display:flex;
+        justify-content:space-around;
+        align-items:center;
+        flex-shrink:0;
+    }
+
+    .admin-nav-btn {
+        flex:1;
+        text-align:center;
+        color:#318af8;
+        font-size:15px;
+        font-weight:600;
+        background:transparent;
+        border:none;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:3px;
+        cursor:pointer;
+    }
+    .admin-nav-btn.active {color:#17c2ae;}
+    .admin-navbar i {font-style:normal;font-size:22px;margin-bottom:2px;}
+</style>
+</head>
+
+<body>
+
+  <!-- 顶部栏 -->
+  <div class="top-bar">
+    <span class="admin-user">管理员：admin001</span>
+    <button class="btn-logout" onclick="window.location.href='signin.html'">退出登录</button>
+  </div>
+
+  <!-- 主体内容 -->
+  <div class="main-panel">
+    
+    <div class="page-title">词书管理</div>
+
+    <!-- 查询区 -->
+    <form class="search-row">
+      <input type="text" placeholder="词书名称 / 词书ID">
+      <select>
+        <option>难度等级</option>
+        <option>全部</option>
+        <option>初级</option>
+        <option>中级</option>
+        <option>高级</option>
+      </select>
+      <select>
+        <option>词书状态</option>
+        <option>全部</option>
+        <option>已上架</option>
+        <option>未上架</option>
+      </select>
+      <button type="submit" class="search-btn">查询</button>
+    </form>
+
+    <!-- 新增词书按钮 -->
+    <button class="add-btn" onclick="window.location.href='addWordBook.html'">新增词书</button>
+
+    <!-- 词书卡片示例 -->
+    <div class="book-card">
+      <div class="row">ID: BK001 | 名称: 英语四级词书 | 难度: 中级</div>
+      <div class="row">词数: 1200 | 创建管理员: admin001</div>
+      <div class="row">创建: 2025-06-01 | 更新: 2025-06-17 | 状态: 已上架</div>
+      <div class="row">
+        <button class="action-btn">编辑</button>
+        <button class="action-btn cancel">删除</button>
+        <button class="action-btn" onclick="window.location.href='addWordToBook.html'">添加单词</button>
+        <button class="action-btn" onclick="window.location.href='manageWordAdmin-app.html'">查看单词</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="admin-navbar">
+    <button class="admin-nav-btn" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn active" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+  </div>
+
+</body>
+</html>

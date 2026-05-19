@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 词书管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主体布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 45px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .sidebar-menu .sub-item:hover {
+            background-color: #fff5f5;
+            color: #dc3545;
+        }
+
+        /* 右侧主内容区 */
+        .content-area {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* 搜索区域 */
+        .search-area {
+            background-color: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .search-input-wrap {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-search {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        /* 表格区域 */
+        .table-area {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .level-beginner {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .level-intermediate {
+            color: #ffc107;
+            font-weight: 500;
+        }
+
+        .level-advanced {
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        .status-online {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .status-offline {
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-view {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+<script src="/api.js"></script>
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name">管理员账号：admin</span>
+        <button class="btn-logout">退出登录</button>
+    </div>
+</div>
+
+<!-- 主体内容 -->
+<div class="main-container">
+    <!-- 左侧侧边栏 -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li>管理员首页</li>
+            <li>用户管理</li>
+            <li class="sub-item">用户管理</li>
+            <li class="active">词书管理</li>
+            <li class="sub-item">添加词书</li>
+            <li class="sub-item">管理词书</li>
+            <li>单词管理</li>
+            <li class="sub-item">添加单词</li>
+            <li class="sub-item">批量添加单词</li>
+            <li class="sub-item">管理单词</li>
+            <li>学习记录查询</li>
+        </ul>
+    </div>
+
+    <!-- 右侧主内容区 -->
+    <div class="content-area">
+        <div class="page-header">
+            <h1 class="page-title">词书管理</h1>
+            <div class="header-buttons">
+                <button class="btn btn-green">新增词书</button>
+                <button class="btn btn-secondary">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="search-area">
+            <div class="search-input-wrap">
+                <input type="text" class="search-input" placeholder="输入词书名称/词书ID搜索">
+                <button class="btn-search">搜索</button>
+            </div>
+            <div class="filter-row">
+                <div>
+                    <label style="font-size:14px; color:#333; margin-right:8px;">难度等级:</label>
+                    <select class="filter-select">
+                        <option>全部</option>
+                        <option>初级</option>
+                        <option>中级</option>
+                        <option>高级</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:14px; color:#333; margin-right:8px;">词书状态:</label>
+                    <select class="filter-select">
+                        <option>全部</option>
+                        <option>已上架</option>
+                        <option>未上架</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表格区域 -->
+        <div class="table-area">
+            <table>
+                <thead>
+                <tr>
+                    <th>词书ID</th>
+                    <th>词书名称</th>
+                    <th>难度等级</th>
+                    <th>单词数量</th>
+                    <th>创建管理员ID</th>
+                    <th>创建时间</th>
+                    <th>更新时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>WB001</td>
+                    <td>四级核心词汇</td>
+                    <td class="level-intermediate">中级</td>
+                    <td>3000</td>
+                    <td>admin001</td>
+                    <td>2024-01-15 14:30:25</td>
+                    <td>2024-03-10 09:15:42</td>
+                    <td class="status-online">已上架</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit">编辑</button>
+                            <button class="btn-delete">删除</button>
+                            <button class="btn-add">添加</button>
+                        </div>
+                        <button class="btn-view">查看单词</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>WB002</td>
+                    <td>六级高频词汇</td>
+                    <td class="level-advanced">高级</td>
+                    <td>5000</td>
+                    <td>admin001</td>
+                    <td>2024-02-10 10:20:35</td>
+                    <td>2024-03-12 16:45:18</td>
+                    <td class="status-online">已上架</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit">编辑</button>
+                            <button class="btn-delete">删除</button>
+                            <button class="btn-add">添加</button>
+                        </div>
+                        <button class="btn-view">查看单词</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>WB003</td>
+                    <td>日常交流词汇</td>
+                    <td class="level-beginner">初级</td>
+                    <td>1500</td>
+                    <td>admin002</td>
+                    <td>2024-01-28 08:45:12</td>
+                    <td>2024-02-15 11:30:25</td>
+                    <td class="status-online">已上架</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit">编辑</button>
+                            <button class="btn-delete">删除</button>
+                            <button class="btn-add">添加</button>
+                        </div>
+                        <button class="btn-view">查看单词</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>WB004</td>
+                    <td>商务英语词汇</td>
+                    <td class="level-intermediate">中级</td>
+                    <td>2000</td>
+                    <td>admin001</td>
+                    <td>2024-03-05 13:15:30</td>
+                    <td>2024-03-05 13:15:30</td>
+                    <td class="status-offline">未上架</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit">编辑</button>
+                            <button class="btn-delete">删除</button>
+                            <button class="btn-add">添加</button>
+                        </div>
+                        <button class="btn-view">查看单词</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>WB005</td>
+                    <td>旅游英语词汇</td>
+                    <td class="level-beginner">初级</td>
+                    <td>1200</td>
+                    <td>admin002</td>
+                    <td>2024-02-22 16:20:45</td>
+                    <td>2024-03-08 14:55:33</td>
+                    <td class="status-online">已上架</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit">编辑</button>
+                            <button class="btn-delete">删除</button>
+                            <button class="btn-add">添加</button>
+                        </div>
+                        <button class="btn-view">查看单词</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <!-- 分页 -->
+            <div class="pagination">
+                <button class="page-btn">上一页</button>
+                <span>第 1 页, 共 2 页</span>
+                <button class="page-btn">下一页</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

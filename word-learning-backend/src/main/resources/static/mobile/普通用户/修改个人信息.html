@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
+<title>修改个人信息</title>
+<style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;padding-bottom:40px;}
+.container {max-width:370px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:0 6px 32px rgba(53,119,239,0.08);padding:24px 20px 26px 20px;position:relative;top:36px;}
+h2 {text-align:center;margin:8px 0 16px;font-size:21sp;font-weight:600;color:#3577ef;letter-spacing:2px;}
+.form-wrap {display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.input-group {display:flex;align-items:center;background:#f6f8fc;border-radius:9px;padding: 9px 14px;border:1px solid #e1e6ed;}
+.input-group input {border:none;background:transparent;outline:none;width:100%;font-size:16px;padding:5px;color:#222;}
+.input-group input::placeholder {color:#97adc0;font-size:15px;}
+.btn {display:block;width:100%;margin:12px 0 3px 0;padding:13px 0;border-radius:25px;border:none;background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);color:#fff;font-weight:600;font-size:17px;box-shadow:0 2px 8px #e3f2fd;letter-spacing:2px;cursor:pointer;transition:background .2s, box-shadow .2s;}
+.error-msg {display:none;text-align:center;padding:10px;border-radius:8px;font-size:14px;background:#fff0f0;color:#d93025;margin-bottom:8px;}
+.success-msg {display:none;text-align:center;padding:10px;border-radius:8px;font-size:14px;background:#e8f5e9;color:#1b8a2e;margin-bottom:8px;}
+.btn:disabled {opacity:.65;cursor:not-allowed;}
+</style>
+<script src="/mobile/api.js"></script>
+</head>
+<body>
+<div class="container">
+  <h2>修改个人信息</h2>
+  <form>
+    <div class="form-wrap">
+      <div class="input-group"><input type="text" placeholder="用户昵称" id="nickname"></div>
+      <div class="input-group"><input type="text" placeholder="联系电话" id="phone"></div>
+      <div class="input-group"><input type="email" placeholder="邮箱地址" id="email"></div>
+    </div>
+    <div class="error-msg" id="error"></div>
+    <div class="success-msg" id="success"></div>
+    <button type="button" class="btn" id="btn-save">保存修改</button>
+  </form>
+
+  <h2 style="margin-top:32px;">修改密码</h2>
+  <form>
+    <div class="form-wrap">
+      <div class="input-group"><input type="password" placeholder="当前密码" id="old-pw"></div>
+      <div class="input-group"><input type="password" placeholder="新密码" id="new-pw"></div>
+      <div class="input-group"><input type="password" placeholder="确认新密码" id="confirm-pw"></div>
+    </div>
+    <div class="error-msg" id="pw-error"></div>
+    <div class="success-msg" id="pw-success"></div>
+    <button type="button" class="btn" id="btn-pw" style="background:linear-gradient(90deg,#52e8bc 60%,#039c83 100%);">修改密码</button>
+  </form>
+</div>
+
+<script>
+if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+// Load current profile
+apiGet('/api/user/profile').then(function(r) {
+  if (r.code === 200 && r.data) {
+    document.getElementById('nickname').value = r.data.userName || '';
+    document.getElementById('phone').value = r.data.phoneNumber || '';
+    document.getElementById('email').value = r.data.email || '';
+  }
+});
+
+// Save profile
+document.getElementById('btn-save').onclick = function() {
+  var btn = this;
+  btn.disabled = true; btn.innerText = '保存中...';
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('success').style.display = 'none';
+
+  apiPut('/api/user/profile', {
+    userName: document.getElementById('nickname').value.trim(),
+    phoneNumber: document.getElementById('phone').value.trim(),
+    email: document.getElementById('email').value.trim()
+  }).then(function(r) {
+    btn.disabled = false; btn.innerText = '保存修改';
+    if (r.code === 200) {
+      var s = document.getElementById('success'); s.innerText = '保存成功！'; s.style.display = 'block';
+    } else {
+      var e = document.getElementById('error'); e.innerText = r.message || '保存失败'; e.style.display = 'block';
+    }
+  });
+};
+
+// Change password
+document.getElementById('btn-pw').onclick = function() {
+  var oldPw = document.getElementById('old-pw').value.trim();
+  var newPw = document.getElementById('new-pw').value.trim();
+  var confirmPw = document.getElementById('confirm-pw').value.trim();
+  var err = document.getElementById('pw-error');
+  var succ = document.getElementById('pw-success');
+  err.style.display = 'none'; succ.style.display = 'none';
+
+  if (!oldPw || !newPw || !confirmPw) { err.innerText = '请填写所有密码字段'; err.style.display = 'block'; return; }
+  if (newPw !== confirmPw) { err.innerText = '两次新密码不一致'; err.style.display = 'block'; return; }
+  if (newPw.length < 6) { err.innerText = '新密码长度至少6位'; err.style.display = 'block'; return; }
+
+  var btn = this;
+  btn.disabled = true; btn.innerText = '修改中...';
+
+  apiPut('/api/user/password', { oldPassword: oldPw, newPassword: newPw }).then(function(r) {
+    btn.disabled = false; btn.innerText = '修改密码';
+    if (r.code === 200) {
+      succ.innerText = '密码修改成功！'; succ.style.display = 'block';
+    } else {
+      err.innerText = r.message || '修改失败'; err.style.display = 'block';
+    }
+  });
+};
+</script>
+</body>
+</html>

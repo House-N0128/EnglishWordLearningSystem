@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>词书浏览</title>
+<style>
+body {
+  margin:0;
+  background:linear-gradient(135deg,#eaf1ff,#fafeff,#f6f8fc);
+  font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  min-height:100vh;
+  position:relative;
+  padding-bottom:82px;
+  color:#273245;
+}
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:14px 22px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+}
+.main-area {
+  padding:30px 14px 17px 14px;
+}
+.title {
+  font-size:18px;
+  font-weight:600;
+  color:#318af8;
+  margin-bottom:20px;
+}
+.filters {
+  display:flex;
+  gap:12px;
+  margin-bottom:17px;
+}
+.filters input, .filters select {
+  padding:9px 14px;
+  border-radius:8px;
+  border:1px solid #c7d9ee;
+  font-size:15px;
+  background:#f6f8fc;
+  color:#234;
+}
+.collection-list {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-bottom:14px;
+}
+.collection-item {
+  background:#fff;
+  border-radius:13px;
+  box-shadow:0 1px 4px #c8e6fa22;
+  padding:15px 13px;
+}
+.collection-item .book-name {
+  font-size:16px;
+  font-weight:600;
+  color:#318af8;
+  margin-bottom:6px;
+}
+.collection-item .book-info {
+  font-size:13px;
+  color:#47b1eb;
+  margin-bottom:6px;
+}
+.collection-item .book-meta {
+  font-size:14px;
+  color:#273245;
+  margin-bottom:6px;
+}
+.action-btn {
+  margin-top:6px;
+  padding:7px 14px;
+  background:#318af8;
+  color:#fff;
+  border:none;
+  border-radius:18px;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  box-shadow:0 1px 4px #e7f0fd;
+  transition:background .2s;
+}
+.navbar {
+  position:fixed;
+  left:0;
+  bottom:0;
+  width:100vw;
+  background:#fff;
+  box-shadow:0 -2px 18px #b4cafab8;
+  border-top-left-radius:16px;
+  border-top-right-radius:16px;
+  height:62px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  z-index:10;
+}
+.nav-btn {
+  flex:1;
+  text-align:center;
+  color:#318af8;
+  font-size:15px;
+  font-weight:600;
+  padding:0;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transition:color .18s;
+  gap:2px;
+}
+.nav-btn.active { color:#17c2ae;}
+.navbar i {
+  font-style:normal;
+  font-size:21px;
+  margin-bottom:2px;
+  font-family:'Arial','PingFang SC';
+  display:block;
+}
+</style>
+<script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">词书浏览</div>
+  <div class="main-area">
+    <div class="title">词书浏览</div>
+    <div class="filters">
+      <select id="filter-difficulty">
+        <option value="">难度等级</option>
+        <option value="初级">初级</option>
+        <option value="中级">中级</option>
+        <option value="高级">高级</option>
+      </select>
+      <input type="text" placeholder="词书名称搜索" id="filter-name">
+    </div>
+    <div class="collection-list" id="book-list">
+      <div style="text-align:center;color:#8899aa;padding:16px;">加载中...</div>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn active">📚<br>词书浏览</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/单词查询.html'">🔍<br>单词查询</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/收藏.html'">⭐<br>我的收藏</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/学习记录.html'">📝<br>学习记录</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/个人中心.html'">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var allBooks = [];
+
+    function render(books) {
+      var box = document.getElementById('book-list');
+      if (!books || books.length === 0) {
+        box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无词书</div>';
+        return;
+      }
+      box.innerHTML = books.map(function(b) {
+        return '<div class="collection-item">' +
+          '<div class="book-name">' + (b.wordBookName || '') + '</div>' +
+          '<div class="book-info">' + (b.difficultyLevel || '') + ' | ' + (b.wordCount || 0) + '词</div>' +
+          '<div class="book-meta">创建时间: ' + (b.createTime || '').substring(0,10) + '</div>' +
+          '<button class="action-btn" onclick="location.href=\'/mobile/普通用户/词书详情.html?bookId=' + b.wordBookId + '\'">开始学习</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    function doFilter() {
+      var diff = document.getElementById('filter-difficulty').value;
+      var name = document.getElementById('filter-name').value.trim().toLowerCase();
+      var filtered = allBooks.filter(function(b) {
+        if (diff && b.difficultyLevel !== diff) return false;
+        if (name && (b.wordBookName || '').toLowerCase().indexOf(name) === -1) return false;
+        return true;
+      });
+      render(filtered);
+    }
+
+    document.getElementById('filter-difficulty').onchange = doFilter;
+    document.getElementById('filter-name').oninput = doFilter;
+
+    (async function() {
+      var res = await apiGet('/api/wordbooks');
+      if (res.code === 200 && res.data) {
+        allBooks = res.data;
+        render(allBooks);
+      } else {
+        document.getElementById('book-list').innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">加载失败</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

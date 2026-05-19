@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 用户管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
+        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
+        .top-nav { background-color:#dc3545; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
+        .nav-title { font-size:18px; font-weight:600; }
+        .user-area { display:flex; align-items:center; gap:15px; }
+        .user-name { font-size:14px; }
+        .btn-logout { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
+        .main-container { display:flex; flex:1; }
+        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
+        .sidebar-menu { list-style:none; }
+        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
+        .sidebar-menu li:hover, .sidebar-menu li.active { background-color:#f8d7da; color:#dc3545; }
+        .content-area { flex:1; padding:25px; }
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .page-title { font-size:22px; color:#333; font-weight:600; }
+        .btn-back { background:#dc3545; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; }
+        .search-area { background:white; padding:20px; border-radius:6px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:15px; align-items:center; }
+        .search-input { flex:1; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
+        .filter-select { padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; min-width:120px; }
+        .btn-search { background:#007bff; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+        .table-area { background:white; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:auto; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
+        th { background:#f8f9fa; }
+        .status-normal { color:#28a745; font-weight:500; }
+        .status-frozen { color:#dc3545; font-weight:500; }
+        .btn-edit { background:#007bff; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:12px; margin-right:5px; }
+        .btn-toggle { background:#ffc107; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:12px; }
+        .empty-hint { text-align:center; color:#999; padding:40px; }
+    </style>
+</head>
+<body>
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name" id="admin-name">管理员</span>
+        <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+    </div>
+</div>
+<div class="main-container">
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li onclick="window.location.href='indexAdmin.html'">管理员首页</li>
+            <li class="active">用户管理</li>
+            <li onclick="window.location.href='../wordbook/manageWordBookAdmin.html'">词书管理</li>
+            <li onclick="window.location.href='../word/manageWordAdmin.html'">单词管理</li>
+        </ul>
+    </div>
+    <div class="content-area">
+        <div class="page-header">
+            <h1 class="page-title">用户管理</h1>
+            <button class="btn-back" onclick="window.location.href='indexAdmin.html'">返回首页</button>
+        </div>
+        <div class="search-area">
+            <input type="text" class="search-input" id="search-keyword" placeholder="输入用户ID搜索">
+            <button class="btn-search" onclick="doSearch()">搜索</button>
+        </div>
+        <div class="table-area">
+            <table><thead><tr><th>用户ID</th><th>昵称</th><th>电话</th><th>邮箱</th><th>注册时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody id="user-tbody"></tbody></table>
+        </div>
+    </div>
+</div>
+<script src="../api.js"></script>
+<script>
+if (!requireAuth('admin')) { /* redirect */ }
+document.getElementById('admin-name').textContent = '管理员：' + (localStorage.getItem('userId') || '');
+
+// Fetch all users by querying known IDs
+var knownIds = ['10001','10002','10003','10004','10005'];
+var users = [];
+Promise.all(knownIds.map(function(id) { return apiGet('/api/user/profile').then(function(r) { if (r.code===200) users.push(r.data); }); })
+).then(renderUsers);
+
+function renderUsers() {
+    var tbody = document.getElementById('user-tbody');
+    var keyword = (document.getElementById('search-keyword').value || '').trim().toLowerCase();
+    var filtered = keyword ? users.filter(function(u) { return (u.userId||'').toLowerCase().indexOf(keyword)>=0 || (u.userName||'').toLowerCase().indexOf(keyword)>=0; }) : users;
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-hint">暂无用户</div></td></tr>'; return; }
+    var html = '';
+    filtered.forEach(function(u) {
+        html += '<tr><td>'+(u.userId||'-')+'</td><td>'+(u.userName||'-')+'</td><td>'+(u.phoneNumber||'-')+'</td><td>'+(u.email||'-')+'</td><td>'+(u.registerTime||'-')+'</td><td class="'+(u.accountStatus==='正常'?'status-normal':'status-frozen')+'">'+(u.accountStatus||'-')+'</td><td></td></tr>';
+    });
+    tbody.innerHTML = html;
+}
+
+function doSearch() { renderUsers(); }
+</script>
+</body>
+</html>

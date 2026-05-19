@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>用户学习记录（管理员）</title>
+<style>
+body {
+  margin:0;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family:'PingFang SC','Inter','HarmonyOS Sans',Arial,sans-serif;
+  padding-bottom:20px;
+}
+
+/* 顶部栏（加入返回按钮版） */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:13px 18px 12px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:11px;
+}
+
+.back-btn {
+  background:none;
+  border:none;
+  outline:none;
+  cursor:pointer;
+  padding:5px 5px 5px 2px;
+  display:flex;
+  align-items:center;
+}
+
+.back-icon { width:30px; height:30px; display:inline-block; }
+
+.main-panel { padding:20px 16px; }
+
+.user-info-box {
+  background:#fff;
+  padding:14px;
+  border-radius:12px;
+  box-shadow:0 1px 6px #dde6fa50;
+  font-size:15px;
+  margin-bottom:18px;
+  color:#273245;
+}
+
+.section-title {
+  font-size:18px;
+  font-weight:700;
+  color:#318af8;
+  margin:18px 0 10px 0;
+}
+
+.stats-bar {
+  font-size:15px;
+  margin-bottom:12px;
+  color:#273245;
+}
+
+.record-table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 2px 10px #dde6fa40;
+}
+
+.record-table th, .record-table td {
+  padding:11px 0;
+  text-align:center;
+  font-size:14px;
+  border-bottom:1px solid #f2f2fc;
+  color:#318af8;
+}
+
+.record-table th {
+  background:#f7faff;
+  font-weight:600;
+}
+
+.record-table tr:last-child td {
+  border-bottom:none;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='getUserInfo.html'">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  用户学习记录
+</div>
+
+<div class="main-panel">
+
+  <!-- 用户基本信息 -->
+  <div class="user-info-box" id="userInfoBox">
+    用户ID：<strong>1021</strong><br>
+    账号：xiaoming2021<br>
+    昵称：小明<br>
+    注册时间：2025-02-02
+  </div>
+
+  <!-- 统计数据 -->
+  <div class="section-title">学习统计</div>
+  <div class="stats-bar">
+    总学习单词数：<strong>156</strong> ｜ 日均学习数：<strong>17</strong>
+  </div>
+
+  <!-- 学习记录表 -->
+  <div class="section-title">学习记录明细</div>
+
+  <table class="record-table">
+    <tr>
+      <th>日期</th><th>学习词书</th><th>学习单词数</th><th>学习时长</th>
+    </tr>
+    <tr>
+      <td>2025-11-22</td><td>英语四级</td><td>20</td><td>42min</td>
+    </tr>
+    <tr>
+      <td>2025-11-23</td><td>雅思进阶</td><td>15</td><td>37min</td>
+    </tr>
+    <tr>
+      <td>2025-11-24</td><td>英语四级</td><td>18</td><td>46min</td>
+    </tr>
+  </table>
+
+</div>
+
+<script>
+// 从URL取用户ID
+const urlParams = new URLSearchParams(window.location.search);
+const uid = urlParams.get('userId');
+console.log("管理员正在查看用户ID:", uid);
+</script>
+
+</body>
+</html>

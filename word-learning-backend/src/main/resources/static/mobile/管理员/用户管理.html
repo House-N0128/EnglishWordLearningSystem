@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>用户管理(App端)</title>
+<style>
+body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
+.top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.admin-user {font-weight:bold;}
+.btn-logout {background:#fff;color:#318af8;font-weight:600;font-size:15px;border:none;border-radius:16px;padding:7px 20px;}
+.main-panel {padding:8px 12px;}
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin:15px 0;}
+.search-row {display:flex;gap:8px;margin-bottom:14px;}
+.search-row input,.search-row select {padding:6px 8px;border-radius:7px;border:1px solid #c7d9ee;font-size:14px;background:#f6f8fc;}
+.search-btn {background:#318af8;color:#fff;border:none;border-radius:12px;font-size:14px;padding:8px 20px;}
+.pager {display:flex;gap:8px;justify-content:center;margin:10px 0;}
+.pager-btn {background:#318af8; color:#fff; border:none; border-radius:14px; padding:5px 13px;font-size:13px;}
+.admin-navbar{position:fixed;left:0;bottom:0;width:100vw;height:61px;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:14px;border-top-right-radius:14px;display:flex;justify-content:space-around;align-items:center;}
+.admin-nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.admin-nav-btn.active{color:#17c2ae;}
+.admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <span class="admin-user">管理员：admin001</span>
+    <button class="btn-logout" onclick="window.location.href='signin.html'">退出登录</button>
+  </div>
+  <div class="main-panel">
+    <div class="page-title">用户管理</div>
+    <form class="search-row" id="searchForm">
+      <input type="text" placeholder="用户ID/账号/昵称" id="keyword">
+      <select>
+        <option>账号状态</option>
+        <option>全部</option>
+        <option>正常</option>
+        <option>禁用</option>
+      </select>
+      <button type="submit" class="search-btn">查询</button>
+    </form>
+    <!-- 这里不显示具体用户卡片 -->
+  </div>
+
+  <div class="admin-navbar">
+    <button class="admin-nav-btn" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn active"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+  </div>
+
+<script>
+// 搜索跳转到查询结果页面
+document.getElementById('searchForm').onsubmit = function(e){
+  e.preventDefault();
+  const keyword = document.getElementById('keyword').value.trim();
+  if(keyword) window.location.href = `resultSearchUser.html?keyword=${encodeURIComponent(keyword)}`;
+}
+</script>
+
+</body>
+</html>

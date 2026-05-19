@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>我的收藏</title>
+  <style>
+    body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
+    .top-bar {display:flex;align-items:center;background:#318af8;color:#fff;padding:14px 22px 14px 22px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;box-shadow:0 2px 12px #318af82a;font-size:18px;font-weight:600;}
+    .main-area {padding:30px 14px 17px 14px;}
+    .title {font-size:18px;font-weight:600;color:#318af8;margin-bottom:20px;}
+    .search-row {display:flex;gap:11px;margin-bottom:17px;}
+    .search-row input {flex:1;padding:10px 12px;border-radius:8px;border:1px solid #c7d9ee;font-size:15px;background:#f6f8fc;color:#234;}
+    .search-row button {padding:0 18px;background:#318af8;border:none;border-radius:19px;color:#fff;font-weight:600;font-size:16px;cursor:pointer;transition:.17s;}
+    .collection-list {display:flex;flex-direction:column;gap:14px;margin-bottom:14px;}
+    .collection-item {background:#fff;border-radius:13px;box-shadow:0 1px 4px #c8e6fa22;padding:15px 13px;display:flex;align-items:center;justify-content:space-between;}
+    .item-info {display:flex;align-items:center;gap:13px;flex-wrap:wrap;}
+    .spelling {font-size:16px;font-weight:600;color:#318af8;margin-right:3px;}
+    .pron {font-size:13px;color:#547bbc;}
+    .pos {font-size:13px;color:#47b1eb;}
+    .collect-date {color:#6578a0;font-size:12px;margin-left:10px;}
+    .item-actions {display:flex;gap:8px;}
+    .action-btn {background:#318af8;color:#fff;border:none;border-radius:18px;padding:7px 14px;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 1px 4px #e7f0fd;transition:background .2s;}
+    .cancel-btn {background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
+    .navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
+    .nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;}
+    .nav-btn.active { color:#17c2ae;}
+    .navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family: 'Arial','PingFang SC';display:block;}
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">我的收藏</div>
+  <div class="main-area">
+    <div class="title">我的收藏</div>
+    <div class="search-row">
+      <input type="text" placeholder="搜索收藏单词（拼写）" id="filter-keyword">
+      <button id="search-btn">搜索</button>
+    </div>
+    <div class="collection-list" id="collection-list">
+      <div style="text-align:center;color:#8899aa;padding:16px;">加载中...</div>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/词书浏览.html'">📚<br>词书浏览</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/单词查询.html'">🔍<br>单词查询</button>
+    <button class="nav-btn active">⭐<br>我的收藏</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/学习记录.html'">📝<br>学习记录</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/个人中心.html'">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var allCollections = [];
+
+    function render(list) {
+      var box = document.getElementById('collection-list');
+      if (!list || list.length === 0) {
+        box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无收藏</div>';
+        return;
+      }
+      box.innerHTML = list.map(function(c) {
+        return '<div class="collection-item">' +
+          '<div class="item-info">' +
+          '<span class="spelling">' + (c.englishSpelling || '') + '</span>' +
+          '<span class="pron">' + (c.phoneticSymbol || '') + '</span>' +
+          '<span class="collect-date">收藏时间：' + (c.collectionTime || '').substring(0,10) + '</span>' +
+          '</div>' +
+          '<div class="item-actions">' +
+          '<button class="action-btn" onclick="location.href=\'/mobile/普通用户/单词详情.html?wordId=' + c.wordId + '\'">详情</button>' +
+          '<button class="action-btn cancel-btn" onclick="cancelCollect(\'' + c.wordId + '\')">取消</button>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function doFilter() {
+      var kw = document.getElementById('filter-keyword').value.trim().toLowerCase();
+      if (!kw) { render(allCollections); return; }
+      var filtered = allCollections.filter(function(c) {
+        return (c.englishSpelling || '').toLowerCase().indexOf(kw) !== -1;
+      });
+      render(filtered);
+    }
+
+    document.getElementById('search-btn').onclick = doFilter;
+    document.getElementById('filter-keyword').onkeydown = function(e) {
+      if (e.key === 'Enter') { doFilter(); }
+    };
+
+    function cancelCollect(wordId) {
+      if (!confirm('确定取消收藏吗？')) return;
+      apiDelete('/api/collections/remove', { wordId: wordId }).then(function(res) {
+        alert(res.message || '操作失败');
+        // Reload
+        loadCollections();
+      });
+    }
+
+    function loadCollections() {
+      apiGet('/api/collections').then(function(res) {
+        if (res.code === 200 && res.data) {
+          allCollections = res.data;
+          render(allCollections);
+        }
+      });
+    }
+
+    loadCollections();
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>我的学习记录</title>
+  <style>
+body {
+  margin:0;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  min-height:100vh;position:relative;padding-bottom:82px;color:#273245;
+}
+.top-bar {
+  display:flex;align-items:center;background:#318af8;color:#fff;
+  padding:14px 22px 14px 22px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;font-size:18px;font-weight:600;
+}
+.main-area {padding:30px 14px 17px 14px;}
+.record-title {font-size:18px;font-weight:600;color:#318af8;margin-bottom:18px;}
+.filters {display:flex;gap:12px;margin-bottom:17px;}
+.filters input, .filters select {padding:9px 14px;border-radius:8px;border:1px solid #c7d9ee;font-size:15px;background:#f6f8fc;color:#222;}
+.stats-bar {font-size:15px;margin-bottom:13px;}
+.history-list {width:100%;border-radius:12px;background:#fff;box-shadow:0 2px 10px #dde6fa20;padding:3px 0;}
+.history-list table {width:100%;border-collapse:collapse;}
+.history-list th, .history-list td {padding:10px 0;font-size:14px;text-align:center;color:#318af8;border-bottom:1px solid #f5f5fc;}
+.history-list th {background:#f7faff;color:#318af8;}
+.history-list tr:last-child td {border-bottom:none;}
+.btn-detail {background:#318af8;color:#fff;border:none;border-radius:17px;padding:7px 14px;font-size:14px;font-weight:500;cursor:pointer;}
+.navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
+.nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;}
+.nav-btn.active { color:#17c2ae;}
+.navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family: 'Arial','PingFang SC';display:block;}
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">我的学习记录</div>
+  <div class="main-area">
+    <div class="record-title">学习记录</div>
+    <div class="filters">
+      <input type="date" id="filter-date-from">
+      <span>至</span>
+      <input type="date" id="filter-date-to">
+      <select id="filter-book">
+        <option value="">全部词书</option>
+      </select>
+    </div>
+    <div class="stats-bar" id="stats-bar">
+      总学习单词数：<strong id="total-words">-</strong> ｜ 总记录数：<strong id="total-records">-</strong>
+    </div>
+    <div class="history-list">
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th><th>学习词书</th><th>学习单词数</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="record-body">
+          <tr><td colspan="4" style="color:#8899aa;padding:20px;">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/词书浏览.html'">📚<br>词书浏览</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/单词查询.html'">🔍<br>单词查询</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/收藏.html'">⭐<br>我的收藏</button>
+    <button class="nav-btn active">📝<br>学习记录</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/个人中心.html'">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var allRecords = [];
+    var bookNames = {};
+
+    function render(records) {
+      var tbody = document.getElementById('record-body');
+      if (!records || records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#8899aa;padding:20px;">暂无学习记录</td></tr>';
+        return;
+      }
+      tbody.innerHTML = records.map(function(r) {
+        return '<tr>' +
+          '<td>' + (r.date || '') + '</td>' +
+          '<td>' + (r.book || '') + '</td>' +
+          '<td>' + r.count + '词</td>' +
+          '<td><button class="btn-detail" onclick="location.href=\'/mobile/普通用户/词书详情.html?bookId=' + r.bookId + '\'">查看词书</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function aggregate(records) {
+      // Aggregate by date + book
+      var map = {};
+      records.forEach(function(r) {
+        var key = r.learningDate + '|' + (r.learnedWordBookId || 'unknown');
+        if (!map[key]) {
+          map[key] = {
+            date: r.learningDate,
+            bookId: r.learnedWordBookId || 'unknown',
+            book: bookNames[r.learnedWordBookId] || r.learnedWordBookId || '未知词书',
+            count: 0
+          };
+        }
+        map[key].count++;
+      });
+
+      var result = [];
+      for (var k in map) { result.push(map[k]); }
+      result.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+      return result;
+    }
+
+    function doFilter() {
+      var dateFrom = document.getElementById('filter-date-from').value;
+      var dateTo = document.getElementById('filter-date-to').value;
+      var bookFilter = document.getElementById('filter-book').value;
+
+      var filtered = allRecords.filter(function(r) {
+        if (dateFrom && r.learningDate < dateFrom) return false;
+        if (dateTo && r.learningDate > dateTo) return false;
+        if (bookFilter && r.learnedWordBookId !== bookFilter) return false;
+        return true;
+      });
+
+      var aggregated = aggregate(filtered);
+      document.getElementById('total-records').innerText = filtered.length;
+      document.getElementById('total-words').innerText = filtered.length;
+      render(aggregated);
+    }
+
+    document.getElementById('filter-date-from').onchange = doFilter;
+    document.getElementById('filter-date-to').onchange = doFilter;
+    document.getElementById('filter-book').onchange = doFilter;
+
+    (async function() {
+      // Load books for filter dropdown and name mapping
+      var booksRes = await apiGet('/api/wordbooks');
+      if (booksRes.code === 200 && booksRes.data) {
+        var sel = document.getElementById('filter-book');
+        booksRes.data.forEach(function(b) {
+          bookNames[b.wordBookId] = b.wordBookName;
+          var opt = document.createElement('option');
+          opt.value = b.wordBookId;
+          opt.innerText = b.wordBookName;
+          sel.appendChild(opt);
+        });
+      }
+
+      var res = await apiGet('/api/records/list');
+      if (res.code === 200 && res.data) {
+        allRecords = res.data;
+        var aggregated = aggregate(allRecords);
+        document.getElementById('total-records').innerText = allRecords.length;
+        document.getElementById('total-words').innerText = allRecords.length;
+        render(aggregated);
+      } else {
+        document.getElementById('record-body').innerHTML = '<tr><td colspan="4" style="color:#8899aa;padding:20px;">加载失败</td></tr>';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>注销账号</title>
+  <style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family:'Inter', 'PingFang SC', 'HarmonyOS Sans', Arial, sans-serif;
+  min-height:100vh;position:relative;color:#273245;}
+.top-bar {display:flex;align-items:center;background:#318af8;color:#fff;
+  padding:15px 18px 14px 6px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;font-size:18px;font-weight:600;gap:11px;}
+.back-btn {background:none;border:none;outline:none;cursor:pointer;padding:5px 5px 5px 2px;display:flex;align-items:center;}
+.back-icon {width:30px;height:30px;display:inline-block;}
+.main-area{padding:26px 15px 12px 15px;}
+.cancel-card{background:#fff;border-radius:20px;box-shadow:0 2px 12px #dde6fa15;padding:30px 18px 26px 18px;margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto;margin-top:38px;}
+.warn{background:#ffebeb;color:#d34;border-radius:11px;padding:14px 11px;margin-bottom:18px;font-size:16px;text-align:center;font-weight:500;}
+.checkbox{margin:12px 0 18px 0;}
+.btn-row{display:flex;gap:18px;}
+.btn{flex:1;background:#318af8;color:#fff;border:none;border-radius:21px;padding:12px 0;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px #dde6fa30;letter-spacing:1px;}
+.btn.cancel{background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
+input[type="password"]{width:100%;padding:13px 10px;border:1px solid #c7d9ee;border-radius:9px;font-size:16px;margin-bottom:13px;}
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.location.href='getUserInfo.html'">
+      <span class="back-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </button>
+    注销账号
+  </div>
+  <div class="main-area">
+    <form class="cancel-card">
+      <div class="warn">注销账号后，所有个人数据（学习记录、收藏、个人信息）将永久删除，不可恢复</div>
+      <input type="password" placeholder="请输入登录密码验证" name="loginPassword" required>
+      <div class="checkbox">
+        <input type="checkbox" id="ack-logout" required>
+        <label for="ack-logout">我已明确知晓注销后果</label>
+      </div>
+      <div class="btn-row">
+        <button type="submit" class="btn">确认注销</button>
+        <button type="button" class="btn cancel" onclick="window.location.href='getUserInfo.html'">取消</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

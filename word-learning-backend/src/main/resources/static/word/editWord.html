@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 编辑单词</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主体布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 160px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 40px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .sidebar-menu .sub-item:hover {
+            background-color: #fff5f5;
+            color: #dc3545;
+        }
+
+        /* 右侧主内容区 */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        /* 表单卡片 */
+        .form-card {
+            background-color: white;
+            width: 650px;
+            margin: 0 auto;
+            border-radius: 8px;
+            padding: 35px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #007bff;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: #007bff;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus {
+            border-color: #007bff;
+        }
+
+        .input-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+
+        .btn {
+            padding: 10px 35px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name">管理员账号：admin</span>
+        <button class="btn-logout">退出登录</button>
+    </div>
+</div>
+
+<!-- 主体内容 -->
+<div class="main-container">
+    <!-- 左侧侧边栏 -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li>管理员首页</li>
+            <li>用户管理</li>
+            <li class="sub-item">用户管理</li>
+            <li>词书管理</li>
+            <li class="sub-item">添加词书</li>
+            <li class="sub-item">管理词书</li>
+            <li class="active">单词管理</li>
+            <li class="sub-item">添加单词</li>
+            <li class="sub-item">批量添加单词</li>
+            <li class="sub-item">管理单词</li>
+            <li>学习记录查询</li>
+        </ul>
+    </div>
+
+    <!-- 右侧主内容区 -->
+    <div class="content-area">
+        <div class="page-title">编辑单词</div>
+        <div class="form-card">
+            <!-- 单词ID -->
+            <div class="form-group">
+                <label class="form-label">单词 ID</label>
+                <input type="text" class="form-input" value="W001" readonly>
+            </div>
+
+            <!-- 所属词书 -->
+            <div class="form-group">
+                <label class="form-label">所属词书</label>
+                <input type="text" class="form-input" value="四级核心词汇" readonly>
+            </div>
+
+            <!-- 英文拼写 -->
+            <div class="form-group">
+                <label class="form-label">英文拼写 *</label>
+                <input type="text" class="form-input" value="abandon">
+                <div class="input-tip">请输入正确的英文单词拼写</div>
+            </div>
+
+            <!-- 音标和词性 -->
+            <div class="form-group form-row">
+                <div class="form-col">
+                    <label class="form-label">音标</label>
+                    <input type="text" class="form-input" value="/əˈbændən/">
+                    <div class="input-tip">国际音标标注</div>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">词性 *</label>
+                    <select class="form-select">
+                        <option selected>动词 (v.)</option>
+                        <option>名词 (n.)</option>
+                        <option>形容词 (adj.)</option>
+                        <option>副词 (adv.)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 中文释义 -->
+            <div class="form-group">
+                <label class="form-label">中文释义 *</label>
+                <textarea class="form-textarea">放弃，抛弃；离弃，丢弃；中止；陷入，沉湎于</textarea>
+                <div class="input-tip">可以输入多个释义，用分号隔开</div>
+            </div>
+
+            <!-- 例句 -->
+            <div class="form-group">
+                <label class="form-label">例句</label>
+                <textarea class="form-textarea">Never abandon your dreams, no matter how difficult the situation is.
+The captain was the last to abandon the sinking ship.</textarea>
+                <div class="input-tip">可以输入多个例句，每个例句占一行</div>
+            </div>
+
+            <!-- 音频链接和单词状态 -->
+            <div class="form-group form-row">
+                <div class="form-col">
+                    <label class="form-label">音频链接</label>
+                    <input type="text" class="form-input" placeholder="请输入单词发音音频链接">
+                    <div class="input-tip">可选，用于单词发音播放</div>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">单词状态</label>
+                    <select class="form-select">
+                        <option selected>已上架</option>
+                        <option>未上架</option>
+                    </select>
+                    <div class="input-tip">未上架的单词用户无法看到</div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-save">保存修改</button>
+                <button class="btn btn-cancel">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

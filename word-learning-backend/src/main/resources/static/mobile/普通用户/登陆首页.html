@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词学习平台 - 首页</title>
+  <style>
+body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family: 'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+  min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
+.top-bar {display:flex;align-items:center;justify-content:space-between;background:#318af8;color:#fff;padding:14px 22px 13px 22px;border-bottom-left-radius:18px;border-bottom-right-radius:18px;box-shadow:0 2px 12px #318af82a;font-size:17px;}
+.top-bar .username {font-weight:600;font-size:18px;letter-spacing:1px;}
+.main-area {padding:30px 14px 17px 14px;}
+.study-cards {display:flex;gap:14px;margin-bottom:26px;}
+.card {background:#fff;border-radius:14px;box-shadow:0 2px 9px #dde6fa24;padding:15px 11px;font-size:15px;text-align:center;flex:1;}
+.card strong {font-size:19px;color:#318af8;}
+.recommend {margin-bottom:18px;}
+.recommend-title {font-size:17px;font-weight:600;color:#318af8;margin-bottom:8px;}
+.book-list {display:flex;flex-direction:column;gap:14px;}
+.book-item {background:#f6f8fc;border-radius:12px;box-shadow:0 1px 5px #e1e8fa13;padding:13px 14px;font-size:15px;display:flex;flex-direction:column;}
+.book-info {margin-bottom:7px;font-weight:500;}
+.book-desc {font-size:13px;color:#547bbc;}
+.btn-select {margin-top:8px;width:110px;align-self:flex-end;background:#318af8;color:#fff;border:none;border-radius:21px;padding:8px 0;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 1px 4px #e7f0fd;transition:background .19s;}
+.recent-words-title {font-size:16px;font-weight:600;color:#318af8;margin:18px 0 8px 0;}
+.recent-words {display:flex;gap:10px;}
+.recent-word {background:#fff;border-radius:7px;box-shadow:0 1px 4px #dde2f230;padding:10px 13px;font-size:14px;text-align:center;flex:1;}
+.recent-word .word {font-size:15px;font-weight:500;color:#318af8;}
+.recent-word .pos {color:#47b1eb;font-size:13px;}
+.recent-word .trans {color:#222;font-size:13px;}
+.navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
+.nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;}
+.nav-btn.active { color:#17c2ae;}
+.navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family: 'Arial','PingFang SC';display:block;}
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <span class="username" id="display-name">加载中...</span>
+    <span style="font-size:14px;cursor:pointer" onclick="clearAuth()">退出</span>
+  </div>
+  <div class="main-area">
+    <div class="study-cards">
+      <div class="card">今日学习<br><strong id="stat-today">-</strong>词</div>
+      <div class="card">累计学习<br><strong id="stat-total">-</strong>词</div>
+      <div class="card">当前词书<br><strong id="stat-book">-</strong></div>
+    </div>
+    <div class="recommend">
+      <div class="recommend-title">推荐词书</div>
+      <div class="book-list" id="book-list">
+        <div style="text-align:center;color:#8899aa;padding:16px;">加载中...</div>
+      </div>
+    </div>
+    <div>
+      <div class="recent-words-title">最近学习</div>
+      <div class="recent-words" id="recent-words">
+        <div style="text-align:center;color:#8899aa;padding:16px;font-size:14px;">暂无学习记录</div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="nav-btn active" onclick="location.href='/mobile/普通用户/登陆首页.html'">🏠<br>首页</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/词书浏览.html'">📚<br>词书浏览</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/单词查询.html'">🔍<br>单词查询</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/收藏.html'">⭐<br>我的收藏</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/学习记录.html'">📝<br>学习记录</button>
+    <button class="nav-btn" onclick="location.href='/mobile/普通用户/个人中心.html'">👤<br>个人中心</button>
+  </div>
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    (async function() {
+      // 1. Load user profile
+      var profileRes = await apiGet('/api/user/profile');
+      if (profileRes.code === 200) {
+        document.getElementById('display-name').innerText = profileRes.data.userName || profileRes.data.userId;
+      }
+
+      // 2. Load learning stats
+      var statsRes = await apiGet('/api/records/stats');
+      if (statsRes.code === 200) {
+        var s = statsRes.data;
+        document.getElementById('stat-today').innerText = s.todayCount || 0;
+        document.getElementById('stat-total').innerText = s.totalCount || 0;
+        document.getElementById('stat-book').innerText = s.currentBookName || '无';
+      }
+
+      // 3. Load recent words
+      var recentRes = await apiGet('/api/records/recent');
+      var recentBox = document.getElementById('recent-words');
+      if (recentRes.code === 200 && recentRes.data && recentRes.data.length > 0) {
+        recentBox.innerHTML = recentRes.data.map(function(w) {
+          return '<div class="recent-word"><div class="word">' + (w.englishSpelling || '') + '</div><div class="trans">' + (w.chineseDefinition || '') + '</div></div>';
+        }).join('');
+      } else {
+        recentBox.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;font-size:14px;">暂无学习记录</div>';
+      }
+
+      // 4. Load word books
+      var booksRes = await apiGet('/api/wordbooks');
+      var bookBox = document.getElementById('book-list');
+      if (booksRes.code === 200 && booksRes.data && booksRes.data.length > 0) {
+        bookBox.innerHTML = booksRes.data.map(function(b) {
+          var diff = b.difficultyLevel || '';
+          var count = b.wordCount || 0;
+          var desc = b.wordBookDescription || '';
+          return '<div class="book-item">' +
+            '<div class="book-info">' + (b.wordBookName || '') + '｜' + diff + '｜' + count + '词</div>' +
+            '<div class="book-desc">' + desc + '</div>' +
+            '<button class="btn-select" onclick="location.href=\'/mobile/普通用户/词书详情.html?bookId=' + b.wordBookId + '\'">选择学习</button>' +
+            '</div>';
+        }).join('');
+      } else {
+        bookBox.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无词书</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

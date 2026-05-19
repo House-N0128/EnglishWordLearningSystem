@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>单词学习平台 - 登录</title>
+  <style>
+    body {
+      margin:0;
+      background:linear-gradient(135deg,#6cc3ff 0%, #3577ef 100%);
+      font-family:'PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+      min-height:100vh;
+    }
+    .container {
+      max-width:370px;
+      margin:0 auto;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 6px 32px rgba(53,119,239,0.08);
+      padding:34px 20px 26px 20px;
+      position:relative;
+      top:36px;
+    }
+    .role-tabs {
+      display:flex;
+      justify-content:center;
+      margin-bottom:22px;
+    }
+    .role-tab {
+      flex:1;
+      padding:13px 0;
+      font-size:16px;
+      color:#3577ef;
+      background:transparent;
+      border:none;
+      border-bottom:2px solid transparent;
+      cursor:pointer;
+      transition:color .2s;
+    }
+    .role-tab.selected {
+      color:#2363cf;
+      border-bottom:2.5px solid #3577ef;
+      font-weight:600;
+      letter-spacing:1px;
+    }
+    h2 {
+      text-align:center;
+      margin-top:8px;
+      margin-bottom:16px;
+      font-size:23px;
+      font-weight:600;
+      color:#3577ef;
+      letter-spacing:2px;
+    }
+    .form-wrap {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-bottom:16px;
+    }
+    .input-group {
+      display:flex;
+      align-items:center;
+      background:#f6f8fc;
+      border-radius:9px;
+      padding: 9px 14px;
+      border:1px solid #e1e6ed;
+    }
+    .input-group input {
+      border:none;
+      background:transparent;
+      outline:none;
+      width:100%;
+      font-size:16px;
+      padding:5px;
+      color:#222;
+    }
+    .input-group input::placeholder {
+      color:#97adc0;
+      font-size:15px;
+    }
+    .btn {
+      display:block;
+      width:100%;
+      margin:12px 0 3px 0;
+      padding:13px 0;
+      border-radius:25px;
+      border:none;
+      background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);
+      color:#fff;
+      font-weight:600;
+      font-size:17px;
+      box-shadow:0 2px 8px #e3f2fd;
+      letter-spacing:2px;
+      cursor:pointer;
+      transition:background .2s, box-shadow .2s;
+    }
+    .btn-register {
+      background: linear-gradient(90deg, #52e8bc 60%, #039c83 100%);
+    }
+    .actions {
+      text-align:right;
+      display:flex;
+      justify-content:space-between;
+      margin:16px 0 8px 0;
+      font-size:15px;
+      color:#3577ef;
+    }
+    .actions a {
+      color:#3577ef;
+      opacity:.85;
+      text-decoration:none;
+      margin:0 3px;
+      transition:opacity .2s;
+    }
+    .admin-tip {
+      display:none;
+      text-align:center;
+      margin-top:8px;
+      font-size:13px;
+      color:#e38056;
+      background:#fff7f2;
+      padding:7px;
+      border-radius:7px;
+    }
+    .error-msg {
+      display:none;
+      text-align:center;
+      margin:8px 0;
+      padding:10px;
+      border-radius:8px;
+      font-size:14px;
+      background:#fff0f0;
+      color:#d93025;
+    }
+    .btn:disabled {
+      opacity:.65;
+      cursor:not-allowed;
+    }
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="role-tabs">
+      <button class="role-tab selected" id="tab-user" type="button">普通用户</button>
+      <button class="role-tab" id="tab-admin" type="button">管理员</button>
+    </div>
+    <h2 id="login-title">单词学习平台 - 普通用户登录</h2>
+    <form>
+      <div class="form-wrap">
+        <div class="input-group">
+          <input type="text" placeholder="登录账号" name="loginAccount" id="loginAccount" required>
+        </div>
+        <div class="input-group">
+          <input type="password" placeholder="登录密码" name="loginPassword" id="loginPassword" required>
+        </div>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+      <button type="button" class="btn" id="login-btn">登录</button>
+      <button type="button" class="btn btn-register" id="register-btn">注册账号</button>
+    </form>
+    <div class="actions">
+      <a href="#">忘记密码</a>
+      <span>
+        <a href="#">账号问题咨询</a> | <a href="#">隐私政策</a>
+      </span>
+    </div>
+    <div class="admin-tip" id="admin-tip" style="display:none;">
+      管理员账号仅用于系统管理，请勿泄露
+    </div>
+  </div>
+  <script>
+    var currentRole = 'user';
+
+    var tabUser = document.getElementById('tab-user');
+    var tabAdmin = document.getElementById('tab-admin');
+    var title = document.getElementById('login-title');
+    var tip = document.getElementById('admin-tip');
+    var errorMsg = document.getElementById('error-msg');
+    var loginBtn = document.getElementById('login-btn');
+    var registerBtn = document.getElementById('register-btn');
+
+    tabUser.onclick = function() {
+      currentRole = 'user';
+      tabUser.classList.add('selected');
+      tabAdmin.classList.remove('selected');
+      title.innerText = '单词学习平台 - 普通用户登录';
+      tip.style.display = 'none';
+      errorMsg.style.display = 'none';
+    };
+    tabAdmin.onclick = function() {
+      currentRole = 'admin';
+      tabAdmin.classList.add('selected');
+      tabUser.classList.remove('selected');
+      title.innerText = '单词学习平台 - 管理员登录';
+      tip.style.display = 'block';
+      errorMsg.style.display = 'none';
+    };
+
+    function showError(msg) {
+      errorMsg.innerText = msg;
+      errorMsg.style.display = 'block';
+    }
+
+    loginBtn.onclick = async function() {
+      var userId = document.getElementById('loginAccount').value.trim();
+      var password = document.getElementById('loginPassword').value.trim();
+      if (!userId || !password) {
+        showError('请输入账号和密码');
+        return;
+      }
+      errorMsg.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.innerText = '登录中...';
+
+      var endpoint = currentRole === 'admin' ? '/api/admin/login' : '/api/user/login';
+      var result = await apiPost(endpoint, { userid: userId, password: password });
+
+      loginBtn.disabled = false;
+      loginBtn.innerText = '登录';
+
+      if (result.code === 200) {
+        setAuth(result.data.userid, currentRole);
+        if (currentRole === 'admin') {
+          window.location.href = '/mobile/管理员/管理员首页.html';
+        } else {
+          window.location.href = '/mobile/普通用户/登陆首页.html';
+        }
+      } else {
+        showError(result.message || '登录失败，请重试');
+      }
+    };
+
+    registerBtn.onclick = function() {
+      window.location.href = '/mobile/普通用户/用户注册.html';
+    };
+  </script>
+</body>
+</html>

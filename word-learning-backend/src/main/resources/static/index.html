@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 登录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft Yahei", sans-serif; }
+        body {
+            background: linear-gradient(135deg, #4a88f4 0%, #8a4fc9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-card {
+            background: #fff;
+            width: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            background: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 25px 15px;
+        }
+        .card-header h1 { font-size: 26px; margin-bottom: 8px; font-weight: 600; }
+        .card-header p { font-size: 15px; opacity: 0.9; }
+        .tab-bar { display: flex; border-bottom: 1px solid #eee; }
+        .tab {
+            flex: 1; text-align: center; padding: 15px; cursor: pointer;
+            font-size: 16px; color: #666; background: #f8f9fa; transition: all 0.2s;
+        }
+        .tab.active { background: #fff; color: #007bff; border-bottom: 2px solid #007bff; }
+        .form-content { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 15px; color: #333; margin-bottom: 8px; }
+        .form-group input {
+            width: 100%; padding: 12px 15px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 15px; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #007bff; }
+        .btn {
+            width: 100%; padding: 13px; border: none; border-radius: 6px;
+            font-size: 16px; font-weight: 500; cursor: pointer; margin-bottom: 15px; transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-login { background: #007bff; color: #fff; }
+        .btn-register { background: #28a745; color: #fff; }
+        .error-msg {
+            display: none; text-align: center; margin-top: 8px; font-size: 14px;
+            color: #e74c3c; background: #fef0ef; padding: 10px; border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <div class="card-header">
+        <h1>单词学习平台</h1>
+        <p>开启您的英语学习之旅</p>
+    </div>
+    <div class="tab-bar">
+        <div class="tab active" id="tab-user" onclick="switchTab('user')">普通用户</div>
+        <div class="tab" id="tab-admin" onclick="switchTab('admin')">管理员</div>
+    </div>
+    <div class="form-content">
+        <div class="form-group">
+            <label>登录账号</label>
+            <input type="text" id="userId" placeholder="请输入您的账号">
+        </div>
+        <div class="form-group">
+            <label>登录密码</label>
+            <input type="password" id="password" placeholder="请输入您的密码" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-login" onclick="doLogin()">登录</button>
+        <button class="btn btn-register" id="btn-register" onclick="goRegister()">注册账号</button>
+        <div class="error-msg" id="error-msg"></div>
+    </div>
+</div>
+<script src="api.js"></script>
+<script>
+var currentRole = 'user';
+
+function switchTab(role) {
+    currentRole = role;
+    document.getElementById('tab-user').classList.toggle('active', role === 'user');
+    document.getElementById('tab-admin').classList.toggle('active', role === 'admin');
+    document.getElementById('btn-register').style.display = role === 'user' ? 'block' : 'none';
+    document.getElementById('error-msg').style.display = 'none';
+}
+
+function showError(msg) {
+    var el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+async function doLogin() {
+    var userId = document.getElementById('userId').value.trim();
+    var password = document.getElementById('password').value.trim();
+    if (!userId || !password) { showError('请输入账号和密码'); return; }
+
+    var endpoint = currentRole === 'admin' ? '/api/admin/login' : '/api/user/login';
+    var result = await apiPost(endpoint, { userid: userId, password: password });
+
+    if (result.code === 200) {
+        setAuth(result.data.userid, currentRole);
+        window.location.href = currentRole === 'admin' ? '/admin/indexAdmin.html' : '/user/index.html';
+    } else {
+        showError(result.message);
+    }
+}
+
+function goRegister() {
+    window.location.href = '/user/signupOrdinaryUser.html';
+}
+</script>
+</body>
+</html>

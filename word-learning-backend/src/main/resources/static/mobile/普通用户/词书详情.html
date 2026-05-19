@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
+  <title>词书详情</title>
+  <style>
+    body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+      font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;
+      min-height:100vh;color:#273245;}
+    .top-bar {
+      display:flex;align-items:center;gap:10px;
+      background:#318af8;color:#fff;
+      padding:13px 18px;
+      border-bottom-left-radius:18px;
+      border-bottom-right-radius:18px;
+      box-shadow:0 2px 12px #318af82a;
+      font-size:18px;font-weight:600;
+    }
+    .back-btn {
+      background:none;
+      border:none;
+      outline:none;
+      cursor:pointer;
+      padding:4px 4px 4px 0;
+      display:flex;
+      align-items:center;
+    }
+    .back-icon { width:30px; height:30px; display:inline-block; }
+    .main-area {padding:26px 16px;}
+    .book-name {font-size:22px;font-weight:700;color:#318af8;margin-bottom:10px;}
+    .book-meta {font-size:14px;color:#5b77a0;margin-bottom:18px;}
+    .section-title {font-size:17px;font-weight:600;color:#318af8;margin:18px 0 8px;}
+    .book-desc {font-size:15px;line-height:1.6;color:#345;}
+    .word-list {display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+    .word-item {background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px #dde6fa30;display:flex;justify-content:space-between;align-items:center;}
+    .word-item .eng {font-size:15px;font-weight:600;color:#318af8;}
+    .word-item .chn {font-size:14px;color:#555;}
+    .btn-learn{
+      margin-top:28px;width:100%;
+      background:#318af8;color:#fff;border:none;border-radius:25px;
+      padding:13px 0;font-size:17px;font-weight:600;
+      cursor:pointer;box-shadow:0 2px 10px #d9eaff;
+    }
+    .loading {text-align:center;color:#8899aa;padding:20px;}
+  </style>
+  <script src="/mobile/api.js"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="history.back()">
+      <span class="back-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </button>
+    词书详情
+  </div>
+
+  <div class="main-area" id="main-area">
+    <div class="loading">加载中...</div>
+  </div>
+
+  <script>
+    if (!requireAuth('user')) { throw new Error('unauthorized'); }
+
+    var params = new URLSearchParams(window.location.search);
+    var bookId = params.get('bookId');
+
+    if (!bookId) {
+      document.getElementById('main-area').innerHTML = '<div class="loading">参数错误</div>';
+    } else {
+      (async function() {
+        var [bookRes, wordsRes] = await Promise.all([
+          apiGet('/api/wordbooks'),
+          apiGet('/api/words?wordBookId=' + bookId)
+        ]);
+
+        var books = (bookRes.code === 200 && bookRes.data) ? bookRes.data : [];
+        var book = null;
+        for (var i = 0; i < books.length; i++) {
+          if (books[i].wordBookId === bookId) { book = books[i]; break; }
+        }
+
+        var words = (wordsRes.code === 200 && wordsRes.data) ? wordsRes.data : [];
+
+        var html = '';
+        if (book) {
+          html += '<div class="book-name">' + (book.wordBookName || '') + '</div>';
+          html += '<div class="book-meta">难度：' + (book.difficultyLevel || '') + '｜共 ' + (book.wordCount || words.length) + ' 词</div>';
+          html += '<div class="book-meta">创建时间：' + (book.createTime || '').substring(0,10) + '</div>';
+          html += '<div class="section-title">词书简介</div>';
+          html += '<div class="book-desc">' + (book.wordBookDescription || '暂无简介') + '</div>';
+        } else {
+          html += '<div class="book-name">词书详情</div>';
+        }
+
+        html += '<div class="section-title">单词列表（' + words.length + '个）</div>';
+        html += '<div class="word-list">';
+        if (words.length > 0) {
+          words.forEach(function(w) {
+            html += '<div class="word-item">' +
+              '<span><span class="eng">' + (w.englishSpelling || '') + '</span> <span class="chn">' + (w.chineseDefinition || '') + '</span></span>' +
+              '</div>';
+          });
+        } else {
+          html += '<div class="loading">暂无单词</div>';
+        }
+        html += '</div>';
+
+        html += '<button class="btn-learn" onclick="location.href=\'/mobile/普通用户/单词学习.html?bookId=' + bookId + '\'">开始学习</button>';
+
+        document.getElementById('main-area').innerHTML = html;
+      })();
+    }
+  </script>
+</body>
+</html>
