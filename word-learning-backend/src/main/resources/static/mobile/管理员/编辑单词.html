@@ -85,25 +85,25 @@ select.form-input { appearance: none; }
 <div class="main-panel">
   <div class="page-title">编辑单词信息</div>
 
-  <form id="editWordForm">
+  
     <div class="form-group">
       <label>单词 ID</label>
-      <input type="text" id="wordId" value="W1058" readonly>
+      <input type="text" id="wordId" value="W1058" readonly inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>所属词书</label>
-      <input type="text" id="bookName" value="英语四级词书" required>
+      <input type="text" id="bookName" value="英语四级词书" required inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>英文拼写</label>
-      <input type="text" id="spelling" value="mock" required>
+      <input type="text" id="spelling" value="mock" required inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>音标</label>
-      <input type="text" id="phonetic" value="[mɒk]">
+      <input type="text" id="phonetic" value="[mɒk]" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
@@ -130,7 +130,7 @@ select.form-input { appearance: none; }
 
     <div class="form-group">
       <label>音频链接</label>
-      <input type="text" id="audioLink" value="https://example.com/mock.mp3">
+      <input type="text" id="audioLink" value="https://example.com/mock.mp3" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
@@ -143,7 +143,7 @@ select.form-input { appearance: none; }
     </div>
 
     <button type="submit" class="btn-add">保存修改</button>
-  </form>
+  
 </div>
 
 <script>

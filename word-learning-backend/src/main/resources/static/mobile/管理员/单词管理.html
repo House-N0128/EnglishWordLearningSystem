@@ -81,8 +81,8 @@ select.form-input { appearance: none; }
 </div>
   <div class="main-panel">
     <div class="page-title">单词管理</div>
-    <form class="search-row">
-      <input type="text" placeholder="英文拼写/单词ID">
+    
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="英文拼写/单词ID" inputmode="text" autocomplete="off" spellcheck="false">
       <select>
         <option>所属词书</option>
       </select>
@@ -93,7 +93,7 @@ select.form-input { appearance: none; }
         <option>未上架</option>
       </select>
       <button type="submit" class="search-btn">查询</button>
-    </form>
+    
     <div class="btn-group">
       <button class="add-btn" onclick="window.location.href='addWord.html'">新增单词</button>
       <button class="add-btn" onclick="window.location.href='batchAddWord.html'">批量导入</button>

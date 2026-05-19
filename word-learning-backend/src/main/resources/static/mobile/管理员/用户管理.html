@@ -82,8 +82,8 @@ select.form-input { appearance: none; }
 </div>
   <div class="main-panel">
     <div class="page-title">用户管理</div>
-    <form class="search-row" id="searchForm">
-      <input type="text" placeholder="用户ID/账号/昵称" id="keyword">
+    
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="用户ID/账号/昵称" id="keyword" inputmode="text" autocomplete="off" spellcheck="false">
       <select>
         <option>账号状态</option>
         <option>全部</option>
@@ -91,7 +91,7 @@ select.form-input { appearance: none; }
         <option>禁用</option>
       </select>
       <button type="submit" class="search-btn">查询</button>
-    </form>
+    
     <!-- 这里不显示具体用户卡片 -->
   </div>
 
