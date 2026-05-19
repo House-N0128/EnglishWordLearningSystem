@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta charset="UTF-8">
 <title>词书管理</title>
 <script src="/mobile/api.js"></script>
@@ -77,8 +77,8 @@ body {
 
 <div class="section">
   <div class="search-bar">
-    <input type="text" placeholder="词书名称搜索" id="filter-name" oninput="doFilter()">
-    <select id="filter-diff" onchange="doFilter()">
+    <input type="text" placeholder="词书名称搜索" id="filter-name">
+    <select id="filter-diff">
       <option value="">全部难度</option>
       <option value="初级">初级</option>
       <option value="中级">中级</option>
@@ -121,9 +121,16 @@ function render(books) {
   }).join("");
 }
 
+var composing = false;
+var filterInput = document.getElementById("filter-name");
+filterInput.addEventListener("compositionstart", function() { composing = true; });
+filterInput.addEventListener("compositionend", function() { composing = false; doFilter(); });
+filterInput.addEventListener("input", function() { if (!composing) doFilter(); });
+document.getElementById("filter-diff").addEventListener("change", doFilter);
+
 function doFilter() {
   var diff = document.getElementById("filter-diff").value;
-  var name = document.getElementById("filter-name").value.trim().toLowerCase();
+  var name = filterInput.value.trim().toLowerCase();
   var filtered = allBooks.filter(function(b) {
     if (diff && b.difficultyLevel !== diff) return false;
     if (name && (b.wordBookName || '').toLowerCase().indexOf(name) === -1) return false;
