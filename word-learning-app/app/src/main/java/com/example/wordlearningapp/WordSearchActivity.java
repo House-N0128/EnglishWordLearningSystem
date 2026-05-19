@@ -39,10 +39,15 @@ public class WordSearchActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.toolbar_title)).setText(isAdmin ? "单词管理" : "单词查询");
         findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
 
+        etSearch = findViewById(R.id.et_search);
+        tvEmpty = findViewById(R.id.tv_empty);
+        progress = findViewById(R.id.progress);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         if (isAdmin) {
             etSearch.setHint("输入关键词搜索，不输入则显示全部");
-            // Add button
-            LinearLayout root = (LinearLayout) recyclerView.getParent().getParent();
+            LinearLayout root = (LinearLayout) findViewById(android.R.id.content);
             Button addBtn = new Button(this);
             addBtn.setText("+ 新增单词");
             addBtn.setTextColor(0xFFFFFFFF);
@@ -51,17 +56,11 @@ public class WordSearchActivity extends AppCompatActivity {
             addBtn.setPadding(14, 12, 14, 12);
             LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            abp.setMargins(28, 0, 28, 14);
+            abp.setMargins(28, 4, 28, 14);
             addBtn.setLayoutParams(abp);
             addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditWordActivity.class)));
-            root.addView(addBtn, 0);
+            root.addView(addBtn, 2);
         }
-
-        etSearch = findViewById(R.id.et_search);
-        tvEmpty = findViewById(R.id.tv_empty);
-        progress = findViewById(R.id.progress);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; }
