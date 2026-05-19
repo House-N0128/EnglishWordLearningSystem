@@ -65,7 +65,14 @@ body {
 .nav-item .nav-icon { font-size: 20px; }
 .nav-item.active { color: #3577ef; font-weight: 600; }
 .empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
-</style>
+
+/* ==== IME中文输入强制修复 ==== */
+input, textarea, select {
+  ime-mode: auto !important;
+  -webkit-user-modify: read-write !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}</style>
 </head>
 <body>
 

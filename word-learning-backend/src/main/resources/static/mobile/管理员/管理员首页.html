@@ -155,7 +155,14 @@ body {
   text-align: center; color: #8899aa; padding: 24px;
   font-size:16px;
 }
-</style>
+
+/* ==== IME中文输入强制修复 ==== */
+input, textarea, select {
+  ime-mode: auto !important;
+  -webkit-user-modify: read-write !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}</style>
 </head>
 <body>
 

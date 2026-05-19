@@ -71,7 +71,14 @@ select.form-input { appearance: none; }
 .nav-item.active { color: #3577ef; font-weight: 600; }
 .search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
 .search-bar input { flex: 1; }
-.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }</style>
+.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
+/* ==== IME中文输入强制修复 ==== */
+input, textarea, select {
+  ime-mode: auto !important;
+  -webkit-user-modify: read-write !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
