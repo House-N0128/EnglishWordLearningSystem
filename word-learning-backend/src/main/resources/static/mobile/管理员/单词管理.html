@@ -4,33 +4,82 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta charset="UTF-8">
 <title>单词管理(App端)</title>
-<style>
-body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
-.top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
-.admin-user {font-weight:bold;}
-.btn-logout {background:#fff;color:#318af8;font-weight:600;font-size:15px;border:none;border-radius:16px;padding:7px 20px;}
-.main-panel {padding:8px 12px;}
-.page-title {font-size:19px;color:#318af8;font-weight:700;margin:15px 0;}
-.search-row {display:flex;gap:7px;margin-bottom:12px;}
-.search-row input,.search-row select {padding:6px 8px;border-radius:7px;border:1px solid #c7d9ee;font-size:14px;background:#f6f8fc;}
-.search-btn {background:#318af8;color:#fff;border:none;border-radius:12px;font-size:14px;padding:7px 18px;}
-.btn-group {display:flex;gap:10px;margin-bottom:11px;}
-.add-btn {background:#318af8;color:#fff;border:none;border-radius:12px;font-size:14px;padding:8px 0;flex:1;}
-.word-card {background:#fff;margin-bottom:13px;border-radius:12px;box-shadow:0 1px 6px #dde6fa16;padding:13px;}
-.word-card .row{margin-bottom:3px;}
-.action-btn {background:#318af8;color:#fff;border:none;border-radius:11px;padding:6px 14px;font-size:13px;margin-right:4px;}
-.action-btn.cancel {background:#e0e6f2;color:#318af8;}
-.admin-navbar{position:fixed;left:0;bottom:0;width:100vw;height:61px;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:14px;border-top-right-radius:14px;display:flex;justify-content:space-around;align-items:center;}
-.admin-nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.admin-nav-btn.active{color:#17c2ae;}
-.admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
-</style>
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif;
+  background: #f0f4f8; min-height: 100vh;
+  padding-bottom: 75px; color: #2d3748;
+}
+.header {
+  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
+  padding: 16px 18px; border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 20px rgba(26,86,219,0.2);
+  display: flex; align-items: center; gap: 12px;
+}
+.btn-back {
+  background: rgba(255,255,255,0.15); color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 8px 14px; border-radius: 20px; font-size: 13px;
+  cursor: pointer; white-space: nowrap;
+}
+.header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
+.section { padding: 0 14px; margin-top: 16px; }
+.card-list { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  background: #fff; border-radius: 14px;
+  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.card-title { font-size: 16px; font-weight: 600; color: #2d3748; }
+.card-sub  { font-size: 13px; color: #8899aa; }
+.card-meta { font-size: 12px; color: #a0aec0; margin-top: 4px; }
+.btn {
+  padding: 8px 16px; border-radius: 20px; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary { background: #3577ef; color: #fff; }
+.btn-danger  { background: #fff; color: #e53e3e; border: 1px solid #fed7d7; }
+.btn-success { background: #38a169; color: #fff; }
+.btn-outline { background: #fff; color: #3577ef; border: 1px solid #bee3f8; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
+.form-input {
+  width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0;
+  border-radius: 10px; font-size: 15px; background: #f7fafc;
+  font-family: inherit; transition: border .2s;
+}
+.form-input:focus { outline: none; border-color: #3577ef; background: #fff; }
+textarea.form-input { min-height: 80px; resize: vertical; }
+select.form-input { appearance: none; }
+.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size: 14px; margin: 8px 0; }
+.msg-error { background: #fff5f5; color: #c53030; }
+.msg-success { background: #f0fff4; color: #276749; }
+.navbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  border-radius: 20px 20px 0 0;
+  display: flex; justify-content: space-around;
+  padding: 8px 0 12px 0; z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border: none; background: none;
+  font-family: inherit; font-size: 11px; color: #8899aa;
+}
+.nav-item .nav-icon { font-size: 20px; }
+.nav-item.active { color: #3577ef; font-weight: 600; }
+.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+.search-bar input { flex: 1; }
+.empty { text-align: center; color: #8899aa; padding: 32px; font-size: 14px; }</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
-  <div class="top-bar"><span class="admin-user">管理员：admin001</span>
-    <button class="btn-logout" onclick="window.location.href='signin.html'">退出登录</button>
-  </div>
+  <div class="header">
+  <span class="btn-back" onclick="history.back()">← 返回</span>
+  <span class="header-title">单词管理</span>
+</div>
   <div class="main-panel">
     <div class="page-title">单词管理</div>
     <form class="search-row">
@@ -60,12 +109,12 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
       </div>
     </div>
   </div>
-  <div class="admin-navbar">
-    <button class="admin-nav-btn" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
-    <button class="admin-nav-btn active" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
-  </div>
+  <div class="navbar">
+  <span class="nav-item" onclick="location.href='管理员首页.html'"><span class="nav-icon">🏠</span>首页</span>
+  <span class="nav-item" onclick="location.href='用户管理.html'"><span class="nav-icon">👥</span>用户</span>
+  <span class="nav-item" onclick="location.href='词书管理.html'"><span class="nav-icon">📚</span>词书</span>
+  <span class="nav-item" onclick="location.href='单词管理.html'"><span class="nav-icon">📝</span>单词</span>
+</div>
 `n<script>
 if (!requireAuth("admin")) { throw new Error("unauthorized"); }
 

@@ -1,99 +1,281 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <meta charset="UTF-8">
-<title>管理员首页(App端)</title>
+<title>管理后台</title>
 <script src="/mobile/api.js"></script>
 <style>
-body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
-.top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
-.admin-user {font-weight:bold;}
-.btn-logout {background:#fff;color:#318af8;font-weight:600;font-size:15px;border:none;border-radius:16px;padding:7px 20px;}
-.main-panel {padding:0 12px;}
-.dashboard-title {font-size:19px;color:#318af8;font-weight:700;margin:20px 0 10px 0;}
-.info-grid {display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-.info-card {background:#fff;border-radius:13px;box-shadow:0 1px 6px #dde6fa19;padding:13px 0;text-align:center;}
-.num {font-size:19px;font-weight:bold;color:#318af8;}
-.section-block {background:#fff;border-radius:11px;padding:15px 10px;margin:18px 0 10px 0;box-shadow:0 1px 8px #dde6fa19;}
-.section-title {font-size:16px;color:#318af8;font-weight:600;margin-bottom:14px;}
-.top-books-list {display:flex;flex-direction:column;gap:12px;}
-.top-book-item {background:#318af81a;border-radius:7px;padding:10px 13px;font-size:15px;}
-.book-name {font-weight:600;color:#318af8;font-size:15px;}
-.count {margin-left:7px;font-size:13px;color:#276bab;}
-.admin-navbar{position:fixed;left:0;bottom:0;width:100vw;height:61px;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:14px;border-top-right-radius:14px;display:flex;justify-content:space-around;align-items:center;}
-.admin-nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.admin-nav-btn.active{color:#17c2ae;}
-.admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'PingFang SC', 'HarmonyOS Sans', -apple-system, sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+  padding-bottom: 75px;
+  color: #2d3748;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
+  padding: 20px 18px 24px 18px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 20px rgba(26,86,219,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  right: -20px; top: -20px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative; z-index: 1;
+}
+.avatar {
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.user-info { flex: 1; margin-left: 12px; }
+.user-name { font-size: 17px; font-weight: 700; color: #fff; }
+.user-role { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.btn-logout {
+  background: rgba(255,255,255,0.15);
+  color: #fff; border: 1px solid rgba(255,255,255,0.25);
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;
+  transition: background .2s;
+}
+.btn-logout:active { background: rgba(255,255,255,0.3); }
+
+/* ── Stats Grid ── */
+.section { padding: 0 14px; margin-top: -8px; position: relative; z-index: 2; }
+.section-label {
+  font-size: 13px; font-weight: 600; color: #718096;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin: 22px 0 10px 2px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  display: flex; align-items: center; gap: 12px;
+  transition: transform .15s;
+}
+.stat-card:active { transform: scale(0.97); }
+.stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.stat-icon.blue  { background: #eff6ff; }
+.stat-icon.green { background: #ecfdf5; }
+.stat-icon.amber { background: #fffbeb; }
+.stat-icon.rose  { background: #fff1f2; }
+.stat-text { flex: 1; }
+.stat-num  { font-size: 22px; font-weight: 700; color: #1a202c; line-height: 1; }
+.stat-lbl  { font-size: 12px; color: #8899aa; margin-top: 4px; }
+
+/* ── Quick Actions ── */
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.action-btn {
+  background: #fff;
+  border: none; border-radius: 14px;
+  padding: 18px 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-family: inherit;
+  transition: all .15s;
+}
+.action-btn:active { background: #f7fafc; transform: scale(0.96); }
+.action-btn .action-icon { font-size: 26px; }
+.action-btn .action-label { font-size: 13px; font-weight: 600; color: #4a5568; }
+
+/* ── Book list ── */
+.book-list { display: flex; flex-direction: column; gap: 8px; }
+.book-card {
+  background: #fff; border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  display: flex; align-items: center; gap: 14px;
+}
+.book-rank {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.rank-1 { background: #f59e0b; }
+.rank-2 { background: #94a3b8; }
+.rank-3 { background: #b45309; }
+.book-info { flex: 1; }
+.book-title { font-size: 15px; font-weight: 600; color: #2d3748; }
+.book-sub  { font-size: 12px; color: #8899aa; margin-top: 2px; }
+.book-count { font-size: 14px; font-weight: 700; color: #3577ef; }
+
+/* ── Navbar ── */
+.navbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  border-radius: 20px 20px 0 0;
+  display: flex; justify-content: space-around;
+  padding: 8px 0 12px 0;
+  z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border: none; background: none;
+  font-family: inherit; font-size: 11px; color: #8899aa;
+  padding: 6px 12px; transition: color .2s;
+}
+.nav-item .nav-icon { font-size: 20px; }
+.nav-item.active { color: #3577ef; font-weight: 600; }
+
+.empty {
+  text-align: center; color: #8899aa; padding: 24px;
+  font-size: 14px;
+}
 </style>
 </head>
 <body>
-  <div class="top-bar">
-    <span class="admin-user">管理员：<span id="display-name">admin001</span></span>
-    <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+
+<div class="header">
+  <div class="header-row">
+    <div class="avatar">🛡️</div>
+    <div class="user-info">
+      <div class="user-name" id="display-name">管理员</div>
+      <div class="user-role">系统管理员</div>
+    </div>
+    <button class="btn-logout" onclick="clearAuth()">退出</button>
   </div>
-  <main class="main-panel">
-    <div class="dashboard-title">平台数据总览</div>
-    <div class="info-grid">
-      <div class="info-card">
-        <span class="num" id="stat-users">-</span>
-        <span>总用户数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-books">-</span>
-        <span>总词书数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-words">-</span>
-        <span>总单词数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-today">-</span>
-        <span>今日新增学习记录</span>
+</div>
+
+<div class="section">
+  <div class="section-label">平台概览</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">👥</div>
+      <div class="stat-text">
+        <div class="stat-num" id="stat-users">-</div>
+        <div class="stat-lbl">总用户数</div>
       </div>
     </div>
-    <div class="section-block">
-      <div class="section-title">热门词书TOP3</div>
-      <div class="top-books-list" id="top-books">
-        <div style="text-align:center;color:#8899aa;padding:10px;">加载中...</div>
+    <div class="stat-card">
+      <div class="stat-icon green">📚</div>
+      <div class="stat-text">
+        <div class="stat-num" id="stat-books">-</div>
+        <div class="stat-lbl">总词书数</div>
       </div>
     </div>
-  </main>
-  <div class="admin-navbar">
-    <button class="admin-nav-btn active" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+    <div class="stat-card">
+      <div class="stat-icon amber">📝</div>
+      <div class="stat-text">
+        <div class="stat-num" id="stat-words">-</div>
+        <div class="stat-lbl">总单词数</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon rose">⚡</div>
+      <div class="stat-text">
+        <div class="stat-num" id="stat-today">-</div>
+        <div class="stat-lbl">今日学习记录</div>
+      </div>
+    </div>
   </div>
+
+  <div class="section-label">快捷管理</div>
+  <div class="actions-grid">
+    <button class="action-btn" onclick="location.href='用户管理.html'">
+      <span class="action-icon">👥</span>
+      <span class="action-label">用户管理</span>
+    </button>
+    <button class="action-btn" onclick="location.href='词书管理.html'">
+      <span class="action-icon">📚</span>
+      <span class="action-label">词书管理</span>
+    </button>
+    <button class="action-btn" onclick="location.href='单词管理.html'">
+      <span class="action-icon">📝</span>
+      <span class="action-label">单词管理</span>
+    </button>
+    <button class="action-btn" onclick="location.href='添加词书.html'">
+      <span class="action-icon">➕</span>
+      <span class="action-label">新增词书</span>
+    </button>
+    <button class="action-btn" onclick="location.href='添加单词.html'">
+      <span class="action-icon">✏️</span>
+      <span class="action-label">新增单词</span>
+    </button>
+    <button class="action-btn" onclick="location.href='批量添加单词.html'">
+      <span class="action-icon">📎</span>
+      <span class="action-label">批量导入</span>
+    </button>
+  </div>
+
+  <div class="section-label">词书列表</div>
+  <div class="book-list" id="top-books">
+    <div class="empty">加载中...</div>
+  </div>
+</div>
+
+<div class="navbar">
+  <span class="nav-item active"><span class="nav-icon">🏠</span>首页</span>
+  <span class="nav-item" onclick="location.href='用户管理.html'"><span class="nav-icon">👥</span>用户</span>
+  <span class="nav-item" onclick="location.href='词书管理.html'"><span class="nav-icon">📚</span>词书</span>
+  <span class="nav-item" onclick="location.href='单词管理.html'"><span class="nav-icon">📝</span>单词</span>
+</div>
+
 <script>
 if (!requireAuth('admin')) { throw new Error('unauthorized'); }
 document.getElementById('display-name').innerText = localStorage.getItem('userId') || 'admin';
 
 (async function() {
-  // Load admin stats
   try {
-    var statsRes = await apiGet('/api/admin/stats');
-    if (statsRes.code === 200 && statsRes.data) {
-      var s = statsRes.data;
-      document.getElementById('stat-users').innerText = s.userCount || 0;
-      document.getElementById('stat-books').innerText = s.wordBookCount || 0;
-      document.getElementById('stat-words').innerText = s.wordCount || 0;
-      document.getElementById('stat-today').innerText = s.todayRecordCount || 0;
+    var s = await apiGet('/api/admin/stats');
+    if (s.code === 200 && s.data) {
+      document.getElementById('stat-users').innerText = s.data.userCount || 0;
+      document.getElementById('stat-books').innerText = s.data.wordBookCount || 0;
+      document.getElementById('stat-words').innerText = s.data.wordCount || 0;
+      document.getElementById('stat-today').innerText = s.data.todayRecordCount || 0;
     }
   } catch(e) {}
 
-  // Load top books
   try {
-    var booksRes = await apiGet('/api/wordbooks');
+    var b = await apiGet('/api/wordbooks');
     var box = document.getElementById('top-books');
-    if (booksRes.code === 200 && booksRes.data && booksRes.data.length > 0) {
-      var books = booksRes.data.slice(0, 3);
-      box.innerHTML = books.map(function(b) {
-        return '<div class="top-book-item"><span class="book-name">' + (b.wordBookName || '') + '</span><span class="count">' + (b.wordCount || 0) + '词</span></div>';
+    if (b.code === 200 && b.data && b.data.length > 0) {
+      var colors = ['rank-1','rank-2','rank-3'];
+      box.innerHTML = b.data.slice(0, 5).map(function(book, i) {
+        return '<div class="book-card">' +
+          '<div class="book-rank ' + (colors[i] || '') + '" style="' + (i>=3 ? 'background:#cbd5e0' : '') + '">' + (i+1) + '</div>' +
+          '<div class="book-info">' +
+            '<div class="book-title">' + (book.wordBookName || '') + '</div>' +
+            '<div class="book-sub">' + (book.difficultyLevel || '') + ' · ' + (book.wordCount || 0) + '词</div>' +
+          '</div>' +
+          '<div class="book-count">' + (book.wordCount || 0) + '词</div>' +
+        '</div>';
       }).join('');
-    } else {
-      box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:10px;">暂无词书</div>';
-    }
+    } else { box.innerHTML = '<div class="empty">暂无词书</div>'; }
   } catch(e) {}
 })();
 </script>

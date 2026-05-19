@@ -81,9 +81,11 @@ public class WordSearchActivity extends AppCompatActivity {
                         progress.setVisibility(View.GONE);
                         currentData = data;
                         if (data.size() == 0) {
+                            recyclerView.setAdapter(null);
                             tvEmpty.setText("未找到相关单词");
                             tvEmpty.setVisibility(View.VISIBLE);
                         } else {
+                            tvEmpty.setVisibility(View.GONE);
                             recyclerView.setAdapter(new WordAdapter(data));
                         }
                     });

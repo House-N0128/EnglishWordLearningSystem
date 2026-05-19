@@ -2,23 +2,32 @@ package com.example.wordlearningapp;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddEditWordActivity extends AppCompatActivity {
 
     private EditText etBookId, etSpelling, etPhonetic, etChinese, etExample, etAudio, etImage;
+    private Spinner spBook;
     private Button btnSubmit;
     private TextView tvTitle;
-    private String wordId; // null = add mode
+    private String wordId;
+    private List<String> bookIds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +62,33 @@ public class AddEditWordActivity extends AppCompatActivity {
         form.setOrientation(LinearLayout.VERTICAL);
         form.setPadding(28, 20, 28, 24);
 
-        etBookId = addField(form, "所属词书ID");
+        // Book selector
+        TextView bookLabel = new TextView(this);
+        bookLabel.setText("所属词书"); bookLabel.setTextSize(14); bookLabel.setTextColor(0xFF318af8);
+        bookLabel.setPadding(0, 10, 0, 4);
+        form.addView(bookLabel);
+
+        if (wordId == null) {
+            // Add mode: spinner with book names
+            spBook = new Spinner(this);
+            spBook.setPadding(28, 12, 28, 12);
+            spBook.setBackgroundColor(0xFFf6f8fc);
+            spBook.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            form.addView(spBook);
+            loadBookList();
+        } else {
+            // Edit mode: readonly book ID
+            etBookId = new EditText(this);
+            etBookId.setPadding(28, 12, 28, 12);
+            etBookId.setBackgroundColor(0xFFf6f8fc);
+            etBookId.setTextSize(15);
+            etBookId.setEnabled(false);
+            etBookId.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            form.addView(etBookId);
+        }
+
         etSpelling = addField(form, "英文拼写");
         etPhonetic = addField(form, "音标");
         etChinese = addField(form, "中文释义");
@@ -116,12 +151,50 @@ public class AddEditWordActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void loadBookList() {
+        new Thread(() -> {
+            try {
+                JsonObject res = ApiClient.get().get("/api/wordbooks");
+                if (res.get("code").getAsInt() == 200) {
+                    JsonArray books = res.getAsJsonArray("data");
+                    List<String> names = new ArrayList<>();
+                    bookIds.clear();
+                    for (int i = 0; i < books.size(); i++) {
+                        JsonObject b = books.get(i).getAsJsonObject();
+                        String name = (b.has("wordBookName") ? b.get("wordBookName").getAsString() : "")
+                                + " (" + (b.has("wordBookId") ? b.get("wordBookId").getAsString() : "") + ")";
+                        names.add(name);
+                        bookIds.add(b.has("wordBookId") ? b.get("wordBookId").getAsString() : "");
+                    }
+                    runOnUiThread(() -> {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(AddEditWordActivity.this,
+                                android.R.layout.simple_spinner_item, names);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spBook.setAdapter(adapter);
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+
     private void submit() {
-        String bookId = etBookId.getText().toString().trim();
+        String bookId;
+        if (wordId == null && spBook != null) {
+            int pos = spBook.getSelectedItemPosition();
+            if (pos < 0 || pos >= bookIds.size()) {
+                Toast.makeText(this, "请选择词书", Toast.LENGTH_SHORT).show(); return;
+            }
+            bookId = bookIds.get(pos);
+        } else if (etBookId != null) {
+            bookId = etBookId.getText().toString().trim();
+        } else {
+            Toast.makeText(this, "词书信息缺失", Toast.LENGTH_SHORT).show(); return;
+        }
+
         String spelling = etSpelling.getText().toString().trim();
         String chinese = etChinese.getText().toString().trim();
-        if (spelling.isEmpty() || chinese.isEmpty() || bookId.isEmpty()) {
-            Toast.makeText(this, "请填写词书ID、拼写和释义", Toast.LENGTH_SHORT).show(); return;
+        if (spelling.isEmpty() || chinese.isEmpty()) {
+            Toast.makeText(this, "请填写拼写和释义", Toast.LENGTH_SHORT).show(); return;
         }
 
         btnSubmit.setEnabled(false);

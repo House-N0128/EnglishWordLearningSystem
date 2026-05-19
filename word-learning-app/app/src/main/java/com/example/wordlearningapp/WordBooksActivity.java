@@ -55,7 +55,7 @@ public class WordBooksActivity extends AppCompatActivity {
             abp.setMargins(28, 14, 28, 14);
             addBtn.setLayoutParams(abp);
             addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditBookActivity.class)));
-            root.addView(addBtn, 0);
+            root.addView(addBtn, 1);
         }
 
         loadBooks();
