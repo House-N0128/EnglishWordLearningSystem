@@ -2,6 +2,7 @@ package com.word.wordlearning.mapper;
 
 import com.word.wordlearning.entity.OrdinaryUser;
 import org.apache.ibatis.annotations.*;
+import java.util.List;
 
 @Mapper
 public interface OrdinaryUserMapper {
@@ -29,7 +30,7 @@ public interface OrdinaryUserMapper {
     int countAll();
 
     @Select("SELECT * FROM t_ordinary_user WHERE userId LIKE CONCAT('%',#{keyword},'%') OR userName LIKE CONCAT('%',#{keyword},'%')")
-    java.util.List<OrdinaryUser> searchUsers(@Param("keyword") String keyword);
+    List<OrdinaryUser> searchUsers(@Param("keyword") String keyword);
 
     @Update("UPDATE t_ordinary_user SET accountStatus=#{status} WHERE userId=#{userId}")
     void updateStatus(@Param("userId") String userId, @Param("status") String status);
