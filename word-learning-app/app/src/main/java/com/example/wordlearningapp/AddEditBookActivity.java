@@ -65,14 +65,22 @@ public class AddEditBookActivity extends AppCompatActivity {
 
         TextView diffLabel = new TextView(this);
         diffLabel.setText("难度等级");
-        diffLabel.setTextSize(14); diffLabel.setTextColor(0xFF318af8);
-        diffLabel.setPadding(0, 8, 0, 4);
+        diffLabel.setTextSize(14); diffLabel.setTextColor(0xFF4a5568);
+        diffLabel.setPadding(0, 12, 0, 6);
         form.addView(diffLabel);
         spDifficulty = new Spinner(this);
         spDifficulty.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 new String[]{"初级", "中级", "高级"}));
-        spDifficulty.setPadding(14, 14, 14, 14);
-        spDifficulty.setBackgroundColor(0xFFf6f8fc);
+        spDifficulty.setPadding(24, 14, 24, 14);
+        android.graphics.drawable.GradientDrawable sbg = new android.graphics.drawable.GradientDrawable();
+        sbg.setColor(0xFFFFFFFF);
+        sbg.setStroke(2, 0xFFe2e8f0);
+        sbg.setCornerRadius(24);
+        spDifficulty.setBackground(sbg);
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        slp.setMargins(0, 0, 0, 12);
+        spDifficulty.setLayoutParams(slp);
         form.addView(spDifficulty);
 
         etDesc = addField(form, "词书简介");
@@ -100,18 +108,22 @@ public class AddEditBookActivity extends AppCompatActivity {
     private EditText addField(LinearLayout parent, String label) {
         TextView lbl = new TextView(this);
         lbl.setText(label);
-        lbl.setTextSize(14); lbl.setTextColor(0xFF318af8);
-        lbl.setPadding(0, 12, 0, 4);
+        lbl.setTextSize(14); lbl.setTextColor(0xFF4a5568);
+        lbl.setPadding(0, 12, 0, 6);
         parent.addView(lbl);
 
         EditText et = new EditText(this);
-        et.setPadding(28, 14, 28, 14);
-        et.setBackgroundColor(0xFFf6f8fc);
+        et.setPadding(24, 14, 24, 14);
         et.setTextSize(15);
         et.setSingleLine(true);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(0xFFFFFFFF);
+        bg.setStroke(2, 0xFFe2e8f0);
+        bg.setCornerRadius(24);
+        et.setBackground(bg);
         LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ep.setMargins(0, 0, 0, 8);
+        ep.setMargins(0, 0, 0, 12);
         et.setLayoutParams(ep);
         parent.addView(et);
         return et;

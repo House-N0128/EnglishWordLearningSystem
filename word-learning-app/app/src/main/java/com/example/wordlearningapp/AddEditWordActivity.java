@@ -64,28 +64,38 @@ public class AddEditWordActivity extends AppCompatActivity {
 
         // Book selector
         TextView bookLabel = new TextView(this);
-        bookLabel.setText("所属词书"); bookLabel.setTextSize(14); bookLabel.setTextColor(0xFF318af8);
-        bookLabel.setPadding(0, 10, 0, 4);
+        bookLabel.setText("所属词书"); bookLabel.setTextSize(14); bookLabel.setTextColor(0xFF4a5568);
+        bookLabel.setPadding(0, 12, 0, 6);
         form.addView(bookLabel);
 
         if (wordId == null) {
-            // Add mode: spinner with book names
             spBook = new Spinner(this);
-            spBook.setPadding(28, 12, 28, 12);
-            spBook.setBackgroundColor(0xFFf6f8fc);
-            spBook.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            spBook.setPadding(24, 14, 24, 14);
+            android.graphics.drawable.GradientDrawable sbg = new android.graphics.drawable.GradientDrawable();
+            sbg.setColor(0xFFFFFFFF);
+            sbg.setStroke(2, 0xFFe2e8f0);
+            sbg.setCornerRadius(24);
+            spBook.setBackground(sbg);
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.setMargins(0, 0, 0, 12);
+            spBook.setLayoutParams(sp);
             form.addView(spBook);
             loadBookList();
         } else {
-            // Edit mode: readonly book ID
             etBookId = new EditText(this);
-            etBookId.setPadding(28, 12, 28, 12);
-            etBookId.setBackgroundColor(0xFFf6f8fc);
+            etBookId.setPadding(24, 14, 24, 14);
             etBookId.setTextSize(15);
             etBookId.setEnabled(false);
-            etBookId.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            android.graphics.drawable.GradientDrawable ebg = new android.graphics.drawable.GradientDrawable();
+            ebg.setColor(0xFFF0F4F8);
+            ebg.setStroke(2, 0xFFe2e8f0);
+            ebg.setCornerRadius(24);
+            etBookId.setBackground(ebg);
+            LinearLayout.LayoutParams ep2 = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            ep2.setMargins(0, 0, 0, 12);
+            etBookId.setLayoutParams(ep2);
             form.addView(etBookId);
         }
 
@@ -117,16 +127,26 @@ public class AddEditWordActivity extends AppCompatActivity {
 
     private EditText addField(LinearLayout parent, String label) {
         TextView lbl = new TextView(this);
-        lbl.setText(label); lbl.setTextSize(14); lbl.setTextColor(0xFF318af8);
-        lbl.setPadding(0, 10, 0, 4);
+        lbl.setText(label); lbl.setTextSize(14); lbl.setTextColor(0xFF4a5568);
+        lbl.setPadding(0, 12, 0, 6);
         parent.addView(lbl);
         EditText et = new EditText(this);
-        et.setPadding(28, 12, 28, 12); et.setBackgroundColor(0xFFf6f8fc);
+        et.setPadding(24, 14, 24, 14);
+        et.setBackgroundColor(0xFFFFFFFF);
         et.setTextSize(15); et.setSingleLine(true);
         LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ep.setMargins(0, 0, 0, 6);
+        ep.setMargins(0, 0, 0, 12);
         et.setLayoutParams(ep);
+
+        // Add visible border via background drawable
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(0xFFFFFFFF);
+        bg.setStroke(2, 0xFFe2e8f0);
+        bg.setCornerRadius(24);
+        et.setBackground(bg);
+        et.setPadding(24, 14, 24, 14);
+
         parent.addView(et);
         return et;
     }
