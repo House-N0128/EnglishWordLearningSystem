@@ -37,22 +37,45 @@
 | Web前端 | 原生 HTML + CSS + JavaScript、Fetch API |
 | Android | 原生 Java、OkHttp、Gson、Material Design |
 
-## 快速开始
+## 环境要求
 
-### 1. 数据库
+| 工具 | 版本 |
+|------|------|
+| JDK | 17+ |
+| MySQL | 8.0+ |
+| Android Studio | 最新版（需 API 35 SDK） |
+| Python | 3.x（用于快速启动 Web 前端） |
 
-创建 MySQL 数据库并导入数据：
+## 克隆后搭建步骤
 
-```sql
-CREATE DATABASE word_study DEFAULT CHARACTER SET utf8mb4;
+### 1. 导入数据库
+
+项目根目录有 `word_study.sql`，包含完整建表语句和测试数据。
+
+```bash
+# 先创建数据库
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS word_study DEFAULT CHARACTER SET utf8mb4;"
+
+# 导入
+mysql -u root -p word_study < word_study.sql
 ```
 
-然后修改 `word-learning-backend/src/main/resources/application.properties` 中的数据库连接信息。
+然后修改 `word-learning-backend/src/main/resources/application.properties`：
+
+```properties
+spring.datasource.username=你的MySQL用户名
+spring.datasource.password=你的MySQL密码
+```
 
 ### 2. 启动后端
 
 ```bash
 cd word-learning-backend
+
+# Windows
+mvnw.cmd spring-boot:run
+
+# Mac / Linux
 ./mvnw spring-boot:run
 ```
 
@@ -60,22 +83,23 @@ cd word-learning-backend
 
 ### 3. 启动 Web 前端
 
-用任意 HTTP 服务器托管 `word-learning-web` 目录，例如：
-
 ```bash
 cd word-learning-web
-npx serve .
+python -m http.server 3000
 ```
 
-或者直接用浏览器打开 `word-learning-web/index.html`。
+浏览器打开 `http://localhost:3000`。
 
-修改 `api.js` 中的 `BASE_URL` 指向你的后端地址。
+如果后端不在本机，修改 `api.js` 和 `mobile/api.js` 第一行的 `BASE_URL`。
 
 ### 4. 运行 Android App
 
-用 Android Studio 打开 `word-learning-app` 目录，Sync Gradle 后点击 Run。
-
-修改 `ApiClient.java` 中的 `BASE_URL` 指向你的后端地址。
+1. 用 Android Studio 打开 `word-learning-app` 目录
+2. 等待 Gradle Sync 完成
+3. 修改 `app/src/main/java/com/example/wordlearningapp/api/ApiClient.java` 中的 `BASE_URL`：
+   - 模拟器用 `http://10.0.2.2:8080`
+   - 真机用电脑的局域网 IP，如 `http://192.168.x.x:8080`
+4. 点击 Run 运行
 
 ## API 接口
 
