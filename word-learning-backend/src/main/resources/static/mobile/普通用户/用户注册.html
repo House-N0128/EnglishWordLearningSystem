@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
   <title>单词学习平台 - 用户注册</title>
   <style>
     body {
@@ -56,7 +55,7 @@
     }
     .input-group input::placeholder {
       color:#97adc0;
-      font-size:15px;
+      font-size:16px;
     }
     .form-tips {
       font-size:12px; color:#97adc0; margin:2px 0 0 4px;
@@ -98,7 +97,7 @@
       display:flex;
       align-items:center;
       margin:10px 0 7px 2px;
-      font-size:14px;
+      font-size:16px;
       color:#555;
     }
     .checkbox input { margin-right:7px;}
@@ -120,7 +119,7 @@
     }
     .btn:disabled { opacity:.65; cursor:not-allowed; }
     .actions {
-      text-align:right; font-size:15px; margin:12px 0 0 0; color:#3577ef;
+      text-align:right; font-size:16px; margin:12px 0 0 0; color:#3577ef;
     }
     .actions a { color:#3577ef; opacity:.9; text-decoration:none; margin:0 6px; }
     .error-msg {
@@ -129,7 +128,7 @@
       margin:8px 0;
       padding:10px;
       border-radius:8px;
-      font-size:14px;
+      font-size:16px;
       background:#fff0f0;
       color:#d93025;
     }
@@ -139,20 +138,22 @@
       margin:8px 0;
       padding:10px;
       border-radius:8px;
-      font-size:14px;
+      font-size:16px;
       background:#e8f5e9;
       color:#1b8a2e;
     }
-  </style>
+  
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
   <script src="/mobile/api.js"></script>
 </head>
 <body>
   <div class="container">
     <h2>单词学习平台 - 用户注册</h2>
-    <form autocomplete="off">
+    
       <div class="form-wrap">
         <div class="input-group">
-          <input type="text" placeholder="登录账号" id="reg-userid" required>
+          <input type="text" placeholder="登录账号" id="reg-userid" required inputmode="text" autocomplete="off" spellcheck="false">
         </div>
         <div class="input-group">
           <input type="password" placeholder="登录密码" id="reg-password" required>
@@ -166,7 +167,7 @@
           <input type="password" placeholder="确认密码" id="reg-confirm-password" required>
         </div>
         <div class="input-group">
-          <input type="text" placeholder="用户昵称" id="reg-nickname" required>
+          <input type="text" placeholder="用户昵称" id="reg-nickname" required inputmode="text" autocomplete="off" spellcheck="false">
         </div>
         <div class="input-group">
           <input type="tel" placeholder="联系电话" id="reg-phone" required>
@@ -185,7 +186,7 @@
       <div class="success-msg" id="success-msg"></div>
       <button type="button" class="btn" id="register-btn">注册</button>
       <button type="button" class="btn btn-back" id="back-btn">返回登录</button>
-    </form>
+    
     <div class="actions">
       <a href="#">账号问题咨询</a> | <a href="#">隐私政策</a>
     </div>

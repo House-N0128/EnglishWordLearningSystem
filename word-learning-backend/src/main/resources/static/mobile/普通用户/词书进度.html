@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,">
 <title>学习进度</title>
 
 <style>
@@ -34,7 +34,7 @@ body {
 /* 词书信息卡片 */
 .info-box {
   background:#fff;padding:16px;border-radius:14px;
-  box-shadow:0 1px 8px #d0ddf650;font-size:15px;
+  box-shadow:0 1px 8px #d0ddf650;font-size:16px;
   margin-bottom:22px;line-height:1.65;
 }
 
@@ -64,11 +64,13 @@ body {
 
 /* 百分比文字 */
 .progress-text {
-  font-size:15px;
+  font-size:16px;
   font-weight:500;
   color:#318af8;
 }
-</style>
+
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 </head>
 
 <body>

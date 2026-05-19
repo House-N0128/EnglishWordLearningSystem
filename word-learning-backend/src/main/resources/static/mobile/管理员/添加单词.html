@@ -78,7 +78,9 @@ input, textarea, select {
   -webkit-user-modify: read-write !important;
   -webkit-user-select: text !important;
   user-select: text !important;
-}</style>
+}
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -96,17 +98,17 @@ input, textarea, select {
     <!-- 所属词书 -->
     <div class="form-group">
       <label for="book">所属词书</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="book" name="book" placeholder="如：BK001" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="book" name="book" placeholder="如：BK001" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label for="word">单词（英文）</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="word" name="word" placeholder="请输入单词" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="word" name="word" placeholder="请输入单词" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label for="phonetic">音标</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="phonetic" name="phonetic" placeholder="如：/ˈhæpi/" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="phonetic" name="phonetic" placeholder="如：/ˈhæpi/" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
@@ -123,7 +125,7 @@ input, textarea, select {
 
     <div class="form-group">
       <label for="meaning">中文释义</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="meaning" name="meaning" placeholder="请输入中文释义" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="meaning" name="meaning" placeholder="请输入中文释义" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
@@ -133,7 +135,7 @@ input, textarea, select {
 
     <div class="form-group">
       <label for="audioUrl">音频链接</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="audioUrl" name="audioUrl" placeholder="https://..." required inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="audioUrl" name="audioUrl" placeholder="https://..." required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">

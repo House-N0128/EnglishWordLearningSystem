@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
   <title>设置新密码</title>
   <style>
     body {
@@ -55,7 +54,7 @@
     }
     .input-group input::placeholder {
       color:#97adc0;
-      font-size:15px;
+      font-size:16px;
     }
     .btn {
       display:block;
@@ -76,7 +75,7 @@
     .actions {
       text-align:center;
       margin-top:16px;
-      font-size:15px;
+      font-size:16px;
       color:#3577ef;
     }
     .actions a {
@@ -86,12 +85,14 @@
       margin:0 5px;
       transition:opacity .2s;
     }
-  </style>
+  
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 </head>
 <body>
   <div class="container">
     <h2>设置新密码</h2>
-    <form id="resetForm">
+    
       <div class="form-wrap">
         <div class="input-group">
           <input type="password" placeholder="请输入新密码" name="newPassword" required>
@@ -101,7 +102,7 @@
         </div>
       </div>
       <button type="submit" class="btn">重置密码</button>
-    </form>
+    
     <div class="actions">
       <a href="login.html">返回登录</a>
     </div>

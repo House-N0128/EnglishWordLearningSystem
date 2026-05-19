@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
   <title>单词查询</title>
   <style>
     body {
@@ -45,7 +44,7 @@
       padding:10px 12px;
       border-radius:8px;
       border:1px solid #c7d9ee;
-      font-size:15px;
+      font-size:16px;
       background:#f6f8fc;
       color:#234;
     }
@@ -55,7 +54,7 @@
       color:#fff;
       border:none;
       border-radius:8px;
-      font-size:15px;
+      font-size:16px;
       font-weight:600;
       cursor:pointer;
     }
@@ -83,7 +82,7 @@
       margin-bottom:6px;
     }
     .collection-item .word-meaning {
-      font-size:15px;
+      font-size:16px;
       color:#273245;
     }
     .action-btn {
@@ -93,7 +92,7 @@
       color:#fff;
       border:none;
       border-radius:18px;
-      font-size:14px;
+      font-size:16px;
       font-weight:500;
       cursor:pointer;
       box-shadow:0 1px 4px #e7f0fd;
@@ -118,7 +117,7 @@
       flex:1;
       text-align:center;
       color:#318af8;
-      font-size:15px;
+      font-size:16px;
       font-weight:600;
       padding:0;
       border:none;
@@ -138,7 +137,9 @@
       font-family:'Arial','PingFang SC';
       display:block;
     }
-  </style>
+  
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
   <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -146,7 +147,7 @@
   <div class="main-area">
     <div class="title">单词查询</div>
     <div class="search-row">
-      <input type="text" placeholder="输入英文/中文查找单词" id="keyword">
+      <input type="text" placeholder="输入英文/中文查找单词" id="keyword" inputmode="text" autocomplete="off" spellcheck="false">
       <button id="search-btn">搜索</button>
     </div>
     <div class="collection-list" id="result-list">

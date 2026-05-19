@@ -79,7 +79,9 @@ input, textarea, select {
   -webkit-user-modify: read-write !important;
   -webkit-user-select: text !important;
   user-select: text !important;
-}</style>
+}
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -95,22 +97,22 @@ input, textarea, select {
   
     <div class="form-group">
       <label>单词 ID</label>
-      <input type="text" id="wordId" value="W1058" readonly inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="wordId" value="W1058" readonly inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>所属词书</label>
-      <input type="text" id="bookName" value="英语四级词书" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="bookName" value="英语四级词书" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>英文拼写</label>
-      <input type="text" id="spelling" value="mock" required inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="spelling" value="mock" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
       <label>音标</label>
-      <input type="text" id="phonetic" value="[mɒk]" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="phonetic" value="[mɒk]" inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">
@@ -137,7 +139,7 @@ input, textarea, select {
 
     <div class="form-group">
       <label>音频链接</label>
-      <input type="text" id="audioLink" value="https://example.com/mock.mp3" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="audioLink" value="https://example.com/mock.mp3" inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="form-group">

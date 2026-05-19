@@ -79,7 +79,9 @@ input, textarea, select {
   -webkit-user-modify: read-write !important;
   -webkit-user-select: text !important;
   user-select: text !important;
-}</style>
+}
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -90,7 +92,7 @@ input, textarea, select {
   <div class="main-panel">
     <div class="page-title">用户管理</div>
     
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="用户ID/账号/昵称" id="keyword" inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="用户ID/账号/昵称" id="keyword" inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
       <select>
         <option>账号状态</option>
         <option>全部</option>

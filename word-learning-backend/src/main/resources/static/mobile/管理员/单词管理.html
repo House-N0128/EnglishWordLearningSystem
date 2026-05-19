@@ -78,7 +78,9 @@ input, textarea, select {
   -webkit-user-modify: read-write !important;
   -webkit-user-select: text !important;
   user-select: text !important;
-}</style>
+}
+/* ==== 中文IME输入修复 ==== */
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -89,7 +91,7 @@ input, textarea, select {
   <div class="main-panel">
     <div class="page-title">单词管理</div>
     
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="英文拼写/单词ID" inputmode="text" autocomplete="off" spellcheck="false">
+      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="英文拼写/单词ID" inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
       <select>
         <option>所属词书</option>
       </select>
