@@ -40,5 +40,7 @@
         <activity android:name=".AdminMainActivity" />
         <activity android:name=".UserManageActivity" />
         <activity android:name=".UserRecordActivity" />
+        <activity android:name=".AddEditBookActivity" />
+        <activity android:name=".AddEditWordActivity" />
     </application>
 </manifest>

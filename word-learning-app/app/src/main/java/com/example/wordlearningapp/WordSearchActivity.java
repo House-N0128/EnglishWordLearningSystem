@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wordlearningapp.api.ApiClient;
+import com.example.wordlearningapp.util.AuthManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -24,14 +25,35 @@ public class WordSearchActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TextView tvEmpty;
     private ProgressBar progress;
+    private boolean isAdmin;
+    private String lastKeyword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        ((TextView) findViewById(R.id.toolbar_title)).setText("单词管理");
+        isAdmin = "admin".equals(AuthManager.get().getRole());
+        ((TextView) findViewById(R.id.toolbar_title)).setText(isAdmin ? "单词管理" : "单词查询");
         findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
+
+        if (isAdmin) {
+            etSearch.setHint("输入关键词搜索，不输入则显示全部");
+            // Add button
+            LinearLayout root = (LinearLayout) recyclerView.getParent().getParent();
+            Button addBtn = new Button(this);
+            addBtn.setText("+ 新增单词");
+            addBtn.setTextColor(0xFFFFFFFF);
+            addBtn.setBackgroundColor(0xFF52e8bc);
+            addBtn.setTextSize(15);
+            addBtn.setPadding(14, 12, 14, 12);
+            LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            abp.setMargins(28, 0, 28, 14);
+            addBtn.setLayoutParams(abp);
+            addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditWordActivity.class)));
+            root.addView(addBtn, 0);
+        }
 
         etSearch = findViewById(R.id.et_search);
         tvEmpty = findViewById(R.id.tv_empty);
@@ -115,7 +137,12 @@ public class WordSearchActivity extends AppCompatActivity {
             chnTv.setTextColor(0xFF273245);
             card.addView(chnTv);
 
-            return new VH(card, nameTv, infoTv, chnTv);
+            LinearLayout btnRow = new LinearLayout(parent.getContext());
+            btnRow.setOrientation(LinearLayout.HORIZONTAL);
+            btnRow.setVisibility(View.GONE);
+            card.addView(btnRow);
+
+            return new VH(card, nameTv, infoTv, chnTv, btnRow);
         }
 
         @Override public void onBindViewHolder(VH holder, int pos) {
@@ -126,21 +153,64 @@ public class WordSearchActivity extends AppCompatActivity {
 
             String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
             holder.itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(WordSearchActivity.this, WordDetailActivity.class);
-                intent.putExtra("wordId", wordId);
-                startActivity(intent);
+                if (isAdmin) {
+                    Intent intent = new Intent(WordSearchActivity.this, AddEditWordActivity.class);
+                    intent.putExtra("wordId", wordId);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(WordSearchActivity.this, WordDetailActivity.class);
+                    intent.putExtra("wordId", wordId);
+                    startActivity(intent);
+                }
             });
+
+            // Admin buttons
+            if (isAdmin && holder.btnRow.getChildCount() == 0) {
+                TextView delBtn = new TextView(holder.itemView.getContext());
+                delBtn.setText("删除");
+                delBtn.setTextColor(0xFFFFFFFF);
+                delBtn.setBackgroundColor(0xFFd93025);
+                delBtn.setTextSize(12);
+                delBtn.setPadding(16, 6, 16, 6);
+                LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dp.setMarginEnd(16);
+                delBtn.setLayoutParams(dp);
+                delBtn.setOnClickListener(dv -> {
+                    new android.app.AlertDialog.Builder(dv.getContext())
+                            .setTitle("确认删除")
+                            .setMessage("确定删除单词\"" + holder.name.getText() + "\"？")
+                            .setPositiveButton("确定", (d, w2) -> {
+                                new Thread(() -> {
+                                    try {
+                                        JsonObject res = ApiClient.get().delete("/api/words/" + wordId, null);
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(WordSearchActivity.this, res.has("message") ? res.get("message").getAsString() : "已删除", Toast.LENGTH_SHORT).show();
+                                            doSearch();
+                                        });
+                                    } catch (Exception e) {
+                                        runOnUiThread(() -> Toast.makeText(WordSearchActivity.this, "网络错误", Toast.LENGTH_SHORT).show());
+                                    }
+                                }).start();
+                            })
+                            .setNegativeButton("取消", null).show();
+                });
+                holder.btnRow.addView(delBtn);
+            }
+            holder.btnRow.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         }
 
         @Override public int getItemCount() { return data.size(); }
 
         class VH extends RecyclerView.ViewHolder {
             TextView name, info, chn;
-            VH(View v, TextView name, TextView info, TextView chn) {
+            LinearLayout btnRow;
+            VH(View v, TextView name, TextView info, TextView chn, LinearLayout btnRow) {
                 super(v);
                 this.name = name;
                 this.info = info;
                 this.chn = chn;
+                this.btnRow = btnRow;
             }
         }
     }
