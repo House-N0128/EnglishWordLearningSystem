@@ -21,6 +21,7 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
 .admin-nav-btn.active{color:#17c2ae;}
 .admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -50,13 +51,63 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
   </div>
 
 <script>
-// 搜索跳转到查询结果页面
-document.getElementById('searchForm').onsubmit = function(e){
-  e.preventDefault();
-  const keyword = document.getElementById('keyword').value.trim();
-  if(keyword) window.location.href = `resultSearchUser.html?keyword=${encodeURIComponent(keyword)}`;
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+document.getElementById("search-btn").onclick = function() {
+  var kw = document.getElementById("search-keyword").value.trim();
+  if (!kw) return;
+  var box = document.getElementById("result-list");
+  box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">搜索中...</div>';
+  apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
+    if (r.code === 200 && r.data && r.data.length > 0) {
+      box.innerHTML = r.data.map(function(u) {
+        return `<div class="collection-item">
+          <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
+          <div class="book-info">状态: ` + (u.accountStatus||"") + ` | ` + (u.phoneNumber||"") + `</div>
+          <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
+          <button class="action-btn" onclick="location.href='查看用户学习记录.html?userId=` + u.userId + `'">学习记录</button>
+        </div>`;
+      }).join("");
+    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
+  });
+};
+function toggleUser(userId, currentStatus) {
+  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
+  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
+  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
+    alert(r.message);
+    document.getElementById("search-btn").onclick();
+  });
 }
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+document.getElementById("search-btn").onclick = function() {
+  var kw = document.getElementById("search-keyword").value.trim();
+  if (!kw) return;
+  var box = document.getElementById("result-list");
+  box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">搜索中...</div>';
+  apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
+    if (r.code === 200 && r.data && r.data.length > 0) {
+      box.innerHTML = r.data.map(function(u) {
+        return `<div class="collection-item">
+          <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
+          <div class="book-info">状态: ` + (u.accountStatus||"") + ` | ` + (u.phoneNumber||"") + `</div>
+          <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
+          <button class="action-btn" onclick="location.href='查看用户学习记录.html?userId=` + u.userId + `'">学习记录</button>
+        </div>`;
+      }).join("");
+    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
+  });
+};
+function toggleUser(userId, currentStatus) {
+  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
+  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
+  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
+    alert(r.message);
+    document.getElementById("search-btn").onclick();
+  });
+}
+</script>
+`n</body>
 </html>

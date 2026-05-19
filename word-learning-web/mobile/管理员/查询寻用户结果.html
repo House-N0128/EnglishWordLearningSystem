@@ -121,6 +121,7 @@ body {
   font-size:13px;
 }
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 
 <body>
@@ -176,20 +177,57 @@ body {
   </div>
 
 <script>
-function editUser(userId){
-  alert('修改用户信息: ' + userId);
-}
-function toggleStatus(userId, action){
-  if(action==='disable'){
-    alert('禁用用户: ' + userId);
-  }else{
-    alert('启用用户: ' + userId);
-  }
-}
-function viewRecord(userId){
-  window.location.href = 'study_record.html?userId=' + userId;
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var kw = params.get("keyword") || "";
+document.title = "搜索结果: " + kw;
+apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
+  var box = document.getElementById("user-list");
+  if (r.code === 200 && r.data && r.data.length > 0) {
+    box.innerHTML = r.data.map(function(u) {
+      return `<div class="collection-item">
+        <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
+        <div class="book-info">` + (u.phoneNumber||"") + ` | ` + (u.email||"") + `</div>
+        <div class="book-meta">状态: ` + (u.accountStatus||"") + ` | 注册: ` + (u.registerTime||"").substring(0,10) + `</div>
+        <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
+      </div>`;
+    }).join("");
+  } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
+});
+function toggleUser(userId, currentStatus) {
+  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
+  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
+  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
+    alert(r.message); location.reload();
+  });
 }
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var kw = params.get("keyword") || "";
+document.title = "搜索结果: " + kw;
+apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
+  var box = document.getElementById("user-list");
+  if (r.code === 200 && r.data && r.data.length > 0) {
+    box.innerHTML = r.data.map(function(u) {
+      return `<div class="collection-item">
+        <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
+        <div class="book-info">` + (u.phoneNumber||"") + ` | ` + (u.email||"") + `</div>
+        <div class="book-meta">状态: ` + (u.accountStatus||"") + ` | 注册: ` + (u.registerTime||"").substring(0,10) + `</div>
+        <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
+      </div>`;
+    }).join("");
+  } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
+});
+function toggleUser(userId, currentStatus) {
+  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
+  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
+  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
+    alert(r.message); location.reload();
+  });
+}
+</script>
+`n</body>
 </html>

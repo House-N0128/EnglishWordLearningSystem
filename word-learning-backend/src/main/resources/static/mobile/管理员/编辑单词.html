@@ -70,6 +70,7 @@ textarea {resize:vertical; min-height:60px;}
   box-shadow:0 2px 8px #e3f2fd;
 }
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
 
@@ -150,30 +151,73 @@ textarea {resize:vertical; min-height:60px;}
 </div>
 
 <script>
-const form = document.getElementById('editWordForm');
-
-form.onsubmit = function(e){
-  e.preventDefault();
-
-  const wordId = document.getElementById('wordId').value;
-  const bookName = document.getElementById('bookName').value.trim();
-  const spelling = document.getElementById('spelling').value.trim();
-  const phonetic = document.getElementById('phonetic').value.trim();
-  const pos = document.getElementById('partOfSpeech').value;
-  const meaning = document.getElementById('meaning').value.trim();
-  const example = document.getElementById('example').value.trim();
-  const audio = document.getElementById('audioLink').value.trim();
-  const status = document.getElementById('status').value;
-
-  if(!bookName || !spelling || !pos || !meaning || !status){
-    alert('请填写所有必填字段！');
-    return;
-  }
-
-  alert(`单词 ${spelling} 信息已保存！\n所属词书: ${bookName}\n词性: ${pos}\n状态: ${status}`);
-  // TODO: 这里可以添加 AJAX 提交到后端
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var wordId = params.get("wordId");
+if (wordId) {
+  document.getElementById("word-id").value = wordId;
+  apiGet("/api/words/" + wordId).then(function(r) {
+    if (r.code === 200) {
+      var w = r.data;
+      document.getElementById("word-spelling").value = w.englishSpelling || "";
+      document.getElementById("word-phonetic").value = w.phoneticSymbol || "";
+      document.getElementById("word-chinese").value = w.chineseDefinition || "";
+      document.getElementById("word-example").value = w.exampleSentence || "";
+      document.getElementById("word-audio").value = w.wordPronunciation || "";
+      document.getElementById("word-image").value = w.wordImage || "";
+    }
+  });
+}
+document.getElementById("submit-btn").onclick = function() {
+  var w = {
+    englishSpelling: document.getElementById("word-spelling").value.trim(),
+    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
+    chineseDefinition: document.getElementById("word-chinese").value.trim(),
+    exampleSentence: document.getElementById("word-example").value.trim(),
+    wordPronunciation: document.getElementById("word-audio").value.trim(),
+    wordImage: document.getElementById("word-image").value.trim()
+  };
+  apiPut("/api/words/" + wordId, w).then(function(r) {
+    if (r.code === 200) { showMsg("修改已保存！", "success"); }
+    else { showMsg(r.message, "error"); }
+  });
 };
+function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var wordId = params.get("wordId");
+if (wordId) {
+  document.getElementById("word-id").value = wordId;
+  apiGet("/api/words/" + wordId).then(function(r) {
+    if (r.code === 200) {
+      var w = r.data;
+      document.getElementById("word-spelling").value = w.englishSpelling || "";
+      document.getElementById("word-phonetic").value = w.phoneticSymbol || "";
+      document.getElementById("word-chinese").value = w.chineseDefinition || "";
+      document.getElementById("word-example").value = w.exampleSentence || "";
+      document.getElementById("word-audio").value = w.wordPronunciation || "";
+      document.getElementById("word-image").value = w.wordImage || "";
+    }
+  });
+}
+document.getElementById("submit-btn").onclick = function() {
+  var w = {
+    englishSpelling: document.getElementById("word-spelling").value.trim(),
+    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
+    chineseDefinition: document.getElementById("word-chinese").value.trim(),
+    exampleSentence: document.getElementById("word-example").value.trim(),
+    wordPronunciation: document.getElementById("word-audio").value.trim(),
+    wordImage: document.getElementById("word-image").value.trim()
+  };
+  apiPut("/api/words/" + wordId, w).then(function(r) {
+    if (r.code === 200) { showMsg("修改已保存！", "success"); }
+    else { showMsg(r.message, "error"); }
+  });
+};
+function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
+</script>
+`n</body>
 </html>

@@ -140,6 +140,7 @@
     .admin-nav-btn.active {color:#17c2ae;}
     .admin-navbar i {font-style:normal;font-size:22px;margin-bottom:2px;}
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 
 <body>
@@ -200,5 +201,34 @@
     <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
   </div>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+
+function loadBooks() {
+  apiGet("/api/wordbooks").then(function(r) {
+    var box = document.getElementById("book-list");
+    if (r.code === 200 && r.data && r.data.length > 0) {
+      box.innerHTML = r.data.map(function(b) {
+        return `<div class="collection-item">
+          <div class="book-name">` + b.wordBookName + `</div>
+          <div class="book-info">` + (b.difficultyLevel||"") + ` | ` + (b.wordCount||0) + `词</div>
+          <div class="book-meta">创建: ` + (b.createTime||"").substring(0,10) + `</div>
+          <button class="action-btn" onclick="editBook('` + b.wordBookId + `')">编辑</button>
+          <button class="action-btn cancel" onclick="delBook('` + b.wordBookId + `')">下架</button>
+        </div>`;
+      }).join("");
+    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无词书</div>'; }
+  });
+}
+
+function delBook(id) {
+  if (!confirm("确定下架该词书？")) return;
+  apiDelete("/api/wordbooks/" + id).then(function(r) { alert(r.message); loadBooks(); });
+}
+
+function editBook(id) { location.href = "编辑词书.html?bookId=" + id; }
+
+loadBooks();
+</script>
+`n</body>
 </html>

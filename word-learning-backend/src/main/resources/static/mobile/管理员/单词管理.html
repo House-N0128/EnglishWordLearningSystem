@@ -25,6 +25,7 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
 .admin-nav-btn.active{color:#17c2ae;}
 .admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
   <div class="top-bar"><span class="admin-user">管理员：admin001</span>
@@ -65,5 +66,36 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
     <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
     <button class="admin-nav-btn active" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
   </div>
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+
+function loadWords() {
+  apiGet("/api/wordbooks").then(function(r) {
+    if (r.code !== 200 || !r.data || r.data.length === 0) { document.getElementById("word-list").innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无词书</div>'; return; }
+    var box = document.getElementById("word-list");
+    box.innerHTML = "";
+    r.data.forEach(function(b) {
+      apiGet("/api/words?wordBookId=" + b.wordBookId).then(function(wr) {
+        if (wr.code === 200 && wr.data) {
+          wr.data.forEach(function(w) {
+            box.innerHTML += `<div class="collection-item">
+              <div class="word-name">` + (w.englishSpelling||"") + ` <span class="word-pos">` + (w.phoneticSymbol||"") + `</span></div>
+              <div class="word-meaning">` + (w.chineseDefinition||"") + `</div>
+              <div class="word-meta">词书: ` + (b.wordBookName||"") + `</div>
+              <button class="action-btn" onclick="editWord('` + w.wordId + `')">编辑</button>
+              <button class="action-btn cancel" onclick="delWord('` + w.wordId + `')">删除</button>
+            </div>`;
+          });
+        }
+      });
+    });
+  });
+}
+
+function delWord(id) { if (!confirm("确定删除该单词？")) return; apiDelete("/api/words/" + id).then(function(r) { alert(r.message); location.reload(); }); }
+function editWord(id) { location.href = "编辑单词.html?wordId=" + id; }
+
+loadWords();
+</script>
+`n</body>
 </html>

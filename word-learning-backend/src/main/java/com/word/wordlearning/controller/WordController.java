@@ -35,4 +35,23 @@ public class WordController {
     public Result<List<Word>> search(@RequestParam String keyword) {
         return Result.success(wordMapper.search(keyword));
     }
+
+    @PostMapping
+    public Result<String> add(@RequestBody Word word) {
+        wordMapper.insert(word);
+        return Result.success("单词添加成功");
+    }
+
+    @PutMapping("/{wordId}")
+    public Result<String> update(@PathVariable String wordId, @RequestBody Word word) {
+        word.setWordId(wordId);
+        wordMapper.update(word);
+        return Result.success("单词修改成功");
+    }
+
+    @DeleteMapping("/{wordId}")
+    public Result<String> delete(@PathVariable String wordId) {
+        wordMapper.delete(wordId);
+        return Result.success("单词已删除");
+    }
 }

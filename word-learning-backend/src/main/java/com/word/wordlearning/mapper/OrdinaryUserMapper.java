@@ -27,4 +27,10 @@ public interface OrdinaryUserMapper {
 
     @Select("SELECT COUNT(*) FROM t_ordinary_user")
     int countAll();
+
+    @Select("SELECT * FROM t_ordinary_user WHERE userId LIKE CONCAT('%',#{keyword},'%') OR userName LIKE CONCAT('%',#{keyword},'%')")
+    java.util.List<OrdinaryUser> searchUsers(@Param("keyword") String keyword);
+
+    @Update("UPDATE t_ordinary_user SET accountStatus=#{status} WHERE userId=#{userId}")
+    void updateStatus(@Param("userId") String userId, @Param("status") String status);
 }

@@ -18,4 +18,16 @@ public class WordBookService {
     public List<WordBook> listAvailable() {
         return wordBookMapper.findAll();
     }
+
+    public void add(WordBook book) {
+        wordBookMapper.insert(book);
+    }
+
+    public void update(WordBook book) {
+        wordBookMapper.update(book);
+    }
+
+    public void delete(String wordBookId) {
+        wordBookMapper.delete(wordBookId);
+    }
 }

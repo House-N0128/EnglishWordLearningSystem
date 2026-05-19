@@ -4,12 +4,17 @@ import com.word.wordlearning.dto.AdminStatsDTO;
 import com.word.wordlearning.dto.LoginRequest;
 import com.word.wordlearning.dto.LoginResponse;
 import com.word.wordlearning.dto.Result;
+import com.word.wordlearning.entity.OrdinaryUser;
+import com.word.wordlearning.entity.WordLearningRecord;
 import com.word.wordlearning.mapper.OrdinaryUserMapper;
 import com.word.wordlearning.mapper.WordBookMapper;
 import com.word.wordlearning.mapper.WordLearningRecordMapper;
 import com.word.wordlearning.mapper.WordMapper;
 import com.word.wordlearning.service.AdminstratorService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -50,5 +55,25 @@ public class AdminstratorController {
         dto.setWordCount(wordMapper.countAll());
         dto.setTodayRecordCount(recordMapper.countAllToday());
         return Result.success(dto);
+    }
+
+    @GetMapping("/users")
+    public Result<List<OrdinaryUser>> searchUsers(@RequestParam(defaultValue = "") String keyword) {
+        String kw = keyword.isEmpty() ? "%" : keyword;
+        List<OrdinaryUser> users = userMapper.searchUsers(kw);
+        users.forEach(u -> u.setLoginPassword(null));
+        return Result.success(users);
+    }
+
+    @PutMapping("/users/{userId}")
+    public Result<String> updateUserStatus(@PathVariable String userId, @RequestBody Map<String, String> body) {
+        String status = body.get("accountStatus");
+        userMapper.updateStatus(userId, status);
+        return Result.success("用户状态已更新");
+    }
+
+    @GetMapping("/records")
+    public Result<List<WordLearningRecord>> viewUserRecords(@RequestParam String userId) {
+        return Result.success(recordMapper.findByUserId(userId));
     }
 }

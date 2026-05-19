@@ -90,6 +90,7 @@ body {
   border-bottom:none;
 }
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
 
@@ -116,9 +117,7 @@ body {
 
   <!-- 统计数据 -->
   <div class="section-title">学习统计</div>
-  <div class="stats-bar">
-    总学习单词数：<strong>156</strong> ｜ 日均学习数：<strong>17</strong>
-  </div>
+  <div class="stats-bar" id="stats-bar">加载中...</div>
 
   <!-- 学习记录表 -->
   <div class="section-title">学习记录明细</div>
@@ -141,11 +140,71 @@ body {
 </div>
 
 <script>
-// 从URL取用户ID
-const urlParams = new URLSearchParams(window.location.search);
-const uid = urlParams.get('userId');
-console.log("管理员正在查看用户ID:", uid);
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var userId = params.get("userId");
+if (userId) {
+  apiGet("/api/admin/records?userId=" + userId).then(function(r) {
+    var tbody = document.getElementById("record-body");
+    if (r.code === 200 && r.data) {
+      var records = r.data;
+      // Aggregate by date
+      var agg = {};
+      records.forEach(function(rec) {
+        var key = (rec.learningDate||"") + "|" + (rec.learnedWordBookId||"");
+        if (!agg[key]) agg[key] = {date: rec.learningDate, book: rec.learnedWordBookId, count: 0};
+        agg[key].count++;
+      });
+      var list = Object.values(agg).sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+      document.getElementById("stats-bar").innerText = "总记录: " + records.length + " 条";
+      if (list.length > 0) {
+        tbody.innerHTML = list.map(function(r){ return "<tr><td>"+r.date+"</td><td>"+r.book+"</td><td>"+r.count+"词</td></tr>"; }).join("");
+      } else { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#8899aa;padding:16px;">暂无学习记录</td></tr>'; }
+    }
+  });
+  // Load user info
+  apiGet("/api/user/profile").then(function(r) {
+    if (r.code === 200 && r.data) {
+      var u = r.data;
+      var info = "用户: " + (u.userName||"") + " (" + u.userId + ")";
+      document.getElementById("stats-bar").innerText = info + " | " + document.getElementById("stats-bar").innerText;
+    }
+  });
+}
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+var params = new URLSearchParams(window.location.search);
+var userId = params.get("userId");
+if (userId) {
+  apiGet("/api/admin/records?userId=" + userId).then(function(r) {
+    var tbody = document.getElementById("record-body");
+    if (r.code === 200 && r.data) {
+      var records = r.data;
+      // Aggregate by date
+      var agg = {};
+      records.forEach(function(rec) {
+        var key = (rec.learningDate||"") + "|" + (rec.learnedWordBookId||"");
+        if (!agg[key]) agg[key] = {date: rec.learningDate, book: rec.learnedWordBookId, count: 0};
+        agg[key].count++;
+      });
+      var list = Object.values(agg).sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+      document.getElementById("stats-bar").innerText = "总记录: " + records.length + " 条";
+      if (list.length > 0) {
+        tbody.innerHTML = list.map(function(r){ return "<tr><td>"+r.date+"</td><td>"+r.book+"</td><td>"+r.count+"词</td></tr>"; }).join("");
+      } else { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#8899aa;padding:16px;">暂无学习记录</td></tr>'; }
+    }
+  });
+  // Load user info
+  apiGet("/api/user/profile").then(function(r) {
+    if (r.code === 200 && r.data) {
+      var u = r.data;
+      var info = "用户: " + (u.userName||"") + " (" + u.userId + ")";
+      document.getElementById("stats-bar").innerText = info + " | " + document.getElementById("stats-bar").innerText;
+    }
+  });
+}
+</script>
+`n</body>
 </html>

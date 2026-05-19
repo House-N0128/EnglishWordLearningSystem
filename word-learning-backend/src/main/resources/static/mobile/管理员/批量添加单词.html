@@ -91,6 +91,7 @@ body {
   box-shadow:0 2px 8px #e3f2fd;
 }
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
 
@@ -179,5 +180,8 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 });
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+</script>
+`n</body>
 </html>

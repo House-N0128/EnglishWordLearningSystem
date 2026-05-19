@@ -63,6 +63,7 @@ textarea {resize:vertical; min-height:60px;}
   transition:background .2s, box-shadow .2s;
 }
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
 
@@ -139,43 +140,47 @@ textarea {resize:vertical; min-height:60px;}
 </div>
 
 <script>
-const form = document.getElementById('addWordForm');
-form.onsubmit = function(e){
-  e.preventDefault();
-
-  const data = {
-    book: form.book.value.trim(),
-    word: form.word.value.trim(),
-    phonetic: form.phonetic.value.trim(),
-    pos: form.partOfSpeech.value,
-    meaning: form.meaning.value.trim(),
-    example: form.example.value.trim(),
-    audioUrl: form.audioUrl.value.trim(),
-    status: form.status.value
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+document.getElementById("submit-btn").onclick = function() {
+  var w = {
+    wordId: "WD" + Date.now().toString(36).toUpperCase(),
+    wordBookId: document.getElementById("word-bookid").value.trim(),
+    englishSpelling: document.getElementById("word-spelling").value.trim(),
+    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
+    chineseDefinition: document.getElementById("word-chinese").value.trim(),
+    exampleSentence: document.getElementById("word-example").value.trim(),
+    wordPronunciation: document.getElementById("word-audio").value.trim(),
+    wordImage: document.getElementById("word-image").value.trim()
   };
-
-  for (let key in data) {
-    if (!data[key]) {
-      alert("请填写所有字段！");
-      return;
-    }
-  }
-
-  alert(
-    "单词添加成功！\n" +
-    `所属词书：${data.book}\n` +
-    `单词：${data.word}\n` +
-    `音标：${data.phonetic}\n` +
-    `词性：${data.pos}\n` +
-    `释义：${data.meaning}\n` +
-    `例句：${data.example}\n` +
-    `音频：${data.audioUrl}\n` +
-    `状态：${data.status}`
-  );
-
-  form.reset();
+  if (!w.englishSpelling || !w.chineseDefinition || !w.wordBookId) { showMsg("请填写英文拼写、中文释义和所属词书ID", "error"); return; }
+  apiPost("/api/words", w).then(function(r) {
+    if (r.code === 200) { showMsg("单词添加成功！", "success"); }
+    else { showMsg(r.message, "error"); }
+  });
 };
+function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
 </script>
 
-</body>
+`n<script>
+if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+document.getElementById("submit-btn").onclick = function() {
+  var w = {
+    wordId: "WD" + Date.now().toString(36).toUpperCase(),
+    wordBookId: document.getElementById("word-bookid").value.trim(),
+    englishSpelling: document.getElementById("word-spelling").value.trim(),
+    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
+    chineseDefinition: document.getElementById("word-chinese").value.trim(),
+    exampleSentence: document.getElementById("word-example").value.trim(),
+    wordPronunciation: document.getElementById("word-audio").value.trim(),
+    wordImage: document.getElementById("word-image").value.trim()
+  };
+  if (!w.englishSpelling || !w.chineseDefinition || !w.wordBookId) { showMsg("请填写英文拼写、中文释义和所属词书ID", "error"); return; }
+  apiPost("/api/words", w).then(function(r) {
+    if (r.code === 200) { showMsg("单词添加成功！", "success"); }
+    else { showMsg(r.message, "error"); }
+  });
+};
+function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
+</script>
+`n</body>
 </html>

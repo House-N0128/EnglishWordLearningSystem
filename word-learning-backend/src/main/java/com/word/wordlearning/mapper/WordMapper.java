@@ -1,9 +1,7 @@
 package com.word.wordlearning.mapper;
 
 import com.word.wordlearning.entity.Word;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
@@ -20,4 +18,16 @@ public interface WordMapper {
 
     @Select("SELECT COUNT(*) FROM t_word")
     int countAll();
+
+    @Insert("INSERT INTO t_word(wordId, wordBookId, englishSpelling, chineseDefinition, exampleSentence, phoneticSymbol, WordPronunciation, wordImage, createTime, updateTime) " +
+            "VALUES(#{wordId}, #{wordBookId}, #{englishSpelling}, #{chineseDefinition}, #{exampleSentence}, #{phoneticSymbol}, #{wordPronunciation}, #{wordImage}, NOW(), NOW())")
+    void insert(Word word);
+
+    @Update("UPDATE t_word SET englishSpelling=#{englishSpelling}, chineseDefinition=#{chineseDefinition}, " +
+            "exampleSentence=#{exampleSentence}, phoneticSymbol=#{phoneticSymbol}, WordPronunciation=#{wordPronunciation}, " +
+            "wordImage=#{wordImage}, updateTime=NOW() WHERE wordId=#{wordId}")
+    void update(Word word);
+
+    @Delete("DELETE FROM t_word WHERE wordId=#{wordId}")
+    void delete(String wordId);
 }
