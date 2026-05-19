@@ -2,6 +2,7 @@ package com.example.wordlearningapp;
 
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -150,7 +151,7 @@ public class UserRecordActivity extends AppCompatActivity {
             card.setElevation(2);
 
             TextView dateTv = new TextView(parent.getContext());
-            dateTv.setId(ViewGroup.generateViewId());
+            dateTv.setId(View.generateViewId());
             dateTv.setTextSize(16);
             dateTv.setTextColor(0xFF318af8);
             card.addView(dateTv);
