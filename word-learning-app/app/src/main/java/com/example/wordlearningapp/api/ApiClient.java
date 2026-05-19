@@ -64,6 +64,26 @@ public class ApiClient {
         }
     }
 
+    public JsonObject put(String path, JsonObject json) throws IOException {
+        String jsonStr = json.toString();
+        RequestBody body = RequestBody.create(jsonStr, JSON);
+        Request req = addHeaders().url(BASE_URL + path).put(body).build();
+        try (Response res = client.newCall(req).execute()) {
+            String respBody = res.body() != null ? res.body().string() : "{}";
+            return gson.fromJson(respBody, JsonObject.class);
+        }
+    }
+
+    public JsonObject delete(String path, JsonObject json) throws IOException {
+        String jsonStr = json != null ? json.toString() : "{}";
+        RequestBody body = RequestBody.create(jsonStr, JSON);
+        Request req = addHeaders().url(BASE_URL + path).delete(body).build();
+        try (Response res = client.newCall(req).execute()) {
+            String respBody = res.body() != null ? res.body().string() : "{}";
+            return gson.fromJson(respBody, JsonObject.class);
+        }
+    }
+
     public String getBaseUrl() {
         return BASE_URL;
     }

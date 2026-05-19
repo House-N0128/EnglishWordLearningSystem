@@ -38,5 +38,6 @@
         <activity android:name=".StudyRecordsActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".AdminMainActivity" />
+        <activity android:name=".UserManageActivity" />
     </application>
 </manifest>

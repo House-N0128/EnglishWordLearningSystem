@@ -78,7 +78,7 @@ public class AdminMainActivity extends AppCompatActivity {
             // Navigate to word search as quick word management entry
             startActivity(new Intent(this, WordSearchActivity.class));
         });
-        addButton("👥 用户管理", () -> Toast.makeText(this, "用户管理请使用Web端后台", Toast.LENGTH_SHORT).show());
+        addButton("👥 用户管理", () -> startActivity(new Intent(this, UserManageActivity.class)));
 
         // Logout
         Button btnLogout = new Button(this);
