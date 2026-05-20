@@ -57,9 +57,26 @@ public class AddEditBookActivity extends AppCompatActivity {
         form.setOrientation(LinearLayout.VERTICAL);
         form.setPadding(28, 24, 28, 24);
 
-        etId = addField(form, "词书ID");
-        etId.setHint("如 WB001");
-        if (bookId != null) { etId.setText(bookId); etId.setEnabled(false); }
+        if (bookId == null) {
+            // Add mode: ID auto-generated, show hint only
+            TextView idLabel = new TextView(this);
+            idLabel.setText("词书ID（系统自动生成）");
+            idLabel.setTextSize(14); idLabel.setTextColor(0xFF4a5568);
+            idLabel.setPadding(0, 12, 0, 6);
+            form.addView(idLabel);
+
+            TextView idHint = new TextView(this);
+            idHint.setText("系统将自动分配 WB001 格式ID");
+            idHint.setTextSize(13); idHint.setTextColor(0xFF8899aa);
+            idHint.setPadding(0, 0, 0, 12);
+            form.addView(idHint);
+        } else {
+            // Edit mode: show ID as read-only
+            etId = addField(form, "词书ID（不可修改）");
+            etId.setText(bookId);
+            etId.setEnabled(false);
+            etId.setBackgroundColor(0xFFF0F4F8);
+        }
 
         etName = addField(form, "词书名称");
 
@@ -155,18 +172,16 @@ public class AddEditBookActivity extends AppCompatActivity {
     }
 
     private void submit() {
-        String id = etId.getText().toString().trim();
         String name = etName.getText().toString().trim();
         String diff = spDifficulty.getSelectedItem().toString();
         String desc = etDesc.getText().toString().trim();
 
-        if (id.isEmpty() || name.isEmpty()) { Toast.makeText(this, "请填写词书ID和名称", Toast.LENGTH_SHORT).show(); return; }
+        if (name.isEmpty()) { Toast.makeText(this, "请填写词书名称", Toast.LENGTH_SHORT).show(); return; }
 
         btnSubmit.setEnabled(false);
         btnSubmit.setText("提交中...");
 
         JsonObject body = new JsonObject();
-        if (bookId == null) body.addProperty("wordBookId", id);
         body.addProperty("wordBookName", name);
         body.addProperty("difficultyLevel", diff);
         body.addProperty("wordBookDescription", desc);

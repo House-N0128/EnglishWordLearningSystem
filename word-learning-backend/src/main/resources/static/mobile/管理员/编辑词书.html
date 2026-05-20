@@ -2,134 +2,98 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>编辑词书(App端)</title>
-<style>* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif;
-  background: #f0f4f8; min-height: 100vh;
-  padding-bottom: 75px; color: #2d3748;
-}
-.header {
-  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
-  padding: 16px 18px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 20px rgba(26,86,219,0.2);
-  display: flex; align-items: center; gap: 12px;
-}
-.btn-back {
-  background: rgba(255,255,255,0.15); color: #fff;
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 14px; border-radius: 20px; font-size: 13px;
-  cursor: pointer; white-space: nowrap;
-}
+<title>编辑词书</title>
+<script src="/mobile/api.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif; background: #f0f4f8; min-height: 100vh; padding-bottom: 75px; color: #2d3748; }
+.header { background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%); padding: 16px 18px; border-radius: 0 0 20px 20px; box-shadow: 0 4px 20px rgba(26,86,219,0.2); display: flex; align-items: center; gap: 12px; }
+.btn-back { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; }
 .header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
 .section { padding: 0 14px; margin-top: 16px; }
-.card-list { display: flex; flex-direction: column; gap: 10px; }
-.card {
-  background: #fff; border-radius: 14px;
-  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-}
-.card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.card-title { font-size: 16px; font-weight: 600; color: #2d3748; }
-.card-sub  { font-size: 13px; color: #8899aa; }
-.card-meta { font-size: 12px; color: #a0aec0; margin-top: 4px; }
-.btn {
-  padding: 8px 16px; border-radius: 20px; border: none;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: all .15s;
-}
+.card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 12px; }
+.section-title { font-size: 14px; font-weight: 700; color: #4a5568; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #edf2f7; }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 4px; display: block; }
+.form-input { width: 100%; padding: 12px 14px; border: 2px solid #94a3b8; border-radius: 10px; font-size: 16px; background: #eff6ff; font-family: inherit; transition: border .2s, box-shadow .2s; }
+.form-input:focus { outline: none; border-color: #3577ef; box-shadow: 0 0 0 3px rgba(53,119,239,0.15); background: #fff; }
+select.form-input { appearance: none; }
+.btn { padding: 10px 18px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
 .btn:active { transform: scale(0.95); }
 .btn-primary { background: #3577ef; color: #fff; }
 .btn-danger  { background: #fff; color: #e53e3e; border: 1px solid #fed7d7; }
 .btn-success { background: #38a169; color: #fff; }
-.btn-outline { background: #fff; color: #3577ef; border: 1px solid #bee3f8; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
-.form-input {
-  width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0;
-  border-radius: 10px; font-size:16px; background: #f7fafc;
-  font-family: inherit; transition: border .2s;
-}
-.form-input:focus { outline: none; border-color: #3577ef; background: #fff; }
-textarea.form-input { min-height: 80px; resize: vertical; }
-select.form-input { appearance: none; }
-.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size:16px; margin: 8px 0; }
+.btn-full { width: 100%; padding: 12px; font-size: 15px; }
+.word-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; gap: 8px; }
+.word-item:last-child { border-bottom: none; }
+.word-spelling { font-size: 15px; font-weight: 600; color: #2d3748; }
+.word-definition { font-size: 13px; color: #718096; margin-top: 2px; }
+.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size: 14px; margin: 8px 0; }
 .msg-error { background: #fff5f5; color: #c53030; }
 .msg-success { background: #f0fff4; color: #276749; }
-.navbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-  border-radius: 20px 20px 0 0;
-  display: flex; justify-content: space-around;
-  padding: 8px 0 12px 0; z-index: 100;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; border: none; background: none;
-  font-family: inherit; font-size: 11px; color: #8899aa;
-}
-.nav-item .nav-icon { font-size: 20px; }
-.nav-item.active { color: #3577ef; font-weight: 600; }
-.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-.search-bar input { flex: 1; }
-.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
-/* ==== IME中文输入强制修复 ==== */
-input, textarea, select {
-  ime-mode: auto !important;
-  -webkit-user-modify: read-write !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
-<script src="/mobile/api.js"></script>
+.empty { text-align: center; color: #8899aa; padding: 16px; font-size: 14px; }
+input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }
+</style>
 </head>
 <body>
 
-<!-- 顶栏 -->
 <div class="header">
   <span class="btn-back" onclick="history.back()">← 返回</span>
   <span class="header-title">编辑词书</span>
 </div>
 
-<div class="main-panel">
-
-  <div class="page-title">修改词书信息</div>
-
-  
-
+<div class="section">
+  <!-- 词书基本信息编辑 -->
+  <div class="card">
+    <div class="section-title">词书基本信息</div>
     <div class="form-group">
-      <label>词书名称</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="bookName" placeholder="请输入词书名称" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <label class="form-label">词书ID</label>
+      <input class="form-input" id="book-id" readonly>
     </div>
-
     <div class="form-group">
-      <label>词书描述</label>
-      <textarea id="bookDesc" placeholder="请输入词书描述"></textarea>
+      <label class="form-label">词书名称</label>
+      <input class="form-input" id="book-name" placeholder="词书名称">
     </div>
-
     <div class="form-group">
-      <label>难度等级</label>
-      <select id="level" required>
-        <option value="">请选择</option>
+      <label class="form-label">难度等级</label>
+      <select class="form-input" id="book-difficulty">
         <option value="初级">初级</option>
         <option value="中级">中级</option>
         <option value="高级">高级</option>
       </select>
     </div>
-
     <div class="form-group">
-      <label>状态</label>
-      <select id="status" required>
-        <option value="">请选择</option>
-        <option value="已上架">已上架</option>
-        <option value="未上架">未上架</option>
-      </select>
+      <label class="form-label">词书简介</label>
+      <textarea class="form-input" id="book-desc" placeholder="词书简介" rows="2"></textarea>
     </div>
+    <div id="msg-book" class="msg"></div>
+    <button class="btn btn-primary btn-full" id="save-book-btn">保存基本信息</button>
+  </div>
 
-    <button type="submit" class="btn-save">保存修改</button>
+  <!-- 单词列表管理 -->
+  <div class="card">
+    <div class="section-title">词书单词管理 <span style="font-weight:400;color:#8899aa;" id="word-count"></span></div>
+    <div id="word-list"><div class="empty">加载中...</div></div>
+  </div>
 
-  
-
+  <!-- 添加单词到此词书 -->
+  <div class="card" style="background:#f0f9ff;">
+    <div class="section-title">+ 添加单词到本词书</div>
+    <div class="form-group">
+      <label class="form-label">英文拼写</label>
+      <input class="form-input" id="new-spelling" placeholder="如: abandon" style="background:#fff;">
+    </div>
+    <div class="form-group">
+      <label class="form-label">中文释义</label>
+      <input class="form-input" id="new-definition" placeholder="如: 抛弃,放弃" style="background:#fff;">
+    </div>
+    <div class="form-group">
+      <label class="form-label">音标 (可选)</label>
+      <input class="form-input" id="new-phonetic" placeholder="如: /əˈbændən/" style="background:#fff;">
+    </div>
+    <div id="msg-add" class="msg"></div>
+    <button class="btn btn-success btn-full" id="add-word-btn">添加单词</button>
+  </div>
 </div>
 
 <script>
@@ -137,85 +101,99 @@ if (!requireAuth("admin")) { throw new Error("unauthorized"); }
 
 var params = new URLSearchParams(window.location.search);
 var bookId = params.get("bookId");
-if (!bookId) { showMsg("缺少词书ID参数", "error"); } else {
+if (!bookId) { document.body.innerHTML = '<div class="empty">缺少词书参数</div>'; }
+
+// Load book info and words
+function loadAll() {
   apiGet("/api/wordbooks").then(function(r) {
-    if (r.code === 200) {
-      var books = r.data;
-      for (var i=0; i<books.length; i++) {
-        if (books[i].wordBookId === bookId) {
-          document.getElementById("book-id").value = books[i].wordBookId;
-          document.getElementById("book-name").value = books[i].wordBookName || "";
-          document.getElementById("book-difficulty").value = books[i].difficultyLevel || "";
-          document.getElementById("book-desc").value = books[i].wordBookDescription || "";
-          break;
-        }
+    if (r.code !== 200 || !r.data) return;
+    r.data.forEach(function(b) {
+      if (b.wordBookId === bookId) {
+        document.getElementById("book-id").value = bookId;
+        document.getElementById("book-name").value = b.wordBookName || "";
+        document.getElementById("book-difficulty").value = b.difficultyLevel || "初级";
+        document.getElementById("book-desc").value = b.wordBookDescription || "";
+      }
+    });
+  });
+
+  apiGet("/api/words?wordBookId=" + bookId).then(function(r) {
+    var box = document.getElementById("word-list");
+    if (r.code === 200 && r.data) {
+      document.getElementById("word-count").innerText = "(共" + r.data.length + "词)";
+      if (r.data.length === 0) {
+        box.innerHTML = '<div class="empty">暂无单词</div>';
+      } else {
+        box.innerHTML = r.data.map(function(w) {
+          return '<div class="word-item">' +
+            '<div style="flex:1;">' +
+              '<div class="word-spelling">' + (w.englishSpelling || "") + '</div>' +
+              '<div class="word-definition">' + (w.chineseDefinition || "") + (w.phoneticSymbol ? '  ' + w.phoneticSymbol : '') + '</div>' +
+            '</div>' +
+            '<button class="btn btn-danger" style="font-size:12px;padding:6px 12px;" onclick="removeWord(\'' + w.wordId + '\')">移除</button>' +
+          '</div>';
+        }).join("");
       }
     }
   });
 }
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
+// Save book info
+document.getElementById("save-book-btn").onclick = function() {
+  var data = {
     wordBookName: document.getElementById("book-name").value.trim(),
     difficultyLevel: document.getElementById("book-difficulty").value,
     wordBookDescription: document.getElementById("book-desc").value.trim()
   };
-  if (!b.wordBookName) { showMsg("请填写词书名称", "error"); return; }
-  apiPut("/api/wordbooks/" + bookId, b).then(function(r) {
-    if (r.code === 200) { showMsg("修改已保存！", "success"); }
-    else { showMsg(r.message, "error"); }
+  if (!data.wordBookName) { showMsg("msg-book", "请填写词书名称", "error"); return; }
+  apiPut("/api/wordbooks/" + bookId, data).then(function(r) {
+    showMsg("msg-book", r.code === 200 ? "保存成功！" : (r.message || "保存失败"), r.code === 200 ? "success" : "error");
   });
 };
 
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
-</script>
+// Add word to book
+document.getElementById("add-word-btn").onclick = function() {
+  var spelling = document.getElementById("new-spelling").value.trim();
+  var definition = document.getElementById("new-definition").value.trim();
+  var phonetic = document.getElementById("new-phonetic").value.trim();
+  if (!spelling || !definition) { showMsg("msg-add", "请填写拼写和释义", "error"); return; }
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-
-var params = new URLSearchParams(window.location.search);
-var bookId = params.get("bookId");
-if (!bookId) { showMsg("缺少词书ID参数", "error"); } else {
-  apiGet("/api/wordbooks").then(function(r) {
+  apiPost("/api/words", {
+    wordId: "WD" + Date.now().toString(36).toUpperCase(),
+    wordBookId: bookId,
+    englishSpelling: spelling,
+    chineseDefinition: definition,
+    phoneticSymbol: phonetic
+  }).then(function(r) {
     if (r.code === 200) {
-      var books = r.data;
-      for (var i=0; i<books.length; i++) {
-        if (books[i].wordBookId === bookId) {
-          document.getElementById("book-id").value = books[i].wordBookId;
-          document.getElementById("book-name").value = books[i].wordBookName || "";
-          document.getElementById("book-difficulty").value = books[i].difficultyLevel || "";
-          document.getElementById("book-desc").value = books[i].wordBookDescription || "";
-          break;
-        }
-      }
+      showMsg("msg-add", "添加成功！", "success");
+      document.getElementById("new-spelling").value = "";
+      document.getElementById("new-definition").value = "";
+      document.getElementById("new-phonetic").value = "";
+      loadAll();
+    } else {
+      showMsg("msg-add", r.message || "添加失败", "error");
     }
   });
-}
-
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookName) { showMsg("请填写词书名称", "error"); return; }
-  apiPut("/api/wordbooks/" + bookId, b).then(function(r) {
-    if (r.code === 200) { showMsg("修改已保存！", "success"); }
-    else { showMsg(r.message, "error"); }
-  });
 };
 
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
+// Remove word from book (delete book ref only)
+function removeWord(wordId) {
+  if (!confirm("确定从本词书移除该单词？")) return;
+  apiDelete("/api/words/" + wordId + "?wordBookId=" + bookId).then(function(r) {
+    alert(r.message || "操作完成");
+    loadAll();
+  });
 }
+
+function showMsg(id, text, type) {
+  var el = document.getElementById(id);
+  el.innerText = text; el.style.display = "block";
+  el.className = "msg msg-" + type;
+  setTimeout(function() { el.style.display = "none"; }, 3000);
+}
+
+loadAll();
 </script>
-`n</body>
+</body>
 </html>

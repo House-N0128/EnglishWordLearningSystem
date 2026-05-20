@@ -29,6 +29,7 @@ public class OrdinaryUserService {
                     user.getAccountStatus(), "账号已被禁用");
         }
 
+        ordinaryUserMapper.updateLoginTime(user.getUserId());
         return new LoginResponse(user.getUserId(), user.getUserName(),
                 user.getAccountStatus(), "登录成功");
     }
