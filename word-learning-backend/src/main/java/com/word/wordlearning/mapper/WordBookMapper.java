@@ -25,4 +25,10 @@ public interface WordBookMapper {
 
     @Update("UPDATE t_word_book SET wordBookStatus='已下线', updateTime=NOW() WHERE wordBookId=#{wordBookId}")
     void delete(String wordBookId);
+
+    @Select("SELECT wordBookId FROM t_word_book WHERE wordBookId LIKE 'WB%' ORDER BY wordBookId DESC LIMIT 1")
+    String maxBookId();
+
+    @Select("SELECT * FROM t_word_book WHERE wordBookName = #{name}")
+    WordBook findByName(String name);
 }
