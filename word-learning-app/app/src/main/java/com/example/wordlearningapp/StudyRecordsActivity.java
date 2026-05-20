@@ -48,21 +48,39 @@ public class StudyRecordsActivity extends AppCompatActivity {
     private void loadData() {
         new Thread(() -> {
             try {
+                // 获取学习记录
                 JsonObject res = ApiClient.get().get("/api/records/list");
                 if (res.get("code").getAsInt() == 200) {
                     JsonArray data = res.getAsJsonArray("data");
 
-                    // Aggregate by date + book
+                    // 获取词书列表，建立词书ID到名称的映射
+                    JsonObject booksRes = ApiClient.get().get("/api/wordbooks");
+                    Map<String, String> bookNameMap = new HashMap<>();
+                    if (booksRes.get("code").getAsInt() == 200) {
+                        JsonArray books = booksRes.getAsJsonArray("data");
+                        for (int i = 0; i < books.size(); i++) {
+                            JsonObject book = books.get(i).getAsJsonObject();
+                            String bookId = book.has("wordBookId") ? book.get("wordBookId").getAsString() : "";
+                            String bookName = book.has("wordBookName") ? book.get("wordBookName").getAsString() : "";
+                            if (!bookId.isEmpty()) {
+                                bookNameMap.put(bookId, bookName);
+                            }
+                        }
+                    }
+
+                    // 按日期 + 词书ID聚合
                     Map<String, JsonObject> agg = new java.util.LinkedHashMap<>();
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject r = data.get(i).getAsJsonObject();
                         String date = r.has("learningDate") ? r.get("learningDate").getAsString() : "";
                         String bookId = r.has("learnedWordBookId") ? r.get("learnedWordBookId").getAsString() : "unknown";
                         String key = date + "|" + bookId;
+
                         if (!agg.containsKey(key)) {
                             JsonObject entry = new JsonObject();
                             entry.addProperty("date", date);
                             entry.addProperty("bookId", bookId);
+                            entry.addProperty("bookName", bookNameMap.getOrDefault(bookId, "未知词书"));
                             entry.addProperty("count", 1);
                             agg.put(key, entry);
                         } else {
@@ -72,7 +90,7 @@ public class StudyRecordsActivity extends AppCompatActivity {
                     }
 
                     List<JsonObject> list = new ArrayList<>(agg.values());
-                    // Sort descending
+                    // Sort descending by date
                     java.util.Collections.sort(list, (a, b) ->
                             b.get("date").getAsString().compareTo(a.get("date").getAsString()));
 
@@ -107,9 +125,11 @@ public class StudyRecordsActivity extends AppCompatActivity {
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
             JsonObject r = data.get(pos).getAsJsonObject();
             String date = r.has("date") ? r.get("date").getAsString() : "";
+            String bookName = r.has("bookName") ? r.get("bookName").getAsString() : "未知词书";
             int count = r.has("count") ? r.get("count").getAsInt() : 0;
+
             ((TextView) holder.itemView.findViewById(android.R.id.text1)).setText(date + "  ｜  " + count + "词");
-            ((TextView) holder.itemView.findViewById(android.R.id.text2)).setText("");
+            ((TextView) holder.itemView.findViewById(android.R.id.text2)).setText(bookName);
         }
 
         @Override public int getItemCount() { return data.size(); }

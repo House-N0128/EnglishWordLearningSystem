@@ -2,10 +2,13 @@ package com.example.wordlearningapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
@@ -15,6 +18,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     private TextView tvUsername, tvToday, tvTotal, tvBook;
     private LinearLayout bookList, recentWords;
@@ -44,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupNavBar();
+        setupClickListeners();
+        loadData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadData();
     }
 
@@ -61,10 +73,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProfileActivity.class)));
     }
 
+    private void setupClickListeners() {
+        findViewById(R.id.card_today).setOnClickListener(v -> {
+            Intent intent = new Intent(this, TodayWordsActivity.class);
+            startActivity(intent);
+        });
+
+        findViewById(R.id.card_total).setOnClickListener(v -> {
+            startActivity(new Intent(this, StudyRecordsActivity.class));
+        });
+    }
+
     private void loadData() {
         new Thread(() -> {
             try {
-                // Load profile
                 JsonObject profileRes = ApiClient.get().get("/api/user/profile");
                 if (profileRes.get("code").getAsInt() == 200) {
                     JsonObject user = profileRes.getAsJsonObject("data");
@@ -73,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> tvUsername.setText(name));
                 }
 
-                // Load stats
                 JsonObject statsRes = ApiClient.get().get("/api/records/stats");
                 if (statsRes.get("code").getAsInt() == 200) {
                     JsonObject s = statsRes.getAsJsonObject("data");
@@ -88,20 +109,26 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
 
-                // Load recent words
                 JsonObject recentRes = ApiClient.get().get("/api/records/recent");
+                Log.d(TAG, "=== 最近学习API响应 ===");
+                Log.d(TAG, recentRes.toString());
                 if (recentRes.get("code").getAsInt() == 200) {
                     JsonArray recentArr = recentRes.getAsJsonArray("data");
+                    Log.d(TAG, "=== 最近学习数据 ===");
+                    Log.d(TAG, "数据数量: " + recentArr.size());
+                    for (int i = 0; i < recentArr.size(); i++) {
+                        Log.d(TAG, "数据项[" + i + "]: " + recentArr.get(i).toString());
+                    }
                     runOnUiThread(() -> buildRecentWords(recentArr));
                 }
 
-                // Load word books
                 JsonObject booksRes = ApiClient.get().get("/api/wordbooks");
                 if (booksRes.get("code").getAsInt() == 200) {
                     JsonArray booksArr = booksRes.getAsJsonArray("data");
                     runOnUiThread(() -> buildBookList(booksArr));
                 }
             } catch (Exception e) {
+                Log.e(TAG, "加载数据异常: " + e.getMessage(), e);
                 runOnUiThread(() -> tvUsername.setText("加载失败"));
             }
         }).start();
@@ -118,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             recentWords.addView(tv);
             return;
         }
+
         for (JsonElement e : arr) {
             JsonObject w = e.getAsJsonObject();
             LinearLayout card = new LinearLayout(this);
@@ -127,18 +155,107 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
             params.setMargins(0, 0, 10, 0);
             card.setLayoutParams(params);
+            card.setClickable(true);
+            card.setFocusable(true);
 
             TextView wordTv = new TextView(this);
-            wordTv.setText(w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "");
+            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+            wordTv.setText(spelling);
             wordTv.setTextSize(15);
             wordTv.setTextColor(0xFF318af8);
             card.addView(wordTv);
 
             TextView transTv = new TextView(this);
-            transTv.setText(w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "");
+            String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+            transTv.setText(definition);
             transTv.setTextSize(13);
             transTv.setTextColor(0xFF273245);
             card.addView(transTv);
+
+            String wordId = "";
+            if (w.has("wordId")) {
+                wordId = w.get("wordId").getAsString();
+            } else if (w.has("id")) {
+                wordId = w.get("id").getAsString();
+            }
+
+            Log.d(TAG, "单词: " + spelling + ", wordId: " + (wordId.isEmpty() ? "(空)" : wordId));
+
+            String finalWordId = wordId;
+            String finalSpelling = spelling;
+            String finalDefinition = definition;
+
+            card.setOnClickListener(v -> {
+                if (finalWordId != null && !finalWordId.isEmpty()) {
+                    Log.d(TAG, "直接跳转，wordId: " + finalWordId);
+                    Intent intent = new Intent(MainActivity.this, WordDetailActivity.class);
+                    intent.putExtra("wordId", finalWordId);
+                    intent.putExtra("fromCollection", false);
+                    startActivity(intent);
+                } else if (!finalSpelling.isEmpty()) {
+                    Log.d(TAG, "使用搜索接口查询: " + finalSpelling);
+                    new Thread(() -> {
+                        try {
+                            String searchUrl = "/api/words/search?keyword=" + finalSpelling;
+                            Log.d(TAG, "=== 使用搜索接口 ===");
+                            Log.d(TAG, "查询URL: " + searchUrl);
+
+                            JsonObject res = ApiClient.get().get(searchUrl);
+                            Log.d(TAG, "搜索响应: " + res.toString());
+
+                            if (res.has("code") && res.get("code").getAsInt() == 200) {
+                                JsonArray searchResults = res.getAsJsonArray("data");
+                                Log.d(TAG, "搜索结果数量: " + searchResults.size());
+
+                                if (searchResults.size() > 0) {
+                                    JsonObject firstWord = searchResults.get(0).getAsJsonObject();
+                                    String foundWordId = firstWord.has("wordId")
+                                            ? firstWord.get("wordId").getAsString()
+                                            : "";
+
+                                    Log.d(TAG, "找到单词ID: " + foundWordId);
+                                    Log.d(TAG, "完整单词对象: " + firstWord.toString());
+
+                                    if (!foundWordId.isEmpty()) {
+                                        String finalFoundWordId = foundWordId;
+                                        runOnUiThread(() -> {
+                                            Log.d(TAG, "跳转到详情页，wordId: " + finalFoundWordId);
+                                            Intent intent = new Intent(MainActivity.this, WordDetailActivity.class);
+                                            intent.putExtra("wordId", finalFoundWordId);
+                                            intent.putExtra("fromCollection", false);
+                                            startActivity(intent);
+                                        });
+                                    } else {
+                                        runOnUiThread(() -> {
+                                            Log.e(TAG, "搜索结果中没有wordId");
+                                            Toast.makeText(MainActivity.this, "单词信息不完整", Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                } else {
+                                    runOnUiThread(() -> {
+                                        Log.e(TAG, "未找到匹配的单词: " + finalSpelling);
+                                        Toast.makeText(MainActivity.this, "未找到单词详情", Toast.LENGTH_SHORT).show();
+                                    });
+                                }
+                            } else {
+                                final String errorMsg;
+                                if (res.has("message")) {
+                                    errorMsg = res.get("message").getAsString();
+                                } else {
+                                    errorMsg = "查询失败";
+                                }
+                                Log.e(TAG, errorMsg);
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show());
+                            }
+                        } catch (Exception ex) {
+                            Log.e(TAG, "查询异常: " + ex.getMessage(), ex);
+                            runOnUiThread(() -> Toast.makeText(MainActivity.this, "加载失败: " + ex.getMessage(), Toast.LENGTH_SHORT).show());
+                        }
+                    }).start();
+                } else {
+                    Toast.makeText(MainActivity.this, "单词信息无效", Toast.LENGTH_SHORT).show();
+                }
+            });
 
             recentWords.addView(card);
         }

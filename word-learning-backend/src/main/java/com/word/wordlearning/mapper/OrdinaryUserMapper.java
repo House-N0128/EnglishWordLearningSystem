@@ -13,8 +13,8 @@ public interface OrdinaryUserMapper {
     @Select("SELECT * FROM t_ordinary_user WHERE userId = #{userId} AND loginPassword = #{loginPassword}")
     OrdinaryUser findByUserIdAndPassword(String userId, String loginPassword);
 
-    @Insert("INSERT INTO t_ordinary_user (userId, loginPassword, accountStatus, registerTime, lastLoginTime, userName, phoneNumber, email) " +
-            "VALUES (#{userId}, #{loginPassword}, '正常', NOW(), NOW(), #{userName}, #{phoneNumber}, #{email})")
+    @Insert("INSERT INTO t_ordinary_user (userId, loginPassword, userName, phoneNumber, email, accountStatus, registerTime, lastLoginTime) " +
+        "VALUES (#{userId}, #{loginPassword}, #{userName}, #{phoneNumber}, #{email}, '正常', NOW(), NOW())")
     void insert(OrdinaryUser user);
 
     @Update("UPDATE t_ordinary_user SET userName = #{userName}, phoneNumber = #{phoneNumber}, email = #{email} WHERE userId = #{userId}")

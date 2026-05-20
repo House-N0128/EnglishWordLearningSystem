@@ -24,7 +24,7 @@ public class AdminMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_admin_main);
 
         if (!AuthManager.get().isLoggedIn() || !"admin".equals(AuthManager.get().getRole())) {
             AuthManager.get().clearAuth();

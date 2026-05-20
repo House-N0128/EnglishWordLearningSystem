@@ -2,6 +2,7 @@ package com.example.wordlearningapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -25,9 +26,11 @@ import com.google.gson.JsonObject;
 public class WordSearchActivity extends AppCompatActivity {
 
     private EditText etSearch;
+    private Button btnSearch;
     private RecyclerView recyclerView;
     private TextView tvEmpty;
     private ProgressBar progress;
+    private TextView tvBack;
     private boolean isAdmin;
     private JsonArray currentData;
 
@@ -37,17 +40,24 @@ public class WordSearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         isAdmin = "admin".equals(AuthManager.get().getRole());
-        ((TextView) findViewById(R.id.toolbar_title)).setText(isAdmin ? "单词管理" : "单词查询");
-        findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
 
+        tvBack = findViewById(R.id.tv_back);
         etSearch = findViewById(R.id.et_search);
+        btnSearch = findViewById(R.id.btn_search);
         tvEmpty = findViewById(R.id.tv_empty);
         progress = findViewById(R.id.progress);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        tvBack.setOnClickListener(v -> finish());
+
+        btnSearch.setOnClickListener(v -> doSearch());
+
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; }
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                doSearch();
+                return true;
+            }
             return false;
         });
 
@@ -91,7 +101,11 @@ public class WordSearchActivity extends AppCompatActivity {
                     });
                 }
             } catch (Exception e) {
-                runOnUiThread(() -> { progress.setVisibility(View.GONE); tvEmpty.setText("搜索失败"); tvEmpty.setVisibility(View.VISIBLE); });
+                runOnUiThread(() -> {
+                    progress.setVisibility(View.GONE);
+                    tvEmpty.setText("搜索失败");
+                    tvEmpty.setVisibility(View.VISIBLE);
+                });
             }
         }).start();
     }
@@ -119,50 +133,34 @@ public class WordSearchActivity extends AppCompatActivity {
 
     private class WordAdapter extends RecyclerView.Adapter<WordAdapter.VH> {
         private final JsonArray data;
-        WordAdapter(JsonArray data) { this.data = data; }
-
-        @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            LinearLayout card = new LinearLayout(parent.getContext());
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFFFFFFF);
-            card.setPadding(24, 20, 24, 20);
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, 0, 0, 18);
-            card.setLayoutParams(lp);
-
-            TextView nameTv = new TextView(parent.getContext());
-            nameTv.setTextSize(18);
-            nameTv.setTextColor(0xFF318af8);
-            card.addView(nameTv);
-
-            TextView infoTv = new TextView(parent.getContext());
-            infoTv.setTextSize(14);
-            infoTv.setTextColor(0xFF47b1eb);
-            infoTv.setPadding(0, 6, 0, 6);
-            card.addView(infoTv);
-
-            TextView chnTv = new TextView(parent.getContext());
-            chnTv.setTextSize(15);
-            chnTv.setTextColor(0xFF273245);
-            card.addView(chnTv);
-
-            VH vh = new VH(card, nameTv, infoTv, chnTv);
-            return vh;
+        WordAdapter(JsonArray data) {
+            this.data = data;
         }
 
-        @Override public void onBindViewHolder(VH holder, int pos) {
+        @Override
+        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_search_word, parent, false);
+            return new VH(view);
+        }
+
+        @Override
+        public void onBindViewHolder(VH holder, int pos) {
             JsonObject w = data.get(pos).getAsJsonObject();
             String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
-            String phonetic = (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull()) ? w.get("phoneticSymbol").getAsString() : "";
+            String phonetic = (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull())
+                    ? w.get("phoneticSymbol").getAsString() : "";
             String chinese = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
             String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
 
-            holder.name.setText(spelling);
-            holder.info.setText("音标: " + phonetic);
-            holder.chn.setText(chinese);
+            String wordWithType = spelling;
+            if (!phonetic.isEmpty()) {
+                wordWithType += " " + phonetic;
+            }
+            holder.tvEnglish.setText(wordWithType);
+            holder.tvChinese.setText(chinese);
 
-            holder.itemView.setOnClickListener(v -> {
+            holder.btnViewDetail.setOnClickListener(v -> {
                 if (isAdmin) {
                     Intent intent = new Intent(WordSearchActivity.this, AddEditWordActivity.class);
                     intent.putExtra("wordId", wordId);
@@ -174,45 +172,39 @@ public class WordSearchActivity extends AppCompatActivity {
                 }
             });
 
-            // Admin delete button
-            holder.btnRow.removeAllViews();
             if (isAdmin) {
-                Button delBtn = new Button(holder.itemView.getContext());
-                delBtn.setText("删除");
-                delBtn.setTextColor(0xFFFFFFFF);
-                delBtn.setBackgroundColor(0xFFd93025);
-                delBtn.setTextSize(13);
-                delBtn.setPadding(20, 8, 20, 8);
-                LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                dp.topMargin = 12;
-                delBtn.setLayoutParams(dp);
+                holder.btnDelete.setVisibility(View.VISIBLE);
                 int finalPos = pos;
-                delBtn.setOnClickListener(dv -> {
+                holder.btnDelete.setOnClickListener(v -> {
                     new AlertDialog.Builder(WordSearchActivity.this)
                             .setTitle("确认删除")
                             .setMessage("确定删除单词\"" + spelling + "\"？")
                             .setPositiveButton("确定", (d, w2) -> deleteWord(wordId, finalPos))
-                            .setNegativeButton("取消", null).show();
+                            .setNegativeButton("取消", null)
+                            .show();
                 });
-                holder.btnRow.addView(delBtn);
+            } else {
+                holder.btnDelete.setVisibility(View.GONE);
             }
-            holder.btnRow.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         }
 
-        @Override public int getItemCount() { return data.size(); }
+        @Override
+        public int getItemCount() {
+            return data.size();
+        }
 
         class VH extends RecyclerView.ViewHolder {
-            TextView name, info, chn;
-            LinearLayout btnRow;
-            VH(View v, TextView name, TextView info, TextView chn) {
+            TextView tvEnglish;
+            TextView tvChinese;
+            Button btnViewDetail;
+            Button btnDelete;
+
+            VH(View v) {
                 super(v);
-                this.name = name;
-                this.info = info;
-                this.chn = chn;
-                this.btnRow = new LinearLayout(v.getContext());
-                this.btnRow.setOrientation(LinearLayout.HORIZONTAL);
-                ((LinearLayout) v).addView(this.btnRow);
+                tvEnglish = v.findViewById(R.id.tv_word_english);
+                tvChinese = v.findViewById(R.id.tv_word_chinese);
+                btnViewDetail = v.findViewById(R.id.btn_view_detail);
+                btnDelete = v.findViewById(R.id.btn_delete);
             }
         }
     }

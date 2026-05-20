@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".WordLearningApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,31 +16,34 @@
         android:theme="@style/Theme.WordLearningApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
         <activity
             android:name=".LoginActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".UserChangePassword1Activity" />
+        <activity android:name=".UserSetNewPasswordActivity" />
+        <activity android:name=".UserDeleteAccountActivity" />
         <activity android:name=".WordBooksActivity" />
         <activity android:name=".BookDetailActivity" />
+        <activity android:name=".AddEditBookActivity" />
         <activity android:name=".WordSearchActivity" />
         <activity android:name=".WordDetailActivity" />
         <activity android:name=".WordStudyActivity" />
+        <activity android:name=".AddEditWordActivity" />
         <activity android:name=".CollectionsActivity" />
         <activity android:name=".StudyRecordsActivity" />
-        <activity android:name=".ProfileActivity" />
         <activity android:name=".AdminMainActivity" />
         <activity android:name=".UserManageActivity" />
         <activity android:name=".UserRecordActivity" />
-        <activity android:name=".AddEditBookActivity" />
-        <activity android:name=".AddEditWordActivity" />
+        <activity android:name=".TodayWordsActivity" />
     </application>
+
 </manifest>

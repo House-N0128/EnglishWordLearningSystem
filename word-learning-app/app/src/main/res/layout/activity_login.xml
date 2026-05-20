@@ -47,33 +47,35 @@
         <!-- Role Tabs -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#f0f4ff"
-            android:layout_marginBottom="20dp"
-            android:weightSum="2">
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:id="@+id/tab_user"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="普通用户"
                 android:textSize="14sp"
-                android:textColor="#ffffff"
+                android:textColor="#3577ef"
                 android:gravity="center"
-                android:background="#3577ef" />
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/tab_selected_bg" />
 
             <TextView
                 android:id="@+id/tab_admin"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="管理员"
                 android:textSize="14sp"
-                android:textColor="#3577ef"
+                android:textColor="#8899aa"
                 android:gravity="center"
-                android:background="#f0f4ff" />
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Account -->
@@ -125,8 +127,41 @@
             android:textSize="16sp"
             android:textColor="#fff"
             android:background="@drawable/bg_btn_primary"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="16dp"
             android:elevation="2dp" />
+
+        <!-- Forgot Password & Help Links -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tv_forgot_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="忘记密码"
+                android:textSize="14sp"
+                android:textColor="#3577ef"
+                android:gravity="start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/tv_help_links"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="账号问题咨询 | 隐私政策"
+                android:textSize="14sp"
+                android:textColor="#3577ef"
+                android:gravity="end"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp" />
+        </LinearLayout>
 
         <!-- Register -->
         <TextView
@@ -136,6 +171,8 @@
             android:text="还没有账号？立即注册"
             android:textSize="14sp"
             android:textColor="#3577ef"
-            android:gravity="center" />
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 </LinearLayout>
