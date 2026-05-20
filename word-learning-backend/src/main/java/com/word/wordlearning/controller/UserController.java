@@ -69,4 +69,26 @@ public class UserController {
         userMapper.deleteByUserId(userId);
         return Result.success("账号已注销");
     }
+
+    @PostMapping("/forgot-password")
+    public Result<String> forgotPassword(@RequestBody java.util.Map<String, String> body) {
+        String userId = body.get("userId");
+        String phone = body.get("phoneNumber");
+        String newPassword = body.get("newPassword");
+        if (userId == null || phone == null || newPassword == null) {
+            return Result.error(400, "请填写账号、手机号和新密码");
+        }
+        if (newPassword.length() < 6) {
+            return Result.error(400, "新密码长度至少6位");
+        }
+        OrdinaryUser user = userMapper.findByUserId(userId);
+        if (user == null) {
+            return Result.error(404, "账号不存在");
+        }
+        if (!phone.equals(user.getPhoneNumber())) {
+            return Result.error(400, "手机号与注册时不一致");
+        }
+        userMapper.updatePassword(userId, newPassword);
+        return Result.success("密码重置成功，请登录");
+    }
 }

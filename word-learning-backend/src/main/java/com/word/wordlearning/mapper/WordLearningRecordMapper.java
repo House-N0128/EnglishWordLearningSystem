@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface WordLearningRecordMapper {
@@ -42,4 +43,12 @@ public interface WordLearningRecordMapper {
 
     @Select("SELECT MAX(CAST(SUBSTRING(recordId,4) AS UNSIGNED)) FROM t_word_learning_record WHERE recordId LIKE 'REC%'")
     Integer maxNumericId();
+
+    @Select("SELECT r.learnedWordBookId AS wordBookId, wb.wordBookName AS wordBookName, " +
+            "(SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = r.learnedWordBookId) AS totalWords, " +
+            "COUNT(DISTINCT r.wordId) AS learnedWords " +
+            "FROM t_word_learning_record r " +
+            "JOIN t_word_book wb ON r.learnedWordBookId = wb.wordBookId " +
+            "WHERE r.userId = #{userId} GROUP BY r.learnedWordBookId, wb.wordBookName")
+    List<Map<String, Object>> getProgress(String userId);
 }

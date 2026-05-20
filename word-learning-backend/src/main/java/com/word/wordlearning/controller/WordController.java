@@ -5,6 +5,7 @@ import com.word.wordlearning.entity.Word;
 import com.word.wordlearning.mapper.WordMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,47 @@ public class WordController {
         word.setWordId(wordId);
         wordMapper.update(word);
         return Result.success("单词修改成功");
+    }
+
+    @GetMapping("/all")
+    public Result<List<Word>> listAll() {
+        return Result.success(wordMapper.findAllWords());
+    }
+
+    @PostMapping("/batch")
+    public Result<String> batchAdd(@RequestBody Map<String, Object> body) {
+        String bookId = (String) body.get("wordBookId");
+        if (bookId == null) return Result.error(400, "缺少词书ID");
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> words = (List<Map<String, String>>) body.get("words");
+        if (words == null || words.isEmpty()) return Result.error(400, "单词列表为空");
+
+        int success = 0, fail = 0;
+        for (Map<String, String> w : words) {
+            try {
+                String wordId = w.get("wordId");
+                String spelling = w.get("englishSpelling");
+                String definition = w.get("chineseDefinition");
+                if (wordId == null || spelling == null || definition == null) { fail++; continue; }
+
+                Word exist = wordMapper.findById(wordId);
+                if (exist == null) {
+                    Word nw = new Word();
+                    nw.setWordId(wordId);
+                    nw.setEnglishSpelling(spelling);
+                    nw.setChineseDefinition(definition);
+                    nw.setPhoneticSymbol(w.getOrDefault("phoneticSymbol", ""));
+                    nw.setExampleSentence(w.getOrDefault("exampleSentence", ""));
+                    nw.setWordPronunciation(w.getOrDefault("wordPronunciation", ""));
+                    nw.setWordImage(w.getOrDefault("wordImage", ""));
+                    wordMapper.insert(nw);
+                }
+                wordMapper.insertBookRef(bookId, wordId);
+                success++;
+            } catch (Exception e) { fail++; }
+        }
+        return Result.success("批量添加完成：成功" + success + "个" + (fail > 0 ? "，失败" + fail + "个" : ""));
     }
 
     @DeleteMapping("/{wordId}")

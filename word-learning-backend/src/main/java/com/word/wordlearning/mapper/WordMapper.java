@@ -48,4 +48,9 @@ public interface WordMapper {
 
     @Delete("DELETE FROM t_word WHERE word_id=#{wordId}")
     void delete(String wordId);
+
+    @Select("SELECT word_id AS wordId, spelling AS englishSpelling, definition AS chineseDefinition, " +
+            "example_sentence AS exampleSentence, phonetic AS phoneticSymbol, " +
+            "pronunciation_url AS wordPronunciation, image_url AS wordImage, created_at AS createTime FROM t_word")
+    List<Word> findAllWords();
 }

@@ -1,5 +1,6 @@
 package com.word.wordlearning.controller;
 
+import com.word.wordlearning.dto.BookProgressDTO;
 import com.word.wordlearning.dto.HomeStatsDTO;
 import com.word.wordlearning.dto.RecentWordDTO;
 import com.word.wordlearning.dto.Result;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -56,5 +58,21 @@ public class LearningRecordController {
         record.setRecordCreateTime(LocalDateTime.now());
         recordMapper.insert(record);
         return Result.success("学习记录已保存");
+    }
+
+    @GetMapping("/progress")
+    public Result<List<BookProgressDTO>> progress(@RequestHeader("X-User-Id") String userId) {
+        List<BookProgressDTO> result = new ArrayList<>();
+        // Get all books the user has records in
+        List<Map<String, Object>> raw = recordMapper.getProgress(userId);
+        for (Map<String, Object> row : raw) {
+            BookProgressDTO dto = new BookProgressDTO();
+            dto.setWordBookId((String) row.get("wordBookId"));
+            dto.setWordBookName((String) row.get("wordBookName"));
+            dto.setTotalWords(row.get("totalWords") != null ? ((Number) row.get("totalWords")).intValue() : 0);
+            dto.setLearnedWords(row.get("learnedWords") != null ? ((Number) row.get("learnedWords")).intValue() : 0);
+            result.add(dto);
+        }
+        return Result.success(result);
     }
 }

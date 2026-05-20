@@ -23,6 +23,9 @@ public interface OrdinaryUserMapper {
     @Update("UPDATE t_ordinary_user SET loginPassword = #{newPassword} WHERE userId = #{userId}")
     void updatePassword(@Param("userId") String userId, @Param("newPassword") String newPassword);
 
+    @Update("UPDATE t_ordinary_user SET lastLoginTime = NOW() WHERE userId = #{userId}")
+    void updateLoginTime(String userId);
+
     @Delete("DELETE FROM t_ordinary_user WHERE userId = #{userId}")
     void deleteByUserId(String userId);
 
