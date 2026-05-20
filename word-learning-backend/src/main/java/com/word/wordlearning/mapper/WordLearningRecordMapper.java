@@ -23,8 +23,8 @@ public interface WordLearningRecordMapper {
     @Select("SELECT COUNT(DISTINCT wordId) FROM t_word_learning_record WHERE userId = #{userId} AND DATE(recordCreateTime) = CURDATE()")
     int countDistinctWordsByUserToday(String userId);
 
-    @Select("SELECT w.englishSpelling AS englishSpelling, w.chineseDefinition AS chineseDefinition " +
-            "FROM t_word_learning_record r JOIN t_word w ON r.wordId = w.wordId " +
+    @Select("SELECT w.spelling AS englishSpelling, w.definition AS chineseDefinition " +
+            "FROM t_word_learning_record r JOIN t_word w ON r.wordId = w.word_id " +
             "WHERE r.userId = #{userId} GROUP BY r.wordId ORDER BY MAX(r.recordCreateTime) DESC LIMIT #{limit}")
     List<RecentWordDTO> findRecentWordsByUser(@Param("userId") String userId, @Param("limit") int limit);
 

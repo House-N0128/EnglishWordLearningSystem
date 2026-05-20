@@ -14,8 +14,8 @@ public interface CollectionMapper {
     Collection findById(String collectionId);
 
     @Select("SELECT c.collectionId, c.userId, c.wordId, c.collectionTime, " +
-            "w.englishSpelling, w.chineseDefinition, w.phoneticSymbol " +
-            "FROM t_collection c JOIN t_word w ON c.wordId = w.wordId " +
+            "w.spelling AS englishSpelling, w.definition AS chineseDefinition, w.phonetic AS phoneticSymbol " +
+            "FROM t_collection c JOIN t_word w ON c.wordId = w.word_id " +
             "WHERE c.userId = #{userId} ORDER BY c.collectionTime DESC")
     List<Collection> findByUserIdWithWord(String userId);
 
