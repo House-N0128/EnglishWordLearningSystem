@@ -24,7 +24,6 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 .msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size: 14px; margin-top: 10px; }
 .msg-error { background: #fff5f5; color: #c53030; }
 .msg-success { background: #f0fff4; color: #276749; }
-.id-hint { font-size: 12px; color: #8899aa; margin-top: 4px; }
 input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }
 </style>
 </head>
@@ -37,11 +36,6 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
 
 <div class="section">
   <div class="card">
-    <div class="form-group">
-      <label class="form-label">词书ID <span style="color:#8899aa;font-weight:400;">（系统自动生成）</span></label>
-      <input class="form-input" id="book-id" readonly placeholder="系统将自动分配 WB001 格式ID" style="background:#f0f4f8;color:#8899aa;">
-    </div>
-
     <div class="form-group">
       <label class="form-label">词书名称</label>
       <input class="form-input" id="book-name" placeholder="如：四级高频词">
@@ -67,19 +61,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-
-// Preview: show what the next ID will be
-apiGet("/api/wordbooks").then(function(r) {
-  if (r.code === 200 && r.data) {
-    var max = 0;
-    r.data.forEach(function(b) {
-      var m = b.wordBookId.match(/^WB(\d+)$/);
-      if (m) { var n = parseInt(m[1]); if (n > max) max = n; }
-    });
-    document.getElementById("book-id").placeholder = "系统将自动生成: WB" + String(max + 1).padStart(3, '0');
-  }
-});
+if (!requireAuth("admin")) throw new Error("unauthorized");
 
 document.getElementById("submit-btn").onclick = function() {
   var name = document.getElementById("book-name").value.trim();
@@ -98,11 +80,14 @@ document.getElementById("submit-btn").onclick = function() {
   }).then(function(r) {
     btn.disabled = false; btn.innerText = "创建词书";
     if (r.code === 200) {
-      showMsg("词书添加成功！即将跳转...", "success");
-      setTimeout(function(){ location.href = "词书管理.html"; }, 1200);
+      showMsg("创建成功，正在跳转...", "success");
+      setTimeout(function(){ location.href = "词书管理.html"; }, 1000);
     } else {
-      showMsg(r.message || "添加失败", "error");
+      showMsg(r.message || "创建失败", "error");
     }
+  }).catch(function(e) {
+    btn.disabled = false; btn.innerText = "创建词书";
+    showMsg("网络错误，请重试", "error");
   });
 };
 
