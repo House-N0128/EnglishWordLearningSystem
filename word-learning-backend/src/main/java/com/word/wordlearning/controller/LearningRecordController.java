@@ -46,7 +46,9 @@ public class LearningRecordController {
     public Result<String> add(@RequestHeader("X-User-Id") String userId,
                               @RequestBody Map<String, String> body) {
         WordLearningRecord record = new WordLearningRecord();
-        record.setRecordId(UUID.randomUUID().toString().substring(0, 20));
+        Integer maxId = recordMapper.maxNumericId();
+        int nextId = (maxId == null || maxId == 0) ? 1 : maxId + 1;
+        record.setRecordId("REC" + String.format("%03d", nextId));
         record.setUserId(userId);
         record.setLearnedWordBookId(body.get("learnedWordBookId"));
         record.setWordId(body.get("wordId"));

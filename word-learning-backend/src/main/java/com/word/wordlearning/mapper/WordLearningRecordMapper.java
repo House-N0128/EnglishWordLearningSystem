@@ -39,4 +39,7 @@ public interface WordLearningRecordMapper {
 
     @Select("SELECT COUNT(*) FROM t_word_learning_record WHERE DATE(recordCreateTime) = CURDATE()")
     int countAllToday();
+
+    @Select("SELECT MAX(CAST(SUBSTRING(recordId,4) AS UNSIGNED)) FROM t_word_learning_record WHERE recordId LIKE 'REC%'")
+    Integer maxNumericId();
 }
