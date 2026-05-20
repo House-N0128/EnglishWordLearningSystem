@@ -34,7 +34,9 @@ public class CollectionController {
             return Result.error(400, "该单词已收藏");
         }
         Collection c = new Collection();
-        c.setCollectionId(UUID.randomUUID().toString().substring(0, 20));
+        Integer maxId = collectionMapper.maxNumericId();
+        int nextId = (maxId == null || maxId == 0) ? 1 : maxId + 1;
+        c.setCollectionId(String.format("%04d", nextId));
         c.setUserId(userId);
         c.setWordId(wordId);
         c.setCollectionTime(LocalDateTime.now());
