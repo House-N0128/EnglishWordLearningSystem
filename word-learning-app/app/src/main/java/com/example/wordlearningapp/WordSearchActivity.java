@@ -49,8 +49,11 @@ public class WordSearchActivity extends AppCompatActivity {
         // ===== TOP BAR: 48dp, #318af8 =====
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
-        topBar.setBackgroundColor(0xFF318af8);
         topBar.setPadding(dp(12), 0, dp(16), 0);
+        GradientDrawable tbBg = new GradientDrawable();
+        tbBg.setColor(0xFF318af8);
+        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
+        topBar.setBackground(tbBg);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
         topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
