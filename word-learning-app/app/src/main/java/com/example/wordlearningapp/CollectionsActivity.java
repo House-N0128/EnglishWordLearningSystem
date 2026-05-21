@@ -1,22 +1,21 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wordlearningapp.api.ApiClient;
 import com.google.gson.JsonArray;
@@ -25,290 +24,277 @@ import com.google.gson.JsonObject;
 
 public class CollectionsActivity extends AppCompatActivity {
 
-    private static final String TAG = "CollectionsActivity";
-
-    private RecyclerView recyclerView;
-    private TextView tvEmpty;
-    private ProgressBar progress;
+    private LinearLayout listArea;
     private EditText etSearch;
-    private Button btnSearch;
-    private TextView tvBack;
     private JsonArray allCollections;
-    private CollectionAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collections);
 
-        tvBack = findViewById(R.id.tv_back);
-        etSearch = findViewById(R.id.et_search);
-        btnSearch = findViewById(R.id.btn_search);
-        tvEmpty = findViewById(R.id.tv_empty);
-        progress = findViewById(R.id.progress);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFFf2f8fc);
 
-        tvBack.setOnClickListener(v -> finish());
+        // ===== TOP BAR =====
+        LinearLayout topBar = new LinearLayout(this);
+        topBar.setOrientation(LinearLayout.HORIZONTAL);
+        topBar.setBackgroundColor(0xFF318af8);
+        topBar.setPadding(dp(22), dp(14), dp(22), dp(14));
+        GradientDrawable tbBg = new GradientDrawable();
+        tbBg.setColor(0xFF318af8);
+        tbBg.setCornerRadii(new float[]{dp(18), dp(18), dp(18), dp(18), 0, 0, 0, 0});
+        topBar.setBackground(tbBg);
+        TextView barTitle = new TextView(this);
+        barTitle.setText("我的收藏");
+        barTitle.setTextSize(18);
+        barTitle.setTextColor(0xFFFFFFFF);
+        barTitle.setTypeface(null, Typeface.BOLD);
+        topBar.addView(barTitle);
+        root.addView(topBar);
 
-        btnSearch.setOnClickListener(v -> filterCollections());
+        // ===== SCROLLABLE MAIN =====
+        ScrollView scroll = new ScrollView(this);
+        LinearLayout main = new LinearLayout(this);
+        main.setOrientation(LinearLayout.VERTICAL);
+        main.setPadding(dp(14), dp(30), dp(14), dp(82));
 
-        etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                filterCollections();
-                return true;
-            }
-            return false;
+        TextView title = new TextView(this);
+        title.setText("我的收藏");
+        title.setTextSize(18);
+        title.setTextColor(0xFF318af8);
+        title.setTypeface(null, Typeface.BOLD);
+        title.setPadding(0, 0, 0, dp(20));
+        main.addView(title);
+
+        // Search row
+        LinearLayout searchRow = new LinearLayout(this);
+        searchRow.setOrientation(LinearLayout.HORIZONTAL);
+        searchRow.setPadding(0, 0, 0, dp(17));
+
+        etSearch = new EditText(this);
+        etSearch.setHint("搜索收藏单词（拼写）");
+        etSearch.setTextSize(15);
+        etSearch.setSingleLine(true);
+        etSearch.setPadding(dp(12), dp(10), dp(12), dp(10));
+        etSearch.setBackgroundColor(0xFFf6f8fc);
+        GradientDrawable edBg = new GradientDrawable();
+        edBg.setColor(0xFFf6f8fc);
+        edBg.setCornerRadius(dp(8));
+        edBg.setStroke(1, 0xFFc7d9ee);
+        etSearch.setBackground(edBg);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        edp.gravity = Gravity.CENTER_VERTICAL;
+        etSearch.setLayoutParams(edp);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterCollections(); }
+            @Override public void afterTextChanged(android.text.Editable e) {}
         });
+        searchRow.addView(etSearch);
 
+        TextView btnSearch = new TextView(this);
+        btnSearch.setText("搜索");
+        btnSearch.setTextSize(16);
+        btnSearch.setTextColor(0xFFFFFFFF);
+        btnSearch.setGravity(Gravity.CENTER);
+        btnSearch.setPadding(dp(18), dp(10), dp(18), dp(10));
+        GradientDrawable sbBg = new GradientDrawable();
+        sbBg.setColor(0xFF318af8);
+        sbBg.setCornerRadius(dp(19));
+        btnSearch.setBackground(sbBg);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        sbp.setMargins(dp(11), 0, 0, 0);
+        btnSearch.setLayoutParams(sbp);
+        btnSearch.setOnClickListener(v -> filterCollections());
+        searchRow.addView(btnSearch);
+        main.addView(searchRow);
+
+        listArea = new LinearLayout(this);
+        listArea.setOrientation(LinearLayout.VERTICAL);
+        main.addView(listArea);
+
+        scroll.addView(main);
+        root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+
+        // ===== BOTTOM NAVBAR =====
+        root.addView(makeUserNavbar(3));
+
+        setContentView(root);
         loadData();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "页面恢复，刷新收藏数据");
-        loadData();
+    private LinearLayout makeUserNavbar(int activeIndex) {
+        LinearLayout navbar = new LinearLayout(this);
+        navbar.setOrientation(LinearLayout.HORIZONTAL);
+        navbar.setBackgroundColor(0xFFFFFFFF);
+        navbar.setPadding(0, dp(8), 0, dp(12));
+        navbar.setElevation(dp(8));
+        GradientDrawable nbBg = new GradientDrawable();
+        nbBg.setColor(0xFFFFFFFF);
+        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
+        navbar.setBackground(nbBg);
+        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
+        navbar.setGravity(Gravity.CENTER);
+        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
+        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
+                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
+        for (int i = 0; i < tabs.length; i++) {
+            boolean active = (i == activeIndex);
+            TextView tv = new TextView(this);
+            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
+            tv.setTextSize(15);
+            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
+            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
+            tv.setGravity(Gravity.CENTER);
+            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            int idx = i;
+            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
+            navbar.addView(tv);
+        }
+        return navbar;
     }
 
     private void loadData() {
-        if (progress != null) progress.setVisibility(View.VISIBLE);
-        if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
-
         new Thread(() -> {
             try {
-                Log.d(TAG, "开始加载收藏数据");
                 JsonObject res = ApiClient.get().get("/api/collections");
-                Log.d(TAG, "API响应: " + res.toString());
-
-                if (res.has("code") && res.get("code").getAsInt() == 200) {
-                    if (res.has("data")) {
-                        allCollections = res.getAsJsonArray("data");
-                        Log.d(TAG, "收藏数据数量: " + allCollections.size());
-                        runOnUiThread(() -> {
-                            if (progress != null) progress.setVisibility(View.GONE);
-                            filterCollections();
-                        });
-                    } else {
-                        runOnUiThread(() -> {
-                            if (progress != null) progress.setVisibility(View.GONE);
-                            allCollections = new JsonArray();
-                            filterCollections();
-                        });
-                    }
+                if (res.has("code") && res.get("code").getAsInt() == 200 && res.has("data")) {
+                    allCollections = res.getAsJsonArray("data");
                 } else {
-                    String errorMsg = res.has("message") ? res.get("message").getAsString() : "加载失败";
-                    Log.e(TAG, "加载失败: " + errorMsg);
-                    runOnUiThread(() -> {
-                        if (progress != null) progress.setVisibility(View.GONE);
-                        if (tvEmpty != null) {
-                            tvEmpty.setText(errorMsg);
-                            tvEmpty.setVisibility(View.VISIBLE);
-                        }
-                    });
+                    allCollections = new JsonArray();
                 }
+                runOnUiThread(() -> filterCollections());
             } catch (Exception e) {
-                Log.e(TAG, "加载异常: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    if (progress != null) progress.setVisibility(View.GONE);
-                    if (tvEmpty != null) {
-                        tvEmpty.setText("加载失败: " + e.getMessage());
-                        tvEmpty.setVisibility(View.VISIBLE);
-                    }
-                });
+                allCollections = new JsonArray();
+                runOnUiThread(() -> filterCollections());
             }
         }).start();
     }
 
     private void filterCollections() {
-        if (allCollections == null) {
-            allCollections = new JsonArray();
-        }
-
-        String searchText = etSearch != null ? etSearch.getText().toString().trim().toLowerCase() : "";
-        JsonArray filteredData = new JsonArray();
-
-        for (int i = 0; i < allCollections.size(); i++) {
-            JsonElement element = allCollections.get(i);
-            if (!element.isJsonObject()) continue;
-
-            JsonObject c = element.getAsJsonObject();
-            String spelling = c.has("englishSpelling") ? c.get("englishSpelling").getAsString().toLowerCase() : "";
-
-            if (searchText.isEmpty() || spelling.contains(searchText)) {
-                filteredData.add(c);
-            }
-        }
-
-        runOnUiThread(() -> {
-            if (filteredData.size() == 0) {
-                if (recyclerView != null) recyclerView.setVisibility(View.GONE);
-                if (tvEmpty != null) {
-                    tvEmpty.setText(searchText.isEmpty() ? "暂无收藏" : "未找到相关单词");
-                    tvEmpty.setVisibility(View.VISIBLE);
-                }
-            } else {
-                if (recyclerView != null) recyclerView.setVisibility(View.VISIBLE);
-                if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
-
-                if (adapter == null) {
-                    adapter = new CollectionAdapter(filteredData);
-                    if (recyclerView != null) recyclerView.setAdapter(adapter);
-                } else {
-                    adapter.updateData(filteredData);
-                }
-            }
-        });
-    }
-
-    private void cancelCollection(String wordId, int pos) {
-        Log.d(TAG, "开始取消收藏, wordId: " + wordId + ", pos: " + pos);
-
-        if (wordId == null || wordId.isEmpty()) {
-            Toast.makeText(this, "无效的单词ID", Toast.LENGTH_SHORT).show();
+        listArea.removeAllViews();
+        if (allCollections == null || allCollections.size() == 0) {
+            TextView emp = new TextView(this);
+            emp.setText("暂无收藏");
+            emp.setTextSize(14);
+            emp.setTextColor(0xFF8899aa);
+            emp.setGravity(Gravity.CENTER);
+            emp.setPadding(0, dp(40), 0, 0);
+            listArea.addView(emp);
             return;
         }
 
-        new Thread(() -> {
-            try {
-                // 正确的API调用：DELETE /api/collections/remove (body: {wordId: "xxx"})
-                JsonObject body = new JsonObject();
-                body.addProperty("wordId", wordId);
-
-                String url = "/api/collections/remove";
-                Log.d(TAG, "DELETE请求: " + url + ", body: " + body.toString());
-
-                JsonObject res = ApiClient.get().delete(url, body);
-                Log.d(TAG, "响应: " + res.toString());
-
-                runOnUiThread(() -> {
-                    if (res != null && res.has("code") && res.get("code").getAsInt() == 200) {
-                        Toast.makeText(this, "已取消收藏", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "取消收藏成功，重新加载数据");
-                        loadData();
-                    } else {
-                        String message = "取消失败";
-                        if (res != null && res.has("message")) {
-                            message = res.get("message").getAsString();
-                        } else if (res != null && res.has("error")) {
-                            message = res.get("error").getAsString();
-                        }
-                        Log.e(TAG, "取消收藏失败: " + message);
-                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            } catch (Exception e) {
-                Log.e(TAG, "取消收藏异常: " + e.getMessage(), e);
-                runOnUiThread(() -> Toast.makeText(this, "网络错误: " + e.getMessage(), Toast.LENGTH_LONG).show());
-            }
-        }).start();
-    }
-
-    private class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.VH> {
-        JsonArray data;
-
-        CollectionAdapter(JsonArray data) {
-            this.data = data != null ? data : new JsonArray();
-        }
-
-        void updateData(JsonArray newData) {
-            this.data = newData != null ? newData : new JsonArray();
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_collection, parent, false);
-            return new VH(view);
-        }
-
-        @Override
-        public void onBindViewHolder(VH holder, int pos) {
-            if (data == null || pos < 0 || pos >= data.size()) {
-                Log.e(TAG, "无效的位置: " + pos + ", 数据大小: " + (data != null ? data.size() : 0));
-                return;
-            }
-
-            JsonElement element = data.get(pos);
-            if (!element.isJsonObject()) {
-                Log.e(TAG, "数据项不是JsonObject");
-                return;
-            }
-
-            JsonObject c = element.getAsJsonObject();
-
+        String kw = etSearch.getText().toString().trim().toLowerCase();
+        for (JsonElement e : allCollections) {
+            if (!e.isJsonObject()) continue;
+            JsonObject c = e.getAsJsonObject();
             String spelling = c.has("englishSpelling") ? c.get("englishSpelling").getAsString() : "";
-            String phonetic = "";
-            if (c.has("phoneticSymbol") && !c.get("phoneticSymbol").isJsonNull()) {
-                phonetic = c.get("phoneticSymbol").getAsString();
-            }
-
+            String phonetic = c.has("phoneticSymbol") && !c.get("phoneticSymbol").isJsonNull() ? c.get("phoneticSymbol").getAsString() : "";
+            String wordId = c.has("wordId") ? c.get("wordId").getAsString() : "";
             String date = "";
             if (c.has("collectionTime") && !c.get("collectionTime").isJsonNull()) {
-                String fullDate = c.get("collectionTime").getAsString();
-                date = fullDate.length() >= 10 ? fullDate.substring(0, 10) : fullDate;
+                String fd = c.get("collectionTime").getAsString();
+                date = fd.length() >= 10 ? fd.substring(0, 10) : fd;
             }
 
-            String collectionId = c.has("collectionId") ? c.get("collectionId").getAsString() : "";
-            String wordId = c.has("wordId") ? c.get("wordId").getAsString() : "";
+            if (!kw.isEmpty() && !spelling.toLowerCase().contains(kw)) continue;
 
-            Log.d(TAG, "绑定数据项 " + pos + ": spelling=" + spelling + ", wordId=" + wordId);
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.HORIZONTAL);
+            card.setBackgroundColor(0xFFFFFFFF);
+            card.setPadding(dp(13), dp(15), dp(13), dp(15));
+            card.setGravity(Gravity.CENTER_VERTICAL);
+            GradientDrawable cd = new GradientDrawable();
+            cd.setColor(0xFFFFFFFF);
+            cd.setCornerRadius(dp(13));
+            card.setBackground(cd);
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            cp.setMargins(0, 0, 0, dp(14));
+            card.setLayoutParams(cp);
 
-            holder.tvWord.setText(spelling);
-            holder.tvPhonetic.setText(phonetic.isEmpty() ? "" : "[" + phonetic + "]");
-            holder.tvTime.setText("收藏时间：" + date);
+            LinearLayout info = new LinearLayout(this);
+            info.setOrientation(LinearLayout.HORIZONTAL);
+            info.setGravity(Gravity.CENTER_VERTICAL);
+            info.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 
-            holder.btnDetail.setOnClickListener(v -> {
-                if (wordId != null && !wordId.isEmpty()) {
-                    Intent intent = new Intent(CollectionsActivity.this, WordDetailActivity.class);
-                    intent.putExtra("wordId", wordId);
-                    intent.putExtra("fromCollection", true);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(CollectionsActivity.this, "无效的单词ID", Toast.LENGTH_SHORT).show();
-                }
-            });
+            TextView sp = new TextView(this);
+            sp.setText(spelling);
+            sp.setTextSize(16);
+            sp.setTextColor(0xFF318af8);
+            sp.setTypeface(null, Typeface.BOLD);
+            info.addView(sp);
 
-            holder.btnCancel.setOnClickListener(v -> {
-                if (wordId == null || wordId.isEmpty()) {
-                    Toast.makeText(CollectionsActivity.this, "无效的单词ID", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                new AlertDialog.Builder(CollectionsActivity.this)
-                        .setTitle("确认取消")
-                        .setMessage("确定取消收藏单词\"" + spelling + "\"？")
-                        .setPositiveButton("确定", (d, w) -> {
-                            Log.d(TAG, "用户确认取消收藏");
-                            cancelCollection(wordId, pos);
-                        })
-                        .setNegativeButton("取消", null)
-                        .show();
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return data != null ? data.size() : 0;
-        }
-
-        class VH extends RecyclerView.ViewHolder {
-            TextView tvWord;
-            TextView tvPhonetic;
-            TextView tvTime;
-            Button btnDetail;
-            Button btnCancel;
-
-            VH(View v) {
-                super(v);
-                tvWord = v.findViewById(R.id.tv_word);
-                tvPhonetic = v.findViewById(R.id.tv_phonetic);
-                tvTime = v.findViewById(R.id.tv_time);
-                btnDetail = v.findViewById(R.id.btn_detail);
-                btnCancel = v.findViewById(R.id.btn_cancel);
+            if (!phonetic.isEmpty()) {
+                TextView ph = new TextView(this);
+                ph.setText(" [" + phonetic + "] ");
+                ph.setTextSize(13);
+                ph.setTextColor(0xFF547bbc);
+                info.addView(ph);
             }
+
+            if (!date.isEmpty()) {
+                TextView dt = new TextView(this);
+                dt.setText(date);
+                dt.setTextSize(12);
+                dt.setTextColor(0xFF6578a0);
+                dt.setPadding(dp(8), 0, 0, 0);
+                info.addView(dt);
+            }
+
+            card.addView(info);
+
+            LinearLayout actions = new LinearLayout(this);
+            actions.setOrientation(LinearLayout.HORIZONTAL);
+
+            TextView btnDetail = smallBtn("详情", 0xFF318af8, 0xFFFFFFFF);
+            btnDetail.setOnClickListener(v -> {
+                Intent in = new Intent(this, WordDetailActivity.class);
+                in.putExtra("wordId", wordId);
+                in.putExtra("fromCollection", true);
+                startActivity(in);
+            });
+            actions.addView(btnDetail);
+
+            TextView btnCancel = smallBtn("取消", 0xFFe0e6f2, 0xFF318af8);
+            btnCancel.setOnClickListener(v -> new AlertDialog.Builder(this)
+                    .setTitle("确认取消")
+                    .setMessage("确定取消收藏 \"" + spelling + "\"？")
+                    .setPositiveButton("确定", (d, w) -> {
+                        new Thread(() -> {
+                            try {
+                                JsonObject body = new JsonObject();
+                                body.addProperty("wordId", wordId);
+                                ApiClient.get().delete("/api/collections/remove", body);
+                                runOnUiThread(() -> { Toast.makeText(this, "已取消收藏", Toast.LENGTH_SHORT).show(); loadData(); });
+                            } catch (Exception ex) {}
+                        }).start();
+                    }).setNegativeButton("取消", null).show());
+            actions.addView(btnCancel);
+
+            card.addView(actions);
+            listArea.addView(card);
         }
+    }
+
+    private TextView smallBtn(String text, int bgColor, int textColor) {
+        TextView b = new TextView(this);
+        b.setText(text);
+        b.setTextSize(14);
+        b.setTextColor(textColor);
+        b.setGravity(Gravity.CENTER);
+        b.setPadding(dp(14), dp(7), dp(14), dp(7));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(bgColor);
+        bg.setCornerRadius(dp(18));
+        b.setBackground(bg);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(dp(8), 0, 0, 0);
+        b.setLayoutParams(bp);
+        return b;
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }

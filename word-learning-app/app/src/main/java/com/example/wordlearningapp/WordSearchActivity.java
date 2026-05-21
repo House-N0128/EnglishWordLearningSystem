@@ -244,7 +244,9 @@ public class WordSearchActivity extends AppCompatActivity {
 
         // ===== BOTTOM NAVBAR (admin only) =====
         if (isAdmin) {
-            root.addView(makeNavbar());
+            root.addView(makeAdminNavbar());
+        } else {
+            root.addView(makeUserNavbar(2));
         }
 
         setContentView(root);
@@ -260,7 +262,7 @@ public class WordSearchActivity extends AppCompatActivity {
         sp.setBackground(bg);
     }
 
-    private LinearLayout makeNavbar() {
+    private LinearLayout makeAdminNavbar() {
         LinearLayout navbar = new LinearLayout(this);
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
@@ -454,6 +456,39 @@ public class WordSearchActivity extends AppCompatActivity {
         bp.setMargins(0, 0, dp(6), 0);
         b.setLayoutParams(bp);
         return b;
+    }
+
+    private LinearLayout makeUserNavbar(int activeIndex) {
+        LinearLayout navbar = new LinearLayout(this);
+        navbar.setOrientation(LinearLayout.HORIZONTAL);
+        navbar.setBackgroundColor(0xFFFFFFFF);
+        navbar.setPadding(0, dp(8), 0, dp(12));
+        navbar.setElevation(dp(8));
+        GradientDrawable nbBg = new GradientDrawable();
+        nbBg.setColor(0xFFFFFFFF);
+        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
+        navbar.setBackground(nbBg);
+        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
+        navbar.setGravity(Gravity.CENTER);
+
+        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
+        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
+                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
+
+        for (int i = 0; i < tabs.length; i++) {
+            boolean active = (i == activeIndex);
+            TextView tv = new TextView(this);
+            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
+            tv.setTextSize(15);
+            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
+            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
+            tv.setGravity(Gravity.CENTER);
+            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            int idx = i;
+            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
+            navbar.addView(tv);
+        }
+        return navbar;
     }
 
     private int dp(int val) {
