@@ -102,7 +102,7 @@ public class UserManageActivity extends AppCompatActivity {
         GradientDrawable edBg = new GradientDrawable();
         edBg.setColor(0xFFf6f8fc); edBg.setCornerRadius(dp(7)); edBg.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(edBg);
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 1);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 3);
         edp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(edp);
         etSearch.setOnEditorActionListener((v, a, e) -> { if (a == EditorInfo.IME_ACTION_SEARCH || a == EditorInfo.IME_ACTION_DONE) { doSearch(); return true; } return false; });
@@ -116,7 +116,7 @@ public class UserManageActivity extends AppCompatActivity {
         GradientDrawable spBg = new GradientDrawable();
         spBg.setColor(0xFFf6f8fc); spBg.setCornerRadius(dp(7)); spBg.setStroke(1, 0xFFc7d9ee);
         spStatus.setBackground(spBg);
-        LinearLayout.LayoutParams spp = new LinearLayout.LayoutParams(0, dp(48), 1);
+        LinearLayout.LayoutParams spp = new LinearLayout.LayoutParams(0, dp(48), 1.5f);
         spp.setMargins(dp(8), 0, dp(8), 0);
         spp.gravity = Gravity.CENTER_VERTICAL;
         spStatus.setLayoutParams(spp);
