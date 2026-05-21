@@ -40,4 +40,7 @@ public interface WordBookMapper {
 
     @Update("UPDATE t_word_book SET wordCount = (SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = #{wordBookId}) WHERE wordBookId = #{wordBookId}")
     void syncWordCount(String wordBookId);
+
+    @Delete("DELETE FROM t_word_book WHERE wordBookId = #{wordBookId}")
+    int hardDelete(String wordBookId);
 }
