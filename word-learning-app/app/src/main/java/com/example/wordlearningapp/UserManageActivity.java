@@ -34,6 +34,7 @@ public class UserManageActivity extends AppCompatActivity {
     private EditText etSearch;
     private Spinner spStatus;
     private List<JsonObject> allUsersData = new ArrayList<>();
+    private List<JsonObject> filteredData = new ArrayList<>();
     private int pageSize = 8, currentPage = 0;
 
     @Override
@@ -177,7 +178,7 @@ public class UserManageActivity extends AppCompatActivity {
         nextBg.setColor(0xFF318af8);
         nextBg.setCornerRadius(dp(14));
         btnNext.setBackground(nextBg);
-        btnNext.setOnClickListener(v -> { int total = (allUsersData.size() + pageSize - 1) / pageSize; if (currentPage < total - 1) { currentPage++; renderPage(); } });
+        btnNext.setOnClickListener(v -> { int total = (filteredData.size() + pageSize - 1) / pageSize; if (currentPage < total - 1) { currentPage++; renderPage(); } });
         pager.addView(btnNext);
 
         main.addView(pager);
@@ -272,7 +273,7 @@ public class UserManageActivity extends AppCompatActivity {
             filtered.add(u);
         }
 
-        allUsersData = filtered;
+        filteredData = filtered;
         currentPage = 0;
         renderPage();
     }
@@ -280,13 +281,13 @@ public class UserManageActivity extends AppCompatActivity {
     private void renderPage() {
         listArea.removeAllViews();
         int start = currentPage * pageSize;
-        int end = Math.min(start + pageSize, allUsersData.size());
-        int total = (allUsersData.size() + pageSize - 1) / pageSize;
+        int end = Math.min(start + pageSize, filteredData.size());
+        int total = (filteredData.size() + pageSize - 1) / pageSize;
         if (total == 0) total = 1;
         tvPager.setText("第" + (currentPage + 1) + "页 / 共" + total + "页");
 
         for (int i = start; i < end; i++) {
-            JsonObject u = allUsersData.get(i);
+            JsonObject u = filteredData.get(i);
             String uid = u.has("userId") ? u.get("userId").getAsString() : "";
             String name = u.has("userName") && !u.get("userName").isJsonNull() ? u.get("userName").getAsString() : "";
             String phone = u.has("phoneNumber") && !u.get("phoneNumber").isJsonNull() ? u.get("phoneNumber").getAsString() : "";
