@@ -234,7 +234,7 @@ public class WordBooksActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (allBooks != null) loadBooks();
+        loadBooks();
     }
 
     private void styleSpinner(Spinner sp) {
