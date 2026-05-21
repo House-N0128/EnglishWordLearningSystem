@@ -83,8 +83,26 @@ public class WordSearchActivity extends AppCompatActivity {
             });
             topBar.addView(btnLogout);
         } else {
-            topBar.setGravity(Gravity.CENTER);
-            userTopBarTitle(topBar, "单词查询");
+            TextView btnBack = new TextView(this);
+            btnBack.setText("←");
+            btnBack.setTextSize(22);
+            btnBack.setTextColor(0xFFFFFFFF);
+            btnBack.setTypeface(null, Typeface.BOLD);
+            btnBack.setPadding(0, 0, dp(12), 0);
+            btnBack.setOnClickListener(v -> finish());
+            topBar.addView(btnBack);
+
+            TextView userTitle = new TextView(this);
+            userTitle.setText("单词查询");
+            userTitle.setTextSize(18);
+            userTitle.setTextColor(0xFFFFFFFF);
+            userTitle.setTypeface(null, Typeface.BOLD);
+            userTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            topBar.addView(userTitle);
+
+            TextView place = new TextView(this);
+            place.setLayoutParams(new LinearLayout.LayoutParams(dp(48), 1));
+            topBar.addView(place);
         }
         root.addView(topBar);
 
@@ -229,9 +247,7 @@ public class WordSearchActivity extends AppCompatActivity {
 
         // ===== BOTTOM NAVBAR (admin only) =====
         if (isAdmin) {
-            root.addView(makeAdminNavbar());
-        } else {
-            root.addView(makeUserNavbar(2));
+            root.addView(makeNavbar());
         }
 
         setContentView(root);
@@ -247,17 +263,7 @@ public class WordSearchActivity extends AppCompatActivity {
         sp.setBackground(bg);
     }
 
-    private void userTopBarTitle(LinearLayout bar, String title) {
-        TextView tv = new TextView(this);
-        tv.setText(title);
-        tv.setTextSize(18);
-        tv.setTextColor(0xFFFFFFFF);
-        tv.setTypeface(null, Typeface.BOLD);
-        tv.setGravity(Gravity.CENTER);
-        bar.addView(tv);
-    }
-
-    private LinearLayout makeAdminNavbar() {
+    private LinearLayout makeNavbar() {
         LinearLayout navbar = new LinearLayout(this);
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
@@ -451,39 +457,6 @@ public class WordSearchActivity extends AppCompatActivity {
         bp.setMargins(0, 0, dp(6), 0);
         b.setLayoutParams(bp);
         return b;
-    }
-
-    private LinearLayout makeUserNavbar(int activeIndex) {
-        LinearLayout navbar = new LinearLayout(this);
-        navbar.setOrientation(LinearLayout.HORIZONTAL);
-        navbar.setBackgroundColor(0xFFFFFFFF);
-        navbar.setPadding(0, dp(8), 0, dp(12));
-        navbar.setElevation(dp(8));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
-        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
-        navbar.setGravity(Gravity.CENTER);
-
-        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
-        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
-                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
-
-        for (int i = 0; i < tabs.length; i++) {
-            boolean active = (i == activeIndex);
-            TextView tv = new TextView(this);
-            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
-            tv.setTextSize(15);
-            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
-            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
-            tv.setGravity(Gravity.CENTER);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            int idx = i;
-            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
-            navbar.addView(tv);
-        }
-        return navbar;
     }
 
     private int dp(int val) {

@@ -1,16 +1,14 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
@@ -21,12 +19,15 @@ import com.google.gson.JsonObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LinearLayout bookList, recentWords;
+    private static final String TAG = "MainActivity";
+
     private TextView tvUsername, tvToday, tvTotal, tvBook;
+    private LinearLayout bookList, recentWords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         if (!AuthManager.get().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -34,148 +35,53 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFf2f8fc);
+        tvUsername = findViewById(R.id.tv_username);
+        tvToday = findViewById(R.id.tv_today);
+        tvTotal = findViewById(R.id.tv_total);
+        tvBook = findViewById(R.id.tv_book);
+        bookList = findViewById(R.id.book_list);
+        recentWords = findViewById(R.id.recent_words);
 
-        // ===== TOP BAR =====
-        LinearLayout topBar = new LinearLayout(this);
-        topBar.setOrientation(LinearLayout.HORIZONTAL);
-        topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(22), 0, dp(22), 0);
-        topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{dp(18), dp(18), dp(18), dp(18), 0, 0, 0, 0});
-        topBar.setBackground(tbBg);
+        findViewById(R.id.btn_logout).setOnClickListener(v -> {
+            AuthManager.get().clearAuth();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
 
-        tvUsername = new TextView(this);
-        tvUsername.setText("加载中...");
-        tvUsername.setTextSize(18);
-        tvUsername.setTextColor(0xFFFFFFFF);
-        tvUsername.setTypeface(null, Typeface.BOLD);
-        topBar.addView(tvUsername);
-        root.addView(topBar);
-
-        // ===== SCROLLABLE MAIN =====
-        ScrollView scroll = new ScrollView(this);
-        LinearLayout main = new LinearLayout(this);
-        main.setOrientation(LinearLayout.VERTICAL);
-        main.setPadding(dp(14), dp(30), dp(14), dp(82));
-
-        // Study stat cards
-        LinearLayout cards = new LinearLayout(this);
-        cards.setOrientation(LinearLayout.HORIZONTAL);
-        cards.setPadding(0, 0, 0, dp(26));
-
-        tvToday = addStatCard(cards, "今日学习");
-        tvTotal = addStatCard(cards, "累计学习");
-        tvBook = addStatCard(cards, "当前词书");
-        main.addView(cards);
-
-        // Recommend title
-        TextView recTitle = new TextView(this);
-        recTitle.setText("推荐词书");
-        recTitle.setTextSize(17);
-        recTitle.setTextColor(0xFF318af8);
-        recTitle.setTypeface(null, Typeface.BOLD);
-        recTitle.setPadding(0, 0, 0, dp(8));
-        main.addView(recTitle);
-
-        bookList = new LinearLayout(this);
-        bookList.setOrientation(LinearLayout.VERTICAL);
-        main.addView(bookList);
-
-        // Recent words title
-        TextView recentTitle = new TextView(this);
-        recentTitle.setText("最近学习");
-        recentTitle.setTextSize(16);
-        recentTitle.setTextColor(0xFF318af8);
-        recentTitle.setTypeface(null, Typeface.BOLD);
-        recentTitle.setPadding(0, dp(18), 0, dp(8));
-        main.addView(recentTitle);
-
-        recentWords = new LinearLayout(this);
-        recentWords.setOrientation(LinearLayout.HORIZONTAL);
-        main.addView(recentWords);
-
-        scroll.addView(main);
-        root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
-
-        // ===== BOTTOM NAVBAR =====
-        root.addView(makeUserNavbar(0));
-
-        setContentView(root);
+        setupNavBar();
+        setupClickListeners();
         loadData();
     }
 
-    private TextView addStatCard(LinearLayout parent, String label) {
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundColor(0xFFFFFFFF);
-        card.setPadding(dp(11), dp(15), dp(11), dp(15));
-        card.setGravity(Gravity.CENTER);
-        GradientDrawable cd = new GradientDrawable();
-        cd.setColor(0xFFFFFFFF);
-        cd.setCornerRadius(dp(14));
-        card.setBackground(cd);
-        card.setElevation(dp(1));
-        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        cp.setMargins(0, 0, dp(14), 0);
-        if (parent.getChildCount() > 0) cp.setMargins(dp(14), 0, 0, 0);
-        card.setLayoutParams(cp);
-
-        TextView num = new TextView(this);
-        num.setText("...");
-        num.setTextSize(19);
-        num.setTextColor(0xFF318af8);
-        num.setTypeface(null, Typeface.BOLD);
-        num.setGravity(Gravity.CENTER);
-        card.addView(num);
-
-        TextView lb = new TextView(this);
-        lb.setText(label);
-        lb.setTextSize(15);
-        lb.setTextColor(0xFF273245);
-        lb.setGravity(Gravity.CENTER);
-        card.addView(lb);
-
-        parent.addView(card);
-        return num;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadData();
     }
 
-    private LinearLayout makeUserNavbar(int activeIndex) {
-        LinearLayout navbar = new LinearLayout(this);
-        navbar.setOrientation(LinearLayout.HORIZONTAL);
-        navbar.setBackgroundColor(0xFFFFFFFF);
-        navbar.setPadding(0, dp(8), 0, dp(12));
-        navbar.setElevation(dp(8));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
-        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
-        navbar.setGravity(Gravity.CENTER);
+    private void setupNavBar() {
+        findViewById(R.id.nav_home).setOnClickListener(v -> {});
+        findViewById(R.id.nav_books).setOnClickListener(v ->
+                startActivity(new Intent(this, WordBooksActivity.class)));
+        findViewById(R.id.nav_search).setOnClickListener(v ->
+                startActivity(new Intent(this, WordSearchActivity.class)));
+        findViewById(R.id.nav_collect).setOnClickListener(v ->
+                startActivity(new Intent(this, CollectionsActivity.class)));
+        findViewById(R.id.nav_records).setOnClickListener(v ->
+                startActivity(new Intent(this, StudyRecordsActivity.class)));
+        findViewById(R.id.nav_profile).setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileActivity.class)));
+    }
 
-        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
-        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
-                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
+    private void setupClickListeners() {
+        findViewById(R.id.card_today).setOnClickListener(v -> {
+            Intent intent = new Intent(this, TodayWordsActivity.class);
+            startActivity(intent);
+        });
 
-        for (int i = 0; i < tabs.length; i++) {
-            boolean active = (i == activeIndex);
-            TextView tv = new TextView(this);
-            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
-            tv.setTextSize(15);
-            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
-            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
-            tv.setGravity(Gravity.CENTER);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            int idx = i;
-            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
-            navbar.addView(tv);
-        }
-        return navbar;
+        findViewById(R.id.card_total).setOnClickListener(v -> {
+            startActivity(new Intent(this, StudyRecordsActivity.class));
+        });
     }
 
     private void loadData() {
@@ -197,98 +103,35 @@ public class MainActivity extends AppCompatActivity {
                     String bookName = s.has("currentBookName") && !s.get("currentBookName").isJsonNull()
                             ? s.get("currentBookName").getAsString() : "无";
                     runOnUiThread(() -> {
-                        tvToday.setText(today + "词");
-                        tvTotal.setText(total + "词");
+                        tvToday.setText(String.valueOf(today));
+                        tvTotal.setText(String.valueOf(total));
                         tvBook.setText(bookName);
                     });
                 }
 
-                JsonObject booksRes = ApiClient.get().get("/api/wordbooks");
-                if (booksRes.get("code").getAsInt() == 200) {
-                    JsonArray arr = booksRes.getAsJsonArray("data");
-                    runOnUiThread(() -> buildBookList(arr));
+                JsonObject recentRes = ApiClient.get().get("/api/records/recent");
+                Log.d(TAG, "=== 最近学习API响应 ===");
+                Log.d(TAG, recentRes.toString());
+                if (recentRes.get("code").getAsInt() == 200) {
+                    JsonArray recentArr = recentRes.getAsJsonArray("data");
+                    Log.d(TAG, "=== 最近学习数据 ===");
+                    Log.d(TAG, "数据数量: " + recentArr.size());
+                    for (int i = 0; i < recentArr.size(); i++) {
+                        Log.d(TAG, "数据项[" + i + "]: " + recentArr.get(i).toString());
+                    }
+                    runOnUiThread(() -> buildRecentWords(recentArr));
                 }
 
-                JsonObject recentRes = ApiClient.get().get("/api/records/recent");
-                if (recentRes.get("code").getAsInt() == 200) {
-                    JsonArray arr = recentRes.getAsJsonArray("data");
-                    runOnUiThread(() -> buildRecentWords(arr));
+                JsonObject booksRes = ApiClient.get().get("/api/wordbooks");
+                if (booksRes.get("code").getAsInt() == 200) {
+                    JsonArray booksArr = booksRes.getAsJsonArray("data");
+                    runOnUiThread(() -> buildBookList(booksArr));
                 }
             } catch (Exception e) {
+                Log.e(TAG, "加载数据异常: " + e.getMessage(), e);
                 runOnUiThread(() -> tvUsername.setText("加载失败"));
             }
         }).start();
-    }
-
-    private void buildBookList(JsonArray arr) {
-        bookList.removeAllViews();
-        if (arr == null || arr.size() == 0) {
-            TextView tv = new TextView(this);
-            tv.setText("暂无词书");
-            tv.setTextSize(14);
-            tv.setTextColor(0xFF8899aa);
-            tv.setPadding(dp(16), dp(16), 0, 0);
-            bookList.addView(tv);
-            return;
-        }
-        for (JsonElement e : arr) {
-            JsonObject b = e.getAsJsonObject();
-            LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFf6f8fc);
-            card.setPadding(dp(14), dp(13), dp(14), dp(13));
-            GradientDrawable cd = new GradientDrawable();
-            cd.setColor(0xFFf6f8fc);
-            cd.setCornerRadius(dp(12));
-            card.setBackground(cd);
-            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            cp.setMargins(0, 0, 0, dp(14));
-            card.setLayoutParams(cp);
-
-            String info = (b.has("wordBookName") ? b.get("wordBookName").getAsString() : "")
-                    + " | " + (b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
-                    + " | " + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词";
-            TextView infoTv = new TextView(this);
-            infoTv.setText(info);
-            infoTv.setTextSize(15);
-            infoTv.setTextColor(0xFF333333);
-            infoTv.setTypeface(null, Typeface.BOLD);
-            card.addView(infoTv);
-
-            if (b.has("wordBookDescription") && !b.get("wordBookDescription").isJsonNull()) {
-                TextView descTv = new TextView(this);
-                descTv.setText(b.get("wordBookDescription").getAsString());
-                descTv.setTextSize(13);
-                descTv.setTextColor(0xFF547bbc);
-                descTv.setPadding(0, dp(8), 0, 0);
-                card.addView(descTv);
-            }
-
-            TextView btn = new TextView(this);
-            btn.setText("选择学习");
-            btn.setTextSize(14);
-            btn.setTextColor(0xFFFFFFFF);
-            btn.setBackgroundColor(0xFF318af8);
-            btn.setPadding(dp(24), dp(8), dp(24), dp(8));
-            btn.setGravity(Gravity.CENTER);
-            GradientDrawable btnBg = new GradientDrawable();
-            btnBg.setColor(0xFF318af8);
-            btnBg.setCornerRadius(dp(21));
-            btn.setBackground(btnBg);
-            LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            bp.gravity = Gravity.END;
-            bp.topMargin = dp(8);
-            btn.setLayoutParams(bp);
-
-            String bookId = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
-            btn.setOnClickListener(v -> {
-                Intent in = new Intent(this, BookDetailActivity.class);
-                in.putExtra("bookId", bookId);
-                startActivity(in);
-            });
-            card.addView(btn);
-            bookList.addView(card);
-        }
     }
 
     private void buildRecentWords(JsonArray arr) {
@@ -298,65 +141,188 @@ public class MainActivity extends AppCompatActivity {
             tv.setText("暂无学习记录");
             tv.setTextSize(14);
             tv.setTextColor(0xFF8899aa);
-            tv.setPadding(dp(16), dp(16), 0, 0);
+            tv.setPadding(16, 16, 16, 16);
             recentWords.addView(tv);
             return;
         }
+
         for (JsonElement e : arr) {
             JsonObject w = e.getAsJsonObject();
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
             card.setBackgroundColor(0xFFFFFFFF);
-            card.setPadding(dp(13), dp(10), dp(13), dp(10));
-            card.setGravity(Gravity.CENTER);
-            GradientDrawable cd = new GradientDrawable();
-            cd.setColor(0xFFFFFFFF);
-            cd.setCornerRadius(dp(7));
-            card.setBackground(cd);
-            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-            cp.setMargins(0, 0, dp(10), 0);
-            card.setLayoutParams(cp);
+            card.setPadding(13, 10, 13, 10);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            params.setMargins(0, 0, 10, 0);
+            card.setLayoutParams(params);
+            card.setClickable(true);
+            card.setFocusable(true);
 
             TextView wordTv = new TextView(this);
-            wordTv.setText(w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "");
+            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+            wordTv.setText(spelling);
             wordTv.setTextSize(15);
             wordTv.setTextColor(0xFF318af8);
-            wordTv.setTypeface(null, Typeface.BOLD);
             card.addView(wordTv);
 
-            if (w.has("partOfSpeech") && !w.get("partOfSpeech").isJsonNull()) {
-                TextView posTv = new TextView(this);
-                posTv.setText(w.get("partOfSpeech").getAsString());
-                posTv.setTextSize(13);
-                posTv.setTextColor(0xFF47b1eb);
-                card.addView(posTv);
-            }
-
             TextView transTv = new TextView(this);
-            transTv.setText(w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "");
+            String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+            transTv.setText(definition);
             transTv.setTextSize(13);
-            transTv.setTextColor(0xFF222222);
+            transTv.setTextColor(0xFF273245);
             card.addView(transTv);
 
-            String wordId = getWordId(w);
+            String wordId = "";
+            if (w.has("wordId")) {
+                wordId = w.get("wordId").getAsString();
+            } else if (w.has("id")) {
+                wordId = w.get("id").getAsString();
+            }
+
+            Log.d(TAG, "单词: " + spelling + ", wordId: " + (wordId.isEmpty() ? "(空)" : wordId));
+
+            String finalWordId = wordId;
+            String finalSpelling = spelling;
+            String finalDefinition = definition;
+
             card.setOnClickListener(v -> {
-                if (wordId != null && !wordId.isEmpty()) {
-                    Intent in = new Intent(this, WordDetailActivity.class);
-                    in.putExtra("wordId", wordId);
-                    startActivity(in);
+                if (finalWordId != null && !finalWordId.isEmpty()) {
+                    Log.d(TAG, "直接跳转，wordId: " + finalWordId);
+                    Intent intent = new Intent(MainActivity.this, WordDetailActivity.class);
+                    intent.putExtra("wordId", finalWordId);
+                    intent.putExtra("fromCollection", false);
+                    startActivity(intent);
+                } else if (!finalSpelling.isEmpty()) {
+                    Log.d(TAG, "使用搜索接口查询: " + finalSpelling);
+                    new Thread(() -> {
+                        try {
+                            String searchUrl = "/api/words/search?keyword=" + finalSpelling;
+                            Log.d(TAG, "=== 使用搜索接口 ===");
+                            Log.d(TAG, "查询URL: " + searchUrl);
+
+                            JsonObject res = ApiClient.get().get(searchUrl);
+                            Log.d(TAG, "搜索响应: " + res.toString());
+
+                            if (res.has("code") && res.get("code").getAsInt() == 200) {
+                                JsonArray searchResults = res.getAsJsonArray("data");
+                                Log.d(TAG, "搜索结果数量: " + searchResults.size());
+
+                                if (searchResults.size() > 0) {
+                                    JsonObject firstWord = searchResults.get(0).getAsJsonObject();
+                                    String foundWordId = firstWord.has("wordId")
+                                            ? firstWord.get("wordId").getAsString()
+                                            : "";
+
+                                    Log.d(TAG, "找到单词ID: " + foundWordId);
+                                    Log.d(TAG, "完整单词对象: " + firstWord.toString());
+
+                                    if (!foundWordId.isEmpty()) {
+                                        String finalFoundWordId = foundWordId;
+                                        runOnUiThread(() -> {
+                                            Log.d(TAG, "跳转到详情页，wordId: " + finalFoundWordId);
+                                            Intent intent = new Intent(MainActivity.this, WordDetailActivity.class);
+                                            intent.putExtra("wordId", finalFoundWordId);
+                                            intent.putExtra("fromCollection", false);
+                                            startActivity(intent);
+                                        });
+                                    } else {
+                                        runOnUiThread(() -> {
+                                            Log.e(TAG, "搜索结果中没有wordId");
+                                            Toast.makeText(MainActivity.this, "单词信息不完整", Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                } else {
+                                    runOnUiThread(() -> {
+                                        Log.e(TAG, "未找到匹配的单词: " + finalSpelling);
+                                        Toast.makeText(MainActivity.this, "未找到单词详情", Toast.LENGTH_SHORT).show();
+                                    });
+                                }
+                            } else {
+                                final String errorMsg;
+                                if (res.has("message")) {
+                                    errorMsg = res.get("message").getAsString();
+                                } else {
+                                    errorMsg = "查询失败";
+                                }
+                                Log.e(TAG, errorMsg);
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show());
+                            }
+                        } catch (Exception ex) {
+                            Log.e(TAG, "查询异常: " + ex.getMessage(), ex);
+                            runOnUiThread(() -> Toast.makeText(MainActivity.this, "加载失败: " + ex.getMessage(), Toast.LENGTH_SHORT).show());
+                        }
+                    }).start();
+                } else {
+                    Toast.makeText(MainActivity.this, "单词信息无效", Toast.LENGTH_SHORT).show();
                 }
             });
+
             recentWords.addView(card);
         }
     }
 
-    private String getWordId(JsonObject w) {
-        if (w.has("wordId")) return w.get("wordId").getAsString();
-        if (w.has("id")) return w.get("id").getAsString();
-        return "";
-    }
+    private void buildBookList(JsonArray arr) {
+        bookList.removeAllViews();
+        if (arr == null || arr.size() == 0) {
+            TextView tv = new TextView(this);
+            tv.setText("暂无词书");
+            tv.setTextSize(14);
+            tv.setTextColor(0xFF8899aa);
+            tv.setPadding(16, 16, 16, 16);
+            bookList.addView(tv);
+            return;
+        }
+        for (JsonElement e : arr) {
+            JsonObject b = e.getAsJsonObject();
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setBackgroundColor(0xFFf6f8fc);
+            card.setPadding(14, 13, 14, 13);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 0, 14);
+            card.setLayoutParams(params);
 
-    private int dp(int val) {
-        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
+            TextView infoTv = new TextView(this);
+            String info = (b.has("wordBookName") ? b.get("wordBookName").getAsString() : "")
+                    + "｜" + (b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
+                    + "｜" + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词";
+            infoTv.setText(info);
+            infoTv.setTextSize(15);
+            infoTv.setTextColor(0xFF333333);
+            card.addView(infoTv);
+
+            if (b.has("wordBookDescription") && !b.get("wordBookDescription").isJsonNull()) {
+                TextView descTv = new TextView(this);
+                descTv.setText(b.get("wordBookDescription").getAsString());
+                descTv.setTextSize(13);
+                descTv.setTextColor(0xFF547bbc);
+                descTv.setPadding(0, 7, 0, 7);
+                card.addView(descTv);
+            }
+
+            TextView btn = new TextView(this);
+            btn.setText("选择学习");
+            btn.setTextSize(14);
+            btn.setTextColor(0xFFFFFFFF);
+            btn.setBackgroundColor(0xFF318af8);
+            btn.setPadding(24, 8, 24, 8);
+            btn.setGravity(android.view.Gravity.CENTER);
+            LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            btnParams.gravity = android.view.Gravity.END;
+            btnParams.topMargin = 8;
+            btn.setLayoutParams(btnParams);
+
+            String bookId = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
+            btn.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, BookDetailActivity.class);
+                intent.putExtra("bookId", bookId);
+                startActivity(intent);
+            });
+
+            card.addView(btn);
+            bookList.addView(card);
+        }
     }
 }
