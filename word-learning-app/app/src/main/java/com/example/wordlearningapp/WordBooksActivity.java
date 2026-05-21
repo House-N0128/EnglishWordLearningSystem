@@ -108,13 +108,14 @@ public class WordBooksActivity extends AppCompatActivity {
         main.setOrientation(LinearLayout.VERTICAL);
         main.setPadding(dp(12), dp(8), dp(12), isAdmin ? dp(70) : dp(16));
 
-        // Title
+        // Title (click to refresh)
         TextView title = new TextView(this);
         title.setText(isAdmin ? "词书管理" : "词书浏览");
         title.setTextSize(19);
         title.setTextColor(0xFF318af8);
         title.setTypeface(null, Typeface.BOLD);
         title.setPadding(0, dp(15), 0, dp(15));
+        title.setOnClickListener(v -> loadBooks());
         main.addView(title);
 
         // Search area: two rows
