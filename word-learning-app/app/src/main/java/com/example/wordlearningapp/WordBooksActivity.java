@@ -369,13 +369,19 @@ public class WordBooksActivity extends AppCompatActivity {
 
                 Button addWordBtn = cardBtn(btns, "添加单词", 0xFF318af8, 0xFFFFFFFF);
                 addWordBtn.setOnClickListener(v -> {
-                    Intent in = new Intent(this, AddEditBookActivity.class);
+                    Intent in = new Intent(this, AddWordToBookActivity.class);
                     in.putExtra("bookId", bid);
+                    in.putExtra("bookName", name);
                     startActivity(in);
                 });
 
                 Button viewWordBtn = cardBtn(btns, "查看单词", 0xFF318af8, 0xFFFFFFFF);
-                viewWordBtn.setOnClickListener(v -> startActivity(new Intent(this, WordSearchActivity.class)));
+                viewWordBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, ViewBookWordsActivity.class);
+                    in.putExtra("bookId", bid);
+                    in.putExtra("bookName", name);
+                    startActivity(in);
+                });
 
                 btns.addView(editBtn);
                 btns.addView(delBtn);
