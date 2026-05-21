@@ -2,6 +2,7 @@ package com.example.wordlearningapp;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -24,7 +25,6 @@ public class AdminMainActivity extends AppCompatActivity {
 
     private TextView tvUsers, tvBooks, tvWords, tvToday;
     private LinearLayout bookList;
-    private LinearLayout content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,163 +37,185 @@ public class AdminMainActivity extends AppCompatActivity {
             return;
         }
 
-        // Root scroll
-        ScrollView scroll = new ScrollView(this);
-        scroll.setBackgroundColor(0xFFf2f8fc);
-
+        // Root layout
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFFf2f8fc);
 
-        // Header
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setBackgroundColor(0xFF318af8);
-        header.setPadding(32, 24, 32, 24);
-        header.setGravity(Gravity.CENTER_VERTICAL);
+        // ===== TOP BAR: 48px blue =====
+        LinearLayout topBar = new LinearLayout(this);
+        topBar.setOrientation(LinearLayout.HORIZONTAL);
+        topBar.setBackgroundColor(0xFF318af8);
+        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setGravity(Gravity.CENTER_VERTICAL);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
-        TextView adminName = new TextView(this);
-        adminName.setText("管理员：" + AuthManager.get().getUserId());
-        adminName.setTextSize(16);
-        adminName.setTextColor(0xFFFFFFFF);
-        adminName.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        header.addView(adminName);
+        TextView adminUser = new TextView(this);
+        adminUser.setText("管理员：" + AuthManager.get().getUserId());
+        adminUser.setTextSize(16);
+        adminUser.setTextColor(0xFFFFFFFF);
+        adminUser.setTypeface(null, Typeface.BOLD);
+        adminUser.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        topBar.addView(adminUser);
 
-        TextView logout = new TextView(this);
-        logout.setText("退出");
-        logout.setTextSize(14);
-        logout.setTextColor(0xFF318af8);
-        logout.setBackgroundColor(0xFFFFFFFF);
-        logout.setPadding(28, 12, 28, 12);
+        TextView btnLogout = new TextView(this);
+        btnLogout.setText("退出登录");
+        btnLogout.setTextSize(15);
+        btnLogout.setTextColor(0xFF318af8);
+        btnLogout.setBackgroundColor(0xFFFFFFFF);
+        btnLogout.setPadding(dp(20), dp(7), dp(20), dp(7));
+        btnLogout.setGravity(Gravity.CENTER);
         GradientDrawable lgBg = new GradientDrawable();
         lgBg.setColor(0xFFFFFFFF);
-        lgBg.setCornerRadius(40);
-        logout.setBackground(lgBg);
-        logout.setOnClickListener(v -> {
+        lgBg.setCornerRadius(dp(16));
+        btnLogout.setBackground(lgBg);
+        btnLogout.setOnClickListener(v -> {
             AuthManager.get().clearAuth();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });
-        header.addView(logout);
-        root.addView(header);
+        topBar.addView(btnLogout);
+        root.addView(topBar);
 
-        // Content
-        content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(24, 20, 24, 24);
-        content.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        // ===== SCROLLABLE MAIN =====
+        ScrollView scroll = new ScrollView(this);
+        LinearLayout main = new LinearLayout(this);
+        main.setOrientation(LinearLayout.VERTICAL);
+        main.setPadding(dp(12), dp(20), dp(12), dp(24));
 
         // Title
-        TextView title = new TextView(this);
-        title.setText("平台数据总览");
-        title.setTextSize(19);
-        title.setTextColor(0xFF318af8);
-        title.setPadding(0, 0, 0, 16);
-        content.addView(title);
+        TextView dashTitle = new TextView(this);
+        dashTitle.setText("平台数据总览");
+        dashTitle.setTextSize(19);
+        dashTitle.setTextColor(0xFF318af8);
+        dashTitle.setTypeface(null, Typeface.BOLD);
+        dashTitle.setPadding(0, 0, 0, dp(10));
+        main.addView(dashTitle);
 
-        // Stats 2x2
-        LinearLayout statGrid = new LinearLayout(this);
-        statGrid.setOrientation(LinearLayout.VERTICAL);
+        // ===== 2x2 STATS GRID =====
+        LinearLayout statsGrid = new LinearLayout(this);
+        statsGrid.setOrientation(LinearLayout.VERTICAL);
 
-        LinearLayout row1 = makeRow();
-        tvUsers = makeStat(row1, "总用户数");
-        tvBooks = makeStat(row1, "总词书数");
-        statGrid.addView(row1);
+        LinearLayout row1 = new LinearLayout(this);
+        row1.setOrientation(LinearLayout.HORIZONTAL);
+        tvUsers = makeStatCard(row1, "总用户数");
+        tvBooks = makeStatCard(row1, "总词书数");
+        statsGrid.addView(row1);
 
-        LinearLayout row2 = makeRow();
-        tvWords = makeStat(row2, "总单词数");
-        tvToday = makeStat(row2, "今日学习记录");
-        statGrid.addView(row2);
+        LinearLayout row2 = new LinearLayout(this);
+        row2.setOrientation(LinearLayout.HORIZONTAL);
+        tvWords = makeStatCard(row2, "总单词数");
+        tvToday = makeStatCard(row2, "今日新增学习记录");
+        statsGrid.addView(row2);
 
-        content.addView(statGrid);
+        main.addView(statsGrid);
 
-        // Bookmarks section
-        TextView bookTitle = new TextView(this);
-        bookTitle.setText("词书列表");
-        bookTitle.setTextSize(16);
-        bookTitle.setTextColor(0xFF318af8);
-        bookTitle.setPadding(0, 24, 0, 12);
-        content.addView(bookTitle);
+        // ===== BOOK LIST SECTION =====
+        LinearLayout sectionBlock = new LinearLayout(this);
+        sectionBlock.setOrientation(LinearLayout.VERTICAL);
+        sectionBlock.setBackgroundColor(0xFFFFFFFF);
+        sectionBlock.setPadding(dp(15), dp(15), dp(10), dp(15));
+        GradientDrawable sbBg = new GradientDrawable();
+        sbBg.setColor(0xFFFFFFFF);
+        sbBg.setCornerRadius(dp(11));
+        sectionBlock.setBackground(sbBg);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        sbp.setMargins(0, dp(18), 0, dp(10));
+        sectionBlock.setLayoutParams(sbp);
+
+        TextView sectionTitle = new TextView(this);
+        sectionTitle.setText("热门词书TOP3");
+        sectionTitle.setTextSize(16);
+        sectionTitle.setTextColor(0xFF318af8);
+        sectionTitle.setTypeface(null, Typeface.BOLD);
+        sectionTitle.setPadding(0, 0, 0, dp(14));
+        sectionBlock.addView(sectionTitle);
 
         bookList = new LinearLayout(this);
         bookList.setOrientation(LinearLayout.VERTICAL);
-        content.addView(bookList);
+        sectionBlock.addView(bookList);
 
-        // Quick actions
-        TextView actTitle = new TextView(this);
-        actTitle.setText("快捷操作");
-        actTitle.setTextSize(16);
-        actTitle.setTextColor(0xFF318af8);
-        actTitle.setPadding(0, 24, 0, 12);
-        content.addView(actTitle);
+        main.addView(sectionBlock);
 
-        addActionBtn("👥  用户管理", v -> startActivity(new Intent(this, UserManageActivity.class)));
-        addActionBtn("📚  词书管理", v -> startActivity(new Intent(this, WordBooksActivity.class)));
-        addActionBtn("📝  单词管理", v -> startActivity(new Intent(this, WordSearchActivity.class)));
+        scroll.addView(main);
+        root.addView(scroll, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
 
-        root.addView(content);
-        scroll.addView(root);
-        setContentView(scroll);
+        // ===== BOTTOM NAVBAR =====
+        LinearLayout navbar = new LinearLayout(this);
+        navbar.setOrientation(LinearLayout.HORIZONTAL);
+        navbar.setBackgroundColor(0xFFFFFFFF);
+        navbar.setPadding(0, dp(8), 0, dp(12));
+        GradientDrawable nbBg = new GradientDrawable();
+        nbBg.setColor(0xFFFFFFFF);
+        nbBg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), 0, 0, 0, 0});
+        navbar.setBackground(nbBg);
+        navbar.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
+        navbar.setGravity(Gravity.CENTER);
 
+        addNavItem(navbar, "🏠", "主页", true, () -> {});
+        addNavItem(navbar, "👥", "用户管理", false, () ->
+                startActivity(new Intent(this, UserManageActivity.class)));
+        addNavItem(navbar, "📚", "词书管理", false, () ->
+                startActivity(new Intent(this, WordBooksActivity.class)));
+        addNavItem(navbar, "🗃️", "单词管理", false, () ->
+                startActivity(new Intent(this, WordSearchActivity.class)));
+
+        root.addView(navbar);
+        setContentView(root);
         loadData();
     }
 
-    private LinearLayout makeRow() {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, 0, 0, 12);
-        return row;
-    }
-
-    private TextView makeStat(LinearLayout parent, String label) {
+    private TextView makeStatCard(LinearLayout parent, String label) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setGravity(Gravity.CENTER);
         card.setBackgroundColor(0xFFFFFFFF);
-        card.setPadding(16, 20, 16, 20);
+        card.setPadding(0, dp(13), 0, dp(13));
         GradientDrawable cd = new GradientDrawable();
         cd.setColor(0xFFFFFFFF);
-        cd.setCornerRadius(24);
+        cd.setCornerRadius(dp(13));
         card.setBackground(cd);
-        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        cp.setMargins(0, 0, 12, 0);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        cp.setMargins(0, 0, dp(13), 0);
         card.setLayoutParams(cp);
 
         TextView num = new TextView(this);
         num.setText("-");
-        num.setTextSize(22);
+        num.setTextSize(19);
         num.setTextColor(0xFF318af8);
+        num.setTypeface(null, Typeface.BOLD);
         num.setGravity(Gravity.CENTER);
         card.addView(num);
 
         TextView lbl = new TextView(this);
         lbl.setText(label);
-        lbl.setTextSize(12);
-        lbl.setTextColor(0xFF8899aa);
+        lbl.setTextSize(14);
+        lbl.setTextColor(0xFF273245);
         lbl.setGravity(Gravity.CENTER);
-        lbl.setPadding(0, 6, 0, 0);
         card.addView(lbl);
 
         parent.addView(card);
         return num;
     }
 
-    private void addActionBtn(String text, View.OnClickListener listener) {
-        TextView btn = new TextView(this);
-        btn.setText(text);
-        btn.setTextSize(16);
-        btn.setTextColor(0xFFFFFFFF);
-        btn.setBackgroundColor(0xFF318af8);
-        btn.setPadding(20, 16, 20, 16);
-        btn.setGravity(Gravity.CENTER);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(0xFF318af8);
-        bg.setCornerRadius(24);
-        btn.setBackground(bg);
-        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bp.setMargins(0, 0, 0, 12);
-        btn.setLayoutParams(bp);
-        btn.setOnClickListener(listener);
-        content.addView(btn);
+    private void addNavItem(LinearLayout parent, String icon, String label,
+                            boolean active, Runnable action) {
+        TextView item = new TextView(this);
+        item.setText(icon + "\n" + label);
+        item.setTextSize(active ? 15 : 15);
+        item.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
+        item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
+        item.setGravity(Gravity.CENTER);
+        item.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        item.setOnClickListener(v -> action.run());
+        parent.addView(item);
     }
 
     private void loadData() {
@@ -215,32 +237,34 @@ public class AdminMainActivity extends AppCompatActivity {
                     JsonArray books = br.getAsJsonArray("data");
                     runOnUiThread(() -> {
                         bookList.removeAllViews();
-                        for (int i = 0; i < books.size(); i++) {
+                        for (int i = 0; i < Math.min(books.size(), 3); i++) {
                             JsonObject b = books.get(i).getAsJsonObject();
                             LinearLayout item = new LinearLayout(this);
                             item.setOrientation(LinearLayout.HORIZONTAL);
-                            item.setBackgroundColor(0x19318af8);
-                            item.setPadding(20, 14, 20, 14);
                             GradientDrawable ib = new GradientDrawable();
                             ib.setColor(0x19318af8);
-                            ib.setCornerRadius(16);
+                            ib.setCornerRadius(dp(7));
                             item.setBackground(ib);
-                            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            ip.setMargins(0, 0, 0, 10);
+                            item.setPadding(dp(10), dp(10), dp(13), dp(10));
+                            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            ip.setMargins(0, 0, 0, dp(12));
                             item.setLayoutParams(ip);
 
-                            TextView nm = new TextView(this);
-                            nm.setText(b.has("wordBookName") ? b.get("wordBookName").getAsString() : "");
-                            nm.setTextSize(15);
-                            nm.setTextColor(0xFF318af8);
-                            nm.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-                            item.addView(nm);
+                            TextView name = new TextView(this);
+                            name.setText(b.has("wordBookName") ? b.get("wordBookName").getAsString() : "");
+                            name.setTextSize(15);
+                            name.setTextColor(0xFF318af8);
+                            name.setTypeface(null, Typeface.BOLD);
+                            name.setLayoutParams(new LinearLayout.LayoutParams(
+                                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+                            item.addView(name);
 
-                            TextView cnt = new TextView(this);
-                            cnt.setText((b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词");
-                            cnt.setTextSize(13);
-                            cnt.setTextColor(0xFF276bab);
-                            item.addView(cnt);
+                            TextView count = new TextView(this);
+                            count.setText((b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词");
+                            count.setTextSize(13);
+                            count.setTextColor(0xFF276bab);
+                            item.addView(count);
 
                             bookList.addView(item);
                         }
@@ -250,5 +274,9 @@ public class AdminMainActivity extends AppCompatActivity {
                 runOnUiThread(() -> Toast.makeText(this, "加载失败", Toast.LENGTH_SHORT).show());
             }
         }).start();
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }
