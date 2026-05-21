@@ -61,18 +61,35 @@ public class WordSearchActivity extends AppCompatActivity {
         main.setOrientation(LinearLayout.VERTICAL);
         main.setPadding(24, 16, 24, 80);
 
-        // Search
+        // Search row
+        LinearLayout searchRow = new LinearLayout(this);
+        searchRow.setOrientation(LinearLayout.HORIZONTAL);
+
         etSearch = new EditText(this);
         etSearch.setHint("输入英文搜索单词");
         etSearch.setTextSize(15);
         etSearch.setPadding(24, 14, 24, 14);
-        etSearch.setBackgroundColor(0xFFf6f8fc);
         GradientDrawable sd = new GradientDrawable();
         sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(sd);
-        etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; } return false; });
-        main.addView(etSearch);
+        etSearch.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        searchRow.addView(etSearch);
+
+        Button searchBtn = new Button(this);
+        searchBtn.setText("搜索");
+        searchBtn.setTextColor(0xFFFFFFFF);
+        searchBtn.setTextSize(14);
+        searchBtn.setPadding(20, 14, 20, 14);
+        GradientDrawable sbb = new GradientDrawable();
+        sbb.setColor(0xFF318af8); sbb.setCornerRadius(12);
+        searchBtn.setBackground(sbb);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        sbp.setMargins(12, 0, 0, 0);
+        searchBtn.setLayoutParams(sbp);
+        searchBtn.setOnClickListener(v -> doSearch());
+        searchRow.addView(searchBtn);
+
+        main.addView(searchRow);
 
         if (isAdmin) {
             Button addBtn = new Button(this);
