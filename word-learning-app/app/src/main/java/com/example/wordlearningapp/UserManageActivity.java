@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -102,9 +101,14 @@ public class UserManageActivity extends AppCompatActivity {
         GradientDrawable edBg = new GradientDrawable();
         edBg.setColor(0xFFf6f8fc); edBg.setCornerRadius(dp(7)); edBg.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(edBg);
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 2);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 3);
         edp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(edp);
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { doSearch(); }
+            @Override public void afterTextChanged(android.text.Editable e) {}
+        });
         etSearch.setOnEditorActionListener((v, a, e) -> { if (a == EditorInfo.IME_ACTION_SEARCH || a == EditorInfo.IME_ACTION_DONE) { doSearch(); return true; } return false; });
         searchRow.addView(etSearch);
 
@@ -117,24 +121,14 @@ public class UserManageActivity extends AppCompatActivity {
         spBg.setColor(0xFFf6f8fc); spBg.setCornerRadius(dp(7)); spBg.setStroke(1, 0xFFc7d9ee);
         spStatus.setBackground(spBg);
         LinearLayout.LayoutParams spp = new LinearLayout.LayoutParams(0, dp(48), 1.5f);
-        spp.setMargins(dp(8), 0, dp(8), 0);
+        spp.setMargins(dp(8), 0, 0, 0);
         spp.gravity = Gravity.CENTER_VERTICAL;
         spStatus.setLayoutParams(spp);
+        spStatus.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { doSearch(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
+        });
         searchRow.addView(spStatus);
-
-        Button searchBtn = new Button(this);
-        searchBtn.setText("查询");
-        searchBtn.setTextColor(0xFFFFFFFF);
-        searchBtn.setTextSize(14);
-        searchBtn.setPadding(dp(12), 0, dp(12), 0);
-        searchBtn.setGravity(Gravity.CENTER);
-        GradientDrawable sbBg = new GradientDrawable();
-        sbBg.setColor(0xFF318af8); sbBg.setCornerRadius(dp(12));
-        searchBtn.setBackground(sbBg);
-        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
-        searchBtn.setLayoutParams(sbp);
-        searchBtn.setOnClickListener(v -> doSearch());
-        searchRow.addView(searchBtn);
 
         main.addView(searchRow);
 
