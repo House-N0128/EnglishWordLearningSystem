@@ -91,6 +91,12 @@ public class ViewBookWordsActivity extends AppCompatActivity {
         loadWords();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadWords();
+    }
+
     private void loadWords() {
         new Thread(() -> {
             try {
