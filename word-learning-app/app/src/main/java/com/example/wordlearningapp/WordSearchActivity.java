@@ -1,22 +1,21 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wordlearningapp.api.ApiClient;
 import com.example.wordlearningapp.util.AuthManager;
@@ -25,187 +24,179 @@ import com.google.gson.JsonObject;
 
 public class WordSearchActivity extends AppCompatActivity {
 
+    private LinearLayout listArea;
     private EditText etSearch;
-    private Button btnSearch;
-    private RecyclerView recyclerView;
-    private TextView tvEmpty;
-    private ProgressBar progress;
-    private TextView tvBack;
     private boolean isAdmin;
-    private JsonArray currentData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
 
         isAdmin = "admin".equals(AuthManager.get().getRole());
 
-        tvBack = findViewById(R.id.tv_back);
-        etSearch = findViewById(R.id.et_search);
-        btnSearch = findViewById(R.id.btn_search);
-        tvEmpty = findViewById(R.id.tv_empty);
-        progress = findViewById(R.id.progress);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ScrollView scroll = new ScrollView(this);
+        scroll.setBackgroundColor(0xFFf2f8fc);
 
-        tvBack.setOnClickListener(v -> finish());
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
 
-        btnSearch.setOnClickListener(v -> doSearch());
+        // Header
+        LinearLayout h = new LinearLayout(this);
+        h.setBackgroundColor(0xFF318af8);
+        h.setPadding(32, 24, 32, 24);
+        h.setGravity(Gravity.CENTER_VERTICAL);
+        TextView back = new TextView(this);
+        back.setText("← 返回"); back.setTextSize(15); back.setTextColor(0xFFFFFFFF);
+        back.setOnClickListener(v -> finish());
+        h.addView(back);
+        TextView t = new TextView(this);
+        t.setText(isAdmin ? "单词管理" : "单词查询");
+        t.setTextSize(18); t.setTextColor(0xFFFFFFFF); t.setGravity(Gravity.CENTER);
+        t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        h.addView(t);
+        h.addView(new View(this) {{ setLayoutParams(new LinearLayout.LayoutParams(48, 1)); }});
+        root.addView(h);
 
-        etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                doSearch();
-                return true;
-            }
-            return false;
-        });
+        LinearLayout main = new LinearLayout(this);
+        main.setOrientation(LinearLayout.VERTICAL);
+        main.setPadding(24, 16, 24, 80);
+
+        // Search
+        etSearch = new EditText(this);
+        etSearch.setHint("输入英文搜索单词");
+        etSearch.setTextSize(15);
+        etSearch.setPadding(24, 14, 24, 14);
+        etSearch.setBackgroundColor(0xFFf6f8fc);
+        GradientDrawable sd = new GradientDrawable();
+        sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
+        etSearch.setBackground(sd);
+        etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; } return false; });
+        main.addView(etSearch);
 
         if (isAdmin) {
-            etSearch.setHint("输入关键词搜索");
-            Button addBtn = findViewById(R.id.btn_add);
-            if (addBtn != null) {
-                addBtn.setVisibility(View.VISIBLE);
-                addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditWordActivity.class)));
-            }
+            Button addBtn = new Button(this);
+            addBtn.setText("+ 新增单词");
+            addBtn.setTextColor(0xFFFFFFFF);
+            addBtn.setTextSize(15); addBtn.setPadding(14, 12, 14, 12);
+            GradientDrawable ab = new GradientDrawable();
+            ab.setColor(0xFF318af8); ab.setCornerRadius(24);
+            addBtn.setBackground(ab);
+            LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            abp.setMargins(0, 12, 0, 12);
+            addBtn.setLayoutParams(abp);
+            addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditWordActivity.class)));
+            main.addView(addBtn);
         }
+
+        listArea = new LinearLayout(this);
+        listArea.setOrientation(LinearLayout.VERTICAL);
+        main.addView(listArea);
+
+        root.addView(main);
+        scroll.addView(root);
+        setContentView(scroll);
     }
 
     private void doSearch() {
-        String keyword = etSearch.getText().toString().trim();
-        if (keyword.isEmpty()) {
-            tvEmpty.setText("输入关键词搜索单词");
-            tvEmpty.setVisibility(View.VISIBLE);
-            recyclerView.setAdapter(null);
-            return;
-        }
-        tvEmpty.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
+        String kw = etSearch.getText().toString().trim();
+        if (kw.isEmpty()) return;
 
         new Thread(() -> {
             try {
-                JsonObject res = ApiClient.get().get("/api/words/search?keyword=" + keyword);
-                if (res.get("code").getAsInt() == 200) {
-                    JsonArray data = res.getAsJsonArray("data");
-                    runOnUiThread(() -> {
-                        progress.setVisibility(View.GONE);
-                        currentData = data;
-                        if (data.size() == 0) {
-                            recyclerView.setAdapter(null);
-                            tvEmpty.setText("未找到相关单词");
-                            tvEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            tvEmpty.setVisibility(View.GONE);
-                            recyclerView.setAdapter(new WordAdapter(data));
-                        }
-                    });
-                }
-            } catch (Exception e) {
+                JsonObject r = ApiClient.get().get("/api/words/search?keyword=" + kw);
                 runOnUiThread(() -> {
-                    progress.setVisibility(View.GONE);
-                    tvEmpty.setText("搜索失败");
-                    tvEmpty.setVisibility(View.VISIBLE);
-                });
-            }
-        }).start();
-    }
+                    listArea.removeAllViews();
+                    if (r.get("code").getAsInt() == 200 && r.getAsJsonArray("data").size() > 0) {
+                        JsonArray data = r.getAsJsonArray("data");
+                        for (int i = 0; i < data.size(); i++) {
+                            JsonObject w = data.get(i).getAsJsonObject();
+                            LinearLayout card = new LinearLayout(this);
+                            card.setOrientation(LinearLayout.VERTICAL);
+                            card.setBackgroundColor(0xFFFFFFFF);
+                            card.setPadding(24, 18, 24, 18);
+                            GradientDrawable cd = new GradientDrawable();
+                            cd.setColor(0xFFFFFFFF); cd.setCornerRadius(16);
+                            card.setBackground(cd);
+                            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            cp.setMargins(0, 0, 0, 14);
+                            card.setLayoutParams(cp);
 
-    private void deleteWord(String wordId, int pos) {
-        new Thread(() -> {
-            try {
-                JsonObject res = ApiClient.get().delete("/api/words/" + wordId, null);
-                runOnUiThread(() -> {
-                    if (res.get("code").getAsInt() == 200) {
-                        Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
-                        if (currentData != null) {
-                            currentData.remove(pos);
-                            recyclerView.getAdapter().notifyItemRemoved(pos);
+                            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+                            String phonetic = w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull() ? w.get("phoneticSymbol").getAsString() : "";
+                            String chinese = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+                            String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
+
+                            TextView nm = new TextView(this);
+                            nm.setText(spelling + "  " + phonetic);
+                            nm.setTextSize(16); nm.setTextColor(0xFF318af8);
+                            card.addView(nm);
+
+                            TextView def = new TextView(this);
+                            def.setText(chinese);
+                            def.setTextSize(14); def.setTextColor(0xFF273245);
+                            def.setPadding(0, 4, 0, 4);
+                            card.addView(def);
+
+                            if (w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull()) {
+                                TextView ex = new TextView(this);
+                                ex.setText("例句：" + w.get("exampleSentence").getAsString());
+                                ex.setTextSize(12); ex.setTextColor(0xFF8899aa);
+                                ex.setPadding(0, 0, 0, 6);
+                                card.addView(ex);
+                            }
+
+                            if (isAdmin) {
+                                LinearLayout btns = new LinearLayout(this);
+                                btns.setOrientation(LinearLayout.HORIZONTAL);
+
+                                Button edit = new Button(this);
+                                edit.setText("编辑"); edit.setTextColor(0xFFFFFFFF); edit.setTextSize(13); edit.setPadding(20, 8, 20, 8);
+                                GradientDrawable eb = new GradientDrawable();
+                                eb.setColor(0xFF318af8); eb.setCornerRadius(20);
+                                edit.setBackground(eb);
+                                LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                ep.setMargins(0, 0, 12, 0);
+                                edit.setLayoutParams(ep);
+                                String fid = wordId;
+                                edit.setOnClickListener(v -> { Intent in = new Intent(this, AddEditWordActivity.class); in.putExtra("wordId", fid); startActivity(in); });
+                                btns.addView(edit);
+
+                                Button del = new Button(this);
+                                del.setText("删除"); del.setTextColor(0xFF318af8); del.setTextSize(13); del.setPadding(20, 8, 20, 8);
+                                GradientDrawable db = new GradientDrawable();
+                                db.setColor(0xFFe0e6f2); db.setCornerRadius(20);
+                                del.setBackground(db);
+                                String did = wordId;
+                                del.setOnClickListener(v -> {
+                                    new AlertDialog.Builder(this).setTitle("确认删除").setMessage("确定删除\"" + spelling + "\"？")
+                                            .setPositiveButton("确定", (d, w2) -> {
+                                                new Thread(() -> {
+                                                    try {
+                                                        JsonObject rr = ApiClient.get().delete("/api/words/" + did, null);
+                                                        runOnUiThread(() -> { Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已删除", Toast.LENGTH_SHORT).show(); doSearch(); });
+                                                    } catch (Exception e) {}
+                                                }).start();
+                                            }).setNegativeButton("取消", null).show();
+                                });
+                                btns.addView(del);
+
+                                card.addView(btns);
+                            } else {
+                                card.setOnClickListener(v -> { Intent in = new Intent(this, WordDetailActivity.class); in.putExtra("wordId", wordId); startActivity(in); });
+                            }
+
+                            listArea.addView(card);
                         }
                     } else {
-                        Toast.makeText(this, res.has("message") ? res.get("message").getAsString() : "删除失败", Toast.LENGTH_SHORT).show();
+                        TextView emp = new TextView(this);
+                        emp.setText("未找到相关单词");
+                        emp.setTextSize(14); emp.setTextColor(0xFF8899aa);
+                        emp.setGravity(Gravity.CENTER); emp.setPadding(0, 40, 0, 40);
+                        listArea.addView(emp);
                     }
                 });
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show());
-            }
+            } catch (Exception e) {}
         }).start();
-    }
-
-    private class WordAdapter extends RecyclerView.Adapter<WordAdapter.VH> {
-        private final JsonArray data;
-        WordAdapter(JsonArray data) {
-            this.data = data;
-        }
-
-        @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_search_word, parent, false);
-            return new VH(view);
-        }
-
-        @Override
-        public void onBindViewHolder(VH holder, int pos) {
-            JsonObject w = data.get(pos).getAsJsonObject();
-            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
-            String phonetic = (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull())
-                    ? w.get("phoneticSymbol").getAsString() : "";
-            String chinese = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
-            String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
-
-            String wordWithType = spelling;
-            if (!phonetic.isEmpty()) {
-                wordWithType += " " + phonetic;
-            }
-            holder.tvEnglish.setText(wordWithType);
-            holder.tvChinese.setText(chinese);
-
-            holder.btnViewDetail.setOnClickListener(v -> {
-                if (isAdmin) {
-                    Intent intent = new Intent(WordSearchActivity.this, AddEditWordActivity.class);
-                    intent.putExtra("wordId", wordId);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(WordSearchActivity.this, WordDetailActivity.class);
-                    intent.putExtra("wordId", wordId);
-                    startActivity(intent);
-                }
-            });
-
-            if (isAdmin) {
-                holder.btnDelete.setVisibility(View.VISIBLE);
-                int finalPos = pos;
-                holder.btnDelete.setOnClickListener(v -> {
-                    new AlertDialog.Builder(WordSearchActivity.this)
-                            .setTitle("确认删除")
-                            .setMessage("确定删除单词\"" + spelling + "\"？")
-                            .setPositiveButton("确定", (d, w2) -> deleteWord(wordId, finalPos))
-                            .setNegativeButton("取消", null)
-                            .show();
-                });
-            } else {
-                holder.btnDelete.setVisibility(View.GONE);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return data.size();
-        }
-
-        class VH extends RecyclerView.ViewHolder {
-            TextView tvEnglish;
-            TextView tvChinese;
-            Button btnViewDetail;
-            Button btnDelete;
-
-            VH(View v) {
-                super(v);
-                tvEnglish = v.findViewById(R.id.tv_word_english);
-                tvChinese = v.findViewById(R.id.tv_word_chinese);
-                btnViewDetail = v.findViewById(R.id.btn_view_detail);
-                btnDelete = v.findViewById(R.id.btn_delete);
-            }
-        }
     }
 }

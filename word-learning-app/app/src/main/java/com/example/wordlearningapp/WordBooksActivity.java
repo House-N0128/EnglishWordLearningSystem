@@ -1,279 +1,214 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wordlearningapp.api.ApiClient;
 import com.example.wordlearningapp.util.AuthManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class WordBooksActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private TextView tvEmpty;
-    private TextView tvBack;
-    private Spinner spinnerDifficulty;
-    private EditText etSearchBook;
+    private LinearLayout listArea;
+    private EditText etSearch;
     private boolean isAdmin;
     private JsonArray allBooks;
-    private BookAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_word_books);
 
         isAdmin = "admin".equals(AuthManager.get().getRole());
 
-        tvBack = findViewById(R.id.tv_back);
-        tvEmpty = findViewById(R.id.tv_empty);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ScrollView scroll = new ScrollView(this);
+        scroll.setBackgroundColor(0xFFf2f8fc);
 
-        spinnerDifficulty = findViewById(R.id.spinner_difficulty);
-        etSearchBook = findViewById(R.id.et_search_book);
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
 
-        tvBack.setOnClickListener(v -> finish());
+        // Header
+        addHeader(root, isAdmin ? "词书管理" : "词书浏览");
 
-        setupDifficultySpinner();
-        setupSearchListener();
-        setupSpinnerListener();
+        LinearLayout main = new LinearLayout(this);
+        main.setOrientation(LinearLayout.VERTICAL);
+        main.setPadding(24, 16, 24, 80);
+
+        // Search
+        etSearch = new EditText(this);
+        etSearch.setHint("词书名称搜索");
+        etSearch.setTextSize(15);
+        etSearch.setPadding(24, 14, 24, 14);
+        etSearch.setBackgroundColor(0xFFf6f8fc);
+        bg(etSearch, 0xFFf6f8fc, 12, 1, 0xFFc7d9ee);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        sp.setMargins(0, 0, 0, 14);
+        etSearch.setLayoutParams(sp);
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterBooks(); }
+            @Override public void afterTextChanged(android.text.Editable e) {}
+        });
+        main.addView(etSearch);
 
         if (isAdmin) {
-            addAdminButton();
+            Button addBtn = new Button(this);
+            addBtn.setText("+ 新增词书");
+            addBtn.setTextColor(0xFFFFFFFF);
+            addBtn.setBackgroundColor(0xFF318af8);
+            addBtn.setTextSize(15);
+            addBtn.setPadding(14, 12, 14, 12);
+            bg(addBtn, 0xFF318af8, 24, 0, 0);
+            LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            abp.setMargins(0, 0, 0, 14);
+            addBtn.setLayoutParams(abp);
+            addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditBookActivity.class)));
+            main.addView(addBtn);
         }
 
+        listArea = new LinearLayout(this);
+        listArea.setOrientation(LinearLayout.VERTICAL);
+        main.addView(listArea);
+
+        root.addView(main);
+        scroll.addView(root);
+        setContentView(scroll);
         loadBooks();
     }
 
-    private void setupDifficultySpinner() {
-        List<String> difficultyLevels = new ArrayList<>();
-        difficultyLevels.add("难度等级");
-        difficultyLevels.add("初级");
-        difficultyLevels.add("中级");
-        difficultyLevels.add("高级");
+    private void addHeader(LinearLayout root, String title) {
+        LinearLayout h = new LinearLayout(this);
+        h.setBackgroundColor(0xFF318af8);
+        h.setPadding(32, 24, 32, 24);
+        h.setGravity(Gravity.CENTER_VERTICAL);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                difficultyLevels
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDifficulty.setAdapter(adapter);
+        TextView back = new TextView(this);
+        back.setText("← 返回");
+        back.setTextSize(15);
+        back.setTextColor(0xFFFFFFFF);
+        back.setOnClickListener(v -> finish());
+        h.addView(back);
+
+        TextView t = new TextView(this);
+        t.setText(title);
+        t.setTextSize(18);
+        t.setTextColor(0xFFFFFFFF);
+        t.setGravity(Gravity.CENTER);
+        t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        h.addView(t);
+
+        h.addView(new View(this) {{ setLayoutParams(new LinearLayout.LayoutParams(48, 1)); }});
+        root.addView(h);
     }
 
-    private void setupSearchListener() {
-        etSearchBook.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterBooks();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-    }
-
-    private void setupSpinnerListener() {
-        spinnerDifficulty.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                filterBooks();
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
-    }
-
-    private void addAdminButton() {
-        ViewGroup root = (ViewGroup) recyclerView.getParent();
-        Button addBtn = new Button(this);
-        addBtn.setText("+ 新增词书");
-        addBtn.setTextColor(0xFFFFFFFF);
-        addBtn.setBackgroundColor(0xFF52e8bc);
-        addBtn.setTextSize(15);
-        addBtn.setPadding(14, 12, 14, 12);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        addBtn.setLayoutParams(params);
-        addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditBookActivity.class)));
-
-        if (root instanceof ViewGroup) {
-            ((ViewGroup) root).addView(addBtn, 2);
-        }
+    private void bg(View v, int color, int radius, int borderW, int borderC) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(color);
+        g.setCornerRadius(radius);
+        if (borderW > 0) g.setStroke(borderW, borderC);
+        v.setBackground(g);
     }
 
     private void loadBooks() {
         new Thread(() -> {
             try {
-                JsonObject res = ApiClient.get().get("/api/wordbooks");
-                if (res.get("code").getAsInt() == 200) {
-                    allBooks = res.getAsJsonArray("data");
+                JsonObject r = ApiClient.get().get("/api/wordbooks");
+                if (r.get("code").getAsInt() == 200) {
+                    allBooks = r.getAsJsonArray("data");
                     runOnUiThread(() -> filterBooks());
                 }
-            } catch (Exception e) {
-                runOnUiThread(() -> {
-                    tvEmpty.setText("加载失败");
-                    tvEmpty.setVisibility(View.VISIBLE);
-                });
-            }
+            } catch (Exception e) {}
         }).start();
     }
 
     private void filterBooks() {
+        String kw = etSearch.getText().toString().trim().toLowerCase();
+        listArea.removeAllViews();
         if (allBooks == null) return;
 
-        String searchText = etSearchBook.getText().toString().trim().toLowerCase();
-        String selectedDifficulty = spinnerDifficulty.getSelectedItem().toString();
-
-        JsonArray filteredBooks = new JsonArray();
-
         for (int i = 0; i < allBooks.size(); i++) {
-            JsonObject book = allBooks.get(i).getAsJsonObject();
-            String bookName = book.has("wordBookName") ? book.get("wordBookName").getAsString() : "";
-            String difficulty = book.has("difficultyLevel") ? book.get("difficultyLevel").getAsString() : "";
+            JsonObject b = allBooks.get(i).getAsJsonObject();
+            String name = b.has("wordBookName") ? b.get("wordBookName").getAsString() : "";
+            if (!kw.isEmpty() && !name.toLowerCase().contains(kw)) continue;
 
-            boolean matchSearch = searchText.isEmpty() || bookName.toLowerCase().contains(searchText);
-            boolean matchDifficulty = "难度等级".equals(selectedDifficulty) || difficulty.equals(selectedDifficulty);
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setBackgroundColor(0xFFFFFFFF);
+            card.setPadding(24, 18, 24, 18);
+            bg(card, 0xFFFFFFFF, 16, 0, 0);
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            cp.setMargins(0, 0, 0, 14);
+            card.setLayoutParams(cp);
 
-            if (matchSearch && matchDifficulty) {
-                filteredBooks.add(book);
-            }
-        }
+            TextView nm = new TextView(this);
+            nm.setText(name);
+            nm.setTextSize(16);
+            nm.setTextColor(0xFF318af8);
+            card.addView(nm);
 
-        if (filteredBooks.size() == 0) {
-            tvEmpty.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            tvEmpty.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            if (adapter == null) {
-                adapter = new BookAdapter(filteredBooks);
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.updateData(filteredBooks);
-            }
-        }
-    }
+            TextView info = new TextView(this);
+            info.setText((b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "") + " | " + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词");
+            info.setTextSize(13);
+            info.setTextColor(0xFF8899aa);
+            info.setPadding(0, 4, 0, 8);
+            card.addView(info);
 
-    private class BookAdapter extends RecyclerView.Adapter<BookAdapter.VH> {
-        private JsonArray data;
-
-        BookAdapter(JsonArray data) {
-            this.data = data;
-        }
-
-        void updateData(JsonArray newData) {
-            this.data = newData;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_word_book, parent, false);
-            return new VH(view);
-        }
-
-        @Override
-        public void onBindViewHolder(VH holder, int pos) {
-            JsonObject b = data.get(pos).getAsJsonObject();
-
-            holder.tvBookName.setText(b.has("wordBookName") ? b.get("wordBookName").getAsString() : "");
-            holder.tvDifficulty.setText((b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
-                    + " | " + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词");
-            holder.tvCreateTime.setText("创建时间: " + (b.has("createTime") && !b.get("createTime").isJsonNull()
-                    ? trimDate(b.get("createTime").getAsString()) : "未知"));
-
-            String bookId = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
-
-            holder.btnViewDetail.setOnClickListener(v -> {
-                Intent intent = new Intent(WordBooksActivity.this, BookDetailActivity.class);
-                intent.putExtra("bookId", bookId);
-                startActivity(intent);
-            });
+            String bid = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
 
             if (isAdmin) {
-                holder.btnViewDetail.setText("编辑");
-                holder.btnViewDetail.setBackgroundColor(0xFF52e8bc);
+                LinearLayout btns = new LinearLayout(this);
+                btns.setOrientation(LinearLayout.HORIZONTAL);
 
-                holder.btnDelete.setVisibility(View.VISIBLE);
-                holder.btnDelete.setOnClickListener(v -> {
-                    new android.app.AlertDialog.Builder(v.getContext())
-                            .setTitle("确认下架")
-                            .setMessage("确定下架词书\"" + holder.tvBookName.getText() + "\"？")
+                Button edit = new Button(this);
+                edit.setText("编辑");
+                edit.setTextColor(0xFFFFFFFF);
+                edit.setTextSize(13);
+                edit.setPadding(20, 8, 20, 8);
+                bg(edit, 0xFF318af8, 20, 0, 0);
+                LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ep.setMargins(0, 0, 12, 0);
+                edit.setLayoutParams(ep);
+                edit.setOnClickListener(v -> { Intent in = new Intent(this, AddEditBookActivity.class); in.putExtra("bookId", bid); startActivity(in); });
+                btns.addView(edit);
+
+                Button del = new Button(this);
+                del.setText("下架");
+                del.setTextColor(0xFF318af8);
+                del.setTextSize(13);
+                del.setPadding(20, 8, 20, 8);
+                bg(del, 0xFFe0e6f2, 20, 0, 0);
+                del.setOnClickListener(v -> {
+                    new AlertDialog.Builder(this).setTitle("确认下架").setMessage("确定下架\"" + name + "\"？")
                             .setPositiveButton("确定", (d, w) -> {
                                 new Thread(() -> {
                                     try {
-                                        JsonObject res = ApiClient.get().delete("/api/wordbooks/" + bookId, null);
-                                        runOnUiThread(() -> {
-                                            Toast.makeText(WordBooksActivity.this,
-                                                    res.has("message") ? res.get("message").getAsString() : "已下架",
-                                                    Toast.LENGTH_SHORT).show();
-                                            loadBooks();
-                                        });
-                                    } catch (Exception e) {
-                                        runOnUiThread(() -> Toast.makeText(WordBooksActivity.this, "网络错误", Toast.LENGTH_SHORT).show());
-                                    }
+                                        JsonObject rr = ApiClient.get().delete("/api/wordbooks/" + bid, null);
+                                        runOnUiThread(() -> { Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已下架", Toast.LENGTH_SHORT).show(); loadBooks(); });
+                                    } catch (Exception e) {}
                                 }).start();
-                            })
-                            .setNegativeButton("取消", null)
-                            .show();
+                            }).setNegativeButton("取消", null).show();
                 });
+                btns.addView(del);
+
+                card.addView(btns);
             } else {
-                holder.btnViewDetail.setText("查看详情");
-                holder.btnViewDetail.setBackgroundColor(0xFF1E90FF);
-                holder.btnDelete.setVisibility(View.GONE);
+                card.setOnClickListener(v -> { Intent in = new Intent(this, BookDetailActivity.class); in.putExtra("bookId", bid); startActivity(in); });
             }
+
+            listArea.addView(card);
         }
-
-        @Override
-        public int getItemCount() {
-            return data.size();
-        }
-
-        class VH extends RecyclerView.ViewHolder {
-            TextView tvBookName;
-            TextView tvDifficulty;
-            TextView tvCreateTime;
-            Button btnViewDetail;
-            Button btnDelete;
-
-            VH(View v) {
-                super(v);
-                tvBookName = v.findViewById(R.id.tv_book_name);
-                tvDifficulty = v.findViewById(R.id.tv_difficulty);
-                tvCreateTime = v.findViewById(R.id.tv_create_time);
-                btnViewDetail = v.findViewById(R.id.btn_view_detail);
-                btnDelete = v.findViewById(R.id.btn_delete);
-            }
-        }
-    }
-
-    private String trimDate(String dt) {
-        return dt != null && dt.length() >= 10 ? dt.substring(0, 10) : dt;
     }
 }

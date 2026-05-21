@@ -1,20 +1,21 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wordlearningapp.api.ApiClient;
 import com.example.wordlearningapp.util.AuthManager;
@@ -23,192 +24,163 @@ import com.google.gson.JsonObject;
 
 public class UserManageActivity extends AppCompatActivity {
 
+    private LinearLayout listArea;
     private EditText etSearch;
-    private RecyclerView recyclerView;
-    private TextView tvEmpty;
-    private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
 
-        if (!AuthManager.get().isLoggedIn() || !"admin".equals(AuthManager.get().getRole())) {
-            finish();
-            return;
-        }
+        ScrollView scroll = new ScrollView(this);
+        scroll.setBackgroundColor(0xFFf2f8fc);
 
-        ((TextView) findViewById(R.id.toolbar_title)).setText("用户管理");
-        findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
 
-        etSearch = findViewById(R.id.et_search);
+        // Header
+        LinearLayout h = new LinearLayout(this);
+        h.setBackgroundColor(0xFF318af8);
+        h.setPadding(32, 24, 32, 24);
+        h.setGravity(Gravity.CENTER_VERTICAL);
+        TextView back = new TextView(this);
+        back.setText("← 返回"); back.setTextSize(15); back.setTextColor(0xFFFFFFFF);
+        back.setOnClickListener(v -> finish());
+        h.addView(back);
+        TextView t = new TextView(this);
+        t.setText("用户管理"); t.setTextSize(18); t.setTextColor(0xFFFFFFFF); t.setGravity(Gravity.CENTER);
+        t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        h.addView(t);
+        h.addView(new View(this) {{ setLayoutParams(new LinearLayout.LayoutParams(48, 1)); }});
+        root.addView(h);
+
+        LinearLayout main = new LinearLayout(this);
+        main.setOrientation(LinearLayout.VERTICAL);
+        main.setPadding(24, 16, 24, 80);
+
+        etSearch = new EditText(this);
         etSearch.setHint("输入用户ID/昵称搜索");
-        tvEmpty = findViewById(R.id.tv_empty);
-        tvEmpty.setText("输入关键词搜索用户");
-        tvEmpty.setVisibility(View.VISIBLE);
-        progress = findViewById(R.id.progress);
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        etSearch.setTextSize(15);
+        etSearch.setPadding(24, 14, 24, 14);
+        GradientDrawable sd = new GradientDrawable();
+        sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
+        etSearch.setBackground(sd);
+        etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; } return false; });
+        main.addView(etSearch);
 
-        etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; }
-            return false;
-        });
+        listArea = new LinearLayout(this);
+        listArea.setOrientation(LinearLayout.VERTICAL);
+        main.addView(listArea);
+
+        root.addView(main);
+        scroll.addView(root);
+        setContentView(scroll);
     }
 
     private void doSearch() {
-        String keyword = etSearch.getText().toString().trim();
-        if (keyword.isEmpty()) return;
-        tvEmpty.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
+        String kw = etSearch.getText().toString().trim();
+        if (kw.isEmpty()) return;
 
         new Thread(() -> {
             try {
-                JsonObject res = ApiClient.get().get("/api/admin/users?keyword=" + keyword);
-                if (res.get("code").getAsInt() == 200) {
-                    JsonArray data = res.getAsJsonArray("data");
-                    runOnUiThread(() -> {
-                        progress.setVisibility(View.GONE);
-                        if (data.size() == 0) {
-                            tvEmpty.setText("未找到匹配用户");
-                            tvEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            recyclerView.setAdapter(new UserAdapter(data));
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                runOnUiThread(() -> { progress.setVisibility(View.GONE); tvEmpty.setText("搜索失败"); tvEmpty.setVisibility(View.VISIBLE); });
-            }
-        }).start();
-    }
-
-    private class UserAdapter extends RecyclerView.Adapter<UserAdapter.VH> {
-        private final JsonArray data;
-        UserAdapter(JsonArray data) { this.data = data; }
-
-        @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            LinearLayout card = new LinearLayout(parent.getContext());
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFFFFFFF);
-            card.setPadding(24, 20, 24, 20);
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, 0, 0, 18);
-            card.setLayoutParams(lp);
-            card.setElevation(4);
-
-            TextView nameTv = new TextView(parent.getContext());
-            nameTv.setId(View.generateViewId());
-            nameTv.setTextSize(18);
-            nameTv.setTextColor(0xFF318af8);
-            card.addView(nameTv);
-
-            TextView infoTv = new TextView(parent.getContext());
-            infoTv.setId(View.generateViewId());
-            infoTv.setTextSize(14);
-            infoTv.setTextColor(0xFF47b1eb);
-            infoTv.setPadding(0, 6, 0, 6);
-            card.addView(infoTv);
-
-            TextView contactTv = new TextView(parent.getContext());
-            contactTv.setId(View.generateViewId());
-            contactTv.setTextSize(12);
-            contactTv.setTextColor(0xFF8899aa);
-            contactTv.setPadding(0, 0, 0, 10);
-            card.addView(contactTv);
-
-            // Buttons row
-            LinearLayout btns = new LinearLayout(parent.getContext());
-            btns.setOrientation(LinearLayout.HORIZONTAL);
-            btns.setId(View.generateViewId());
-            card.addView(btns);
-
-            return new VH(card, nameTv, infoTv, contactTv, btns);
-        }
-
-        @Override public void onBindViewHolder(VH holder, int pos) {
-            JsonObject u = data.get(pos).getAsJsonObject();
-            String name = u.has("userName") ? u.get("userName").getAsString() : "未知";
-            String userId = u.has("userId") ? u.get("userId").getAsString() : "";
-            String status = u.has("accountStatus") ? u.get("accountStatus").getAsString() : "正常";
-            String phone = u.has("phoneNumber") && !u.get("phoneNumber").isJsonNull() ? u.get("phoneNumber").getAsString() : "";
-            String email = u.has("email") && !u.get("email").isJsonNull() ? u.get("email").getAsString() : "";
-
-            holder.name.setText(name + " (" + userId + ")");
-            holder.info.setText("状态: " + status);
-            holder.contact.setText(phone + "  |  " + email);
-
-            holder.btns.removeAllViews();
-
-            // Freeze/Unfreeze button
-            TextView toggleBtn = new TextView(holder.btns.getContext());
-            String newStatus = "冻结".equals(status) ? "正常" : "冻结";
-            String action = "冻结".equals(newStatus) ? "冻结" : "解冻";
-            int btnColor = "冻结".equals(newStatus) ? 0xFFd93025 : 0xFF52e8bc;
-            toggleBtn.setText(action);
-            toggleBtn.setTextColor(0xFFFFFFFF);
-            toggleBtn.setBackgroundColor(btnColor);
-            toggleBtn.setTextSize(14);
-            toggleBtn.setPadding(24, 10, 24, 10);
-            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            tp.setMarginEnd(16);
-            toggleBtn.setLayoutParams(tp);
-            toggleBtn.setOnClickListener(v -> {
-                new AlertDialog.Builder(v.getContext())
-                        .setTitle("用户操作")
-                        .setMessage("确定" + action + "该账号？")
-                        .setPositiveButton(action, (d, w) -> toggleStatus(userId, newStatus))
-                        .setNegativeButton("取消", null)
-                        .show();
-            });
-            holder.btns.addView(toggleBtn);
-
-            // View records button
-            TextView recordBtn = new TextView(holder.btns.getContext());
-            recordBtn.setText("学习记录");
-            recordBtn.setTextColor(0xFFFFFFFF);
-            recordBtn.setBackgroundColor(0xFF318af8);
-            recordBtn.setTextSize(14);
-            recordBtn.setPadding(24, 10, 24, 10);
-            recordBtn.setOnClickListener(v -> {
-                Intent intent = new Intent(UserManageActivity.this, UserRecordActivity.class);
-                intent.putExtra("userId", userId);
-                intent.putExtra("userName", name);
-                startActivity(intent);
-            });
-            holder.btns.addView(recordBtn);
-        }
-
-        @Override public int getItemCount() { return data.size(); }
-
-        class VH extends RecyclerView.ViewHolder {
-            TextView name, info, contact;
-            LinearLayout btns;
-            VH(View v, TextView name, TextView info, TextView contact, LinearLayout btns) {
-                super(v);
-                this.name = name;
-                this.info = info;
-                this.contact = contact;
-                this.btns = btns;
-            }
-        }
-    }
-
-    private void toggleStatus(String userId, String newStatus) {
-        new Thread(() -> {
-            try {
-                JsonObject body = new JsonObject();
-                body.addProperty("accountStatus", newStatus);
-                JsonObject res = ApiClient.get().put("/api/admin/users/" + userId, body);
+                JsonObject r = ApiClient.get().get("/api/admin/users?keyword=" + kw);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, res.has("message") ? res.get("message").getAsString() : "操作完成", Toast.LENGTH_SHORT).show();
-                    doSearch();
+                    listArea.removeAllViews();
+                    if (r.get("code").getAsInt() == 200 && r.getAsJsonArray("data").size() > 0) {
+                        JsonArray data = r.getAsJsonArray("data");
+                        for (int i = 0; i < data.size(); i++) {
+                            JsonObject u = data.get(i).getAsJsonObject();
+                            String name = u.has("userName") ? u.get("userName").getAsString() : "";
+                            String uid = u.has("userId") ? u.get("userId").getAsString() : "";
+                            String status = u.has("accountStatus") ? u.get("accountStatus").getAsString() : "正常";
+                            String phone = u.has("phoneNumber") && !u.get("phoneNumber").isJsonNull() ? u.get("phoneNumber").getAsString() : "";
+                            String email = u.has("email") && !u.get("email").isJsonNull() ? u.get("email").getAsString() : "";
+
+                            LinearLayout card = new LinearLayout(this);
+                            card.setOrientation(LinearLayout.VERTICAL);
+                            card.setBackgroundColor(0xFFFFFFFF);
+                            card.setPadding(24, 18, 24, 18);
+                            GradientDrawable cd = new GradientDrawable();
+                            cd.setColor(0xFFFFFFFF); cd.setCornerRadius(16);
+                            card.setBackground(cd);
+                            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            cp.setMargins(0, 0, 0, 14);
+                            card.setLayoutParams(cp);
+
+                            TextView nm = new TextView(this);
+                            nm.setText(name + " (" + uid + ")");
+                            nm.setTextSize(16); nm.setTextColor(0xFF318af8);
+                            card.addView(nm);
+
+                            TextView info = new TextView(this);
+                            info.setText("状态: " + status + " | " + phone + " | " + email);
+                            info.setTextSize(13); info.setTextColor(0xFF8899aa);
+                            info.setPadding(0, 4, 0, 8);
+                            card.addView(info);
+
+                            if (u.has("registerTime") && !u.get("registerTime").isJsonNull()) {
+                                TextView reg = new TextView(this);
+                                reg.setText("注册: " + u.get("registerTime").getAsString().substring(0, 10));
+                                reg.setTextSize(12); reg.setTextColor(0xFF8899aa);
+                                reg.setPadding(0, 0, 0, 8);
+                                card.addView(reg);
+                            }
+
+                            LinearLayout btns = new LinearLayout(this);
+                            btns.setOrientation(LinearLayout.HORIZONTAL);
+
+                            String newStatus = "冻结".equals(status) ? "正常" : "冻结";
+                            String action = "冻结".equals(newStatus) ? "冻结" : "解冻";
+                            int btnColor = "冻结".equals(newStatus) ? 0xFFe53e3e : 0xFF38a169;
+
+                            Button toggle = new Button(this);
+                            toggle.setText(action); toggle.setTextColor(0xFFFFFFFF); toggle.setTextSize(13); toggle.setPadding(20, 8, 20, 8);
+                            GradientDrawable tb = new GradientDrawable();
+                            tb.setColor(btnColor); tb.setCornerRadius(20);
+                            toggle.setBackground(tb);
+                            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            tp.setMargins(0, 0, 12, 0);
+                            toggle.setLayoutParams(tp);
+                            String fid = uid;
+                            toggle.setOnClickListener(v -> {
+                                new AlertDialog.Builder(this).setTitle(action + "用户").setMessage("确定" + action + "\"" + name + "\"？")
+                                        .setPositiveButton(action, (d, w) -> {
+                                            new Thread(() -> {
+                                                try {
+                                                    JsonObject body = new JsonObject();
+                                                    body.addProperty("accountStatus", newStatus);
+                                                    JsonObject rr = ApiClient.get().put("/api/admin/users/" + fid, body);
+                                                    runOnUiThread(() -> { Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "完成", Toast.LENGTH_SHORT).show(); doSearch(); });
+                                                } catch (Exception e) {}
+                                            }).start();
+                                        }).setNegativeButton("取消", null).show();
+                            });
+                            btns.addView(toggle);
+
+                            Button rec = new Button(this);
+                            rec.setText("学习记录"); rec.setTextColor(0xFFFFFFFF); rec.setTextSize(13); rec.setPadding(20, 8, 20, 8);
+                            GradientDrawable rb = new GradientDrawable();
+                            rb.setColor(0xFF318af8); rb.setCornerRadius(20);
+                            rec.setBackground(rb);
+                            String rid = uid;
+                            rec.setOnClickListener(v -> {
+                                Intent in = new Intent(this, UserRecordActivity.class);
+                                in.putExtra("userId", rid); in.putExtra("userName", name); startActivity(in);
+                            });
+                            btns.addView(rec);
+
+                            card.addView(btns);
+                            listArea.addView(card);
+                        }
+                    } else {
+                        TextView emp = new TextView(this);
+                        emp.setText("未找到匹配用户");
+                        emp.setTextSize(14); emp.setTextColor(0xFF8899aa);
+                        emp.setGravity(Gravity.CENTER); emp.setPadding(0, 40, 0, 40);
+                        listArea.addView(emp);
+                    }
                 });
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show());
-            }
+            } catch (Exception e) {}
         }).start();
     }
 }
