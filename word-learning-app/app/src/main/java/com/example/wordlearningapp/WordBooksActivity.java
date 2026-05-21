@@ -76,26 +76,8 @@ public class WordBooksActivity extends AppCompatActivity {
             });
             topBar.addView(btnLogout);
         } else {
-            TextView btnBack = new TextView(this);
-            btnBack.setText("←");
-            btnBack.setTextSize(22);
-            btnBack.setTextColor(0xFFFFFFFF);
-            btnBack.setTypeface(null, Typeface.BOLD);
-            btnBack.setPadding(0, 0, dp(12), 0);
-            btnBack.setOnClickListener(v -> finish());
-            topBar.addView(btnBack);
-
-            TextView userTitle = new TextView(this);
-            userTitle.setText("词书浏览");
-            userTitle.setTextSize(18);
-            userTitle.setTextColor(0xFFFFFFFF);
-            userTitle.setTypeface(null, Typeface.BOLD);
-            userTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            topBar.addView(userTitle);
-
-            TextView place = new TextView(this);
-            place.setLayoutParams(new LinearLayout.LayoutParams(dp(48), 1));
-            topBar.addView(place);
+            topBar.setGravity(Gravity.CENTER);
+            userTopBarTitle(topBar, "词书浏览");
         }
         root.addView(topBar);
 
@@ -236,6 +218,16 @@ public class WordBooksActivity extends AppCompatActivity {
         bg.setCornerRadius(dp(7));
         bg.setStroke(1, 0xFFc7d9ee);
         sp.setBackground(bg);
+    }
+
+    private void userTopBarTitle(LinearLayout bar, String title) {
+        TextView tv = new TextView(this);
+        tv.setText(title);
+        tv.setTextSize(18);
+        tv.setTextColor(0xFFFFFFFF);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setGravity(Gravity.CENTER);
+        bar.addView(tv);
     }
 
     private LinearLayout makeAdminNavbar() {

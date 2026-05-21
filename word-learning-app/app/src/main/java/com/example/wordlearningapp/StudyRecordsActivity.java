@@ -42,7 +42,8 @@ public class StudyRecordsActivity extends AppCompatActivity {
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(22), dp(14), dp(22), dp(14));
+        topBar.setGravity(Gravity.CENTER);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
         GradientDrawable tbBg = new GradientDrawable();
         tbBg.setColor(0xFF318af8);
         tbBg.setCornerRadii(new float[]{dp(18), dp(18), dp(18), dp(18), 0, 0, 0, 0});
