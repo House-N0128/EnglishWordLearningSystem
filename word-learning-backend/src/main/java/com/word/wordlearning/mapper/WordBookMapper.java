@@ -20,7 +20,7 @@ public interface WordBookMapper {
     int countAll();
 
     @Insert("INSERT INTO t_word_book(wordBookId, wordBookName, difficultyLevel, wordBookDescription, wordCount, createTime, updateTime, wordBookStatus) " +
-            "VALUES(#{wordBookId}, #{wordBookName}, #{difficultyLevel}, #{wordBookDescription}, 0, NOW(), NOW(), '已上架')")
+            "VALUES(#{wordBookId}, #{wordBookName}, #{difficultyLevel}, #{wordBookDescription}, 0, NOW(), NOW(), #{wordBookStatus})")
     void insert(WordBook book);
 
     @Update("UPDATE t_word_book SET wordBookName=#{wordBookName}, difficultyLevel=#{difficultyLevel}, wordBookDescription=#{wordBookDescription}, wordBookStatus=#{wordBookStatus}, updateTime=NOW() WHERE wordBookId=#{wordBookId}")
