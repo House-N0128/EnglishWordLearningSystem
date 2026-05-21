@@ -8,7 +8,6 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,7 +68,11 @@ public class WordBooksActivity extends AppCompatActivity {
         lgBg.setColor(0xFFFFFFFF);
         lgBg.setCornerRadius(dp(16));
         btnLogout.setBackground(lgBg);
-        btnLogout.setOnClickListener(v -> { AuthManager.get().clearAuth(); startActivity(new Intent(this, LoginActivity.class)); finish(); });
+        btnLogout.setOnClickListener(v -> {
+            AuthManager.get().clearAuth();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
         topBar.addView(btnLogout);
         root.addView(topBar);
 
@@ -88,68 +91,84 @@ public class WordBooksActivity extends AppCompatActivity {
         title.setPadding(0, dp(15), 0, dp(15));
         main.addView(title);
 
-        // Search row: input + difficulty dropdown + status dropdown + button
-        LinearLayout searchRow = new LinearLayout(this);
-        searchRow.setOrientation(LinearLayout.HORIZONTAL);
-        searchRow.setPadding(0, 0, 0, dp(14));
+        // Search area: two rows
+        LinearLayout searchArea = new LinearLayout(this);
+        searchArea.setOrientation(LinearLayout.VERTICAL);
+        searchArea.setPadding(0, 0, 0, dp(14));
+
+        // Row 1: search input + search button
+        LinearLayout searchRow1 = new LinearLayout(this);
+        searchRow1.setOrientation(LinearLayout.HORIZONTAL);
+        searchRow1.setPadding(0, 0, 0, dp(8));
 
         etSearch = new EditText(this);
         etSearch.setHint("词书名称 / 词书ID");
         etSearch.setTextSize(14);
         etSearch.setSingleLine(true);
-        etSearch.setPadding(dp(6), 0, dp(6), 0);
+        etSearch.setPadding(dp(12), 0, dp(12), 0);
         bg(etSearch, 0xFFf6f8fc, dp(7), 1, 0xFFc7d9ee);
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
             @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterBooks(); }
             @Override public void afterTextChanged(android.text.Editable e) {}
         });
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 2.5f);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(42), 1);
         edp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(edp);
-        searchRow.addView(etSearch);
+        searchRow1.addView(etSearch);
+
+        Button searchBtn = new Button(this);
+        searchBtn.setText("查询");
+        searchBtn.setTextColor(0xFFFFFFFF);
+        searchBtn.setTextSize(13);
+        searchBtn.setPadding(dp(8), 0, dp(8), 0);
+        searchBtn.setMinWidth(0);
+        searchBtn.setMinimumWidth(0);
+        searchBtn.setGravity(Gravity.CENTER);
+        GradientDrawable sbBg = new GradientDrawable();
+        sbBg.setColor(0xFF318af8);
+        sbBg.setCornerRadius(dp(8));
+        searchBtn.setBackground(sbBg);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(42));
+        sbp.setMargins(dp(8), 0, 0, 0);
+        searchBtn.setLayoutParams(sbp);
+        searchBtn.setOnClickListener(v -> filterBooks());
+        searchRow1.addView(searchBtn);
+
+        // Row 2: difficulty + status dropdowns
+        LinearLayout searchRow2 = new LinearLayout(this);
+        searchRow2.setOrientation(LinearLayout.HORIZONTAL);
 
         spDifficulty = new Spinner(this);
         spDifficulty.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 new String[]{"难度等级", "全部", "初级", "中级", "高级"}));
         styleSpinner(spDifficulty);
-        LinearLayout.LayoutParams dpp = new LinearLayout.LayoutParams(0, dp(48), 1.2f);
-        dpp.setMargins(dp(8), 0, 0, 0); dpp.gravity = Gravity.CENTER_VERTICAL;
+        LinearLayout.LayoutParams dpp = new LinearLayout.LayoutParams(0, dp(42), 1);
+        dpp.gravity = Gravity.CENTER_VERTICAL;
         spDifficulty.setLayoutParams(dpp);
         spDifficulty.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { filterBooks(); }
             @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
         });
-        searchRow.addView(spDifficulty);
+        searchRow2.addView(spDifficulty);
 
         spStatus = new Spinner(this);
         spStatus.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 new String[]{"词书状态", "全部", "已上架", "未上架"}));
         styleSpinner(spStatus);
-        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(0, dp(48), 1.2f);
-        stp.setMargins(dp(8), 0, 0, 0); stp.gravity = Gravity.CENTER_VERTICAL;
+        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(0, dp(42), 1);
+        stp.setMargins(dp(8), 0, 0, 0);
+        stp.gravity = Gravity.CENTER_VERTICAL;
         spStatus.setLayoutParams(stp);
         spStatus.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { filterBooks(); }
             @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
         });
-        searchRow.addView(spStatus);
+        searchRow2.addView(spStatus);
 
-        Button searchBtn = new Button(this);
-        searchBtn.setText("查询");
-        searchBtn.setTextColor(0xFFFFFFFF);
-        searchBtn.setTextSize(14);
-        searchBtn.setPadding(dp(14), 0, dp(14), 0);
-        searchBtn.setGravity(Gravity.CENTER);
-        GradientDrawable sbBg = new GradientDrawable();
-        sbBg.setColor(0xFF318af8); sbBg.setCornerRadius(dp(12));
-        searchBtn.setBackground(sbBg);
-        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
-        searchBtn.setLayoutParams(sbp);
-        searchBtn.setOnClickListener(v -> filterBooks());
-        searchRow.addView(searchBtn);
-
-        main.addView(searchRow);
+        searchArea.addView(searchRow1);
+        searchArea.addView(searchRow2);
+        main.addView(searchArea);
 
         // Add button
         if (isAdmin) {
@@ -157,9 +176,10 @@ public class WordBooksActivity extends AppCompatActivity {
             addBtn.setText("新增词书");
             addBtn.setTextColor(0xFFFFFFFF);
             addBtn.setTextSize(15);
-            addBtn.setPadding(0, dp(9), 0, dp(9));
+            addBtn.setPadding(0, dp(11), 0, dp(11));
             GradientDrawable abBg = new GradientDrawable();
-            abBg.setColor(0xFF318af8); abBg.setCornerRadius(dp(12));
+            abBg.setColor(0xFF318af8);
+            abBg.setCornerRadius(dp(8));
             addBtn.setBackground(abBg);
             LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             abp.setMargins(0, 0, 0, dp(11));
@@ -183,10 +203,11 @@ public class WordBooksActivity extends AppCompatActivity {
     }
 
     private void styleSpinner(Spinner sp) {
-        sp.setPadding(dp(6), 0, dp(6), 0);
-        sp.setBackgroundColor(0xFFf6f8fc);
+        sp.setPadding(dp(8), 0, dp(4), 0);
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(0xFFf6f8fc); bg.setCornerRadius(dp(7)); bg.setStroke(1, 0xFFc7d9ee);
+        bg.setColor(0xFFf6f8fc);
+        bg.setCornerRadius(dp(7));
+        bg.setStroke(1, 0xFFc7d9ee);
         sp.setBackground(bg);
     }
 
@@ -195,10 +216,7 @@ public class WordBooksActivity extends AppCompatActivity {
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
         navbar.setPadding(0, dp(8), 0, dp(12));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
+        navbar.setElevation(dp(8));
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
         navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
@@ -212,7 +230,7 @@ public class WordBooksActivity extends AppCompatActivity {
         TextView item = new TextView(this);
         item.setText(icon + "\n" + label);
         item.setTextSize(15);
-        item.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
+        item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
         item.setGravity(Gravity.CENTER);
         item.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -222,7 +240,8 @@ public class WordBooksActivity extends AppCompatActivity {
 
     private void bg(View v, int color, int radius, int borderW, int borderC) {
         GradientDrawable g = new GradientDrawable();
-        g.setColor(color); g.setCornerRadius(radius);
+        g.setColor(color);
+        g.setCornerRadius(radius);
         if (borderW > 0) g.setStroke(borderW, borderC);
         v.setBackground(g);
     }
@@ -231,7 +250,10 @@ public class WordBooksActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 JsonObject r = ApiClient.get().get("/api/wordbooks");
-                if (r.get("code").getAsInt() == 200) { allBooks = r.getAsJsonArray("data"); runOnUiThread(() -> filterBooks()); }
+                if (r.get("code").getAsInt() == 200) {
+                    allBooks = r.getAsJsonArray("data");
+                    runOnUiThread(() -> filterBooks());
+                }
             } catch (Exception e) {}
         }).start();
     }
@@ -253,6 +275,7 @@ public class WordBooksActivity extends AppCompatActivity {
             int wc = b.has("wordCount") ? b.get("wordCount").getAsInt() : 0;
             String cTime = b.has("createTime") ? b.get("createTime").getAsString().substring(0, 10) : "";
             String uTime = b.has("updateTime") && !b.get("updateTime").isJsonNull() ? b.get("updateTime").getAsString().substring(0, 10) : "";
+            String adminId = b.has("adminId") && !b.get("adminId").isJsonNull() ? b.get("adminId").getAsString() : AuthManager.get().getUserId();
 
             if (!kw.isEmpty() && !name.toLowerCase().contains(kw) && !bid.toLowerCase().contains(kw)) continue;
             if (!"难度等级".equals(diff) && !"全部".equals(diff) && !diff.equals(bookDiff)) continue;
@@ -260,41 +283,57 @@ public class WordBooksActivity extends AppCompatActivity {
 
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFFFFFFF);
-            card.setPadding(dp(13), dp(13), dp(13), dp(13));
+            card.setPadding(dp(8), dp(10), dp(8), dp(10));
             GradientDrawable cBg = new GradientDrawable();
-            cBg.setColor(0xFFFFFFFF); cBg.setCornerRadius(dp(12));
+            cBg.setColor(0xFFFFFFFF);
+            cBg.setCornerRadius(dp(12));
             card.setBackground(cBg);
+            card.setElevation(dp(2));
             LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             cp.setMargins(0, 0, 0, dp(13));
             card.setLayoutParams(cp);
 
             addCardRow(card, "ID: " + bid + " | 名称: " + name + " | 难度: " + bookDiff);
-            addCardRow(card, "词数: " + wc + " | 创建管理员: " + AuthManager.get().getUserId());
+            addCardRow(card, "词数: " + wc + " | 创建管理员: " + adminId);
             addCardRow(card, "创建: " + cTime + " | 更新: " + uTime + " | 状态: " + status);
 
             if (isAdmin) {
                 LinearLayout btns = new LinearLayout(this);
                 btns.setOrientation(LinearLayout.HORIZONTAL);
-                btns.setPadding(0, dp(4), 0, 0);
+                btns.setPadding(0, dp(8), 0, 0);
 
-                Button editBtn = btn(btns, "编辑", 0xFF318af8, 0xFFFFFFFF);
-                editBtn.setOnClickListener(v -> { Intent in = new Intent(this, AddEditBookActivity.class); in.putExtra("bookId", bid); startActivity(in); });
+                Button editBtn = cardBtn(btns, "编辑", 0xFF318af8, 0xFFFFFFFF);
+                editBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, AddEditBookActivity.class);
+                    in.putExtra("bookId", bid);
+                    startActivity(in);
+                });
 
-                Button delBtn = btn(btns, "删除", 0xFFe0e6f2, 0xFF318af8);
+                Button delBtn = cardBtn(btns, "删除", 0xFFe8ecf1, 0xFF5a6b80);
                 String fBid = bid, fName = name;
-                delBtn.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle("确认删除")
+                delBtn.setOnClickListener(v -> new AlertDialog.Builder(this)
+                        .setTitle("确认删除")
                         .setMessage("确定删除\"" + fName + "\"？")
                         .setPositiveButton("确定", (d, w) -> new Thread(() -> {
-                            try { JsonObject rr = ApiClient.get().delete("/api/wordbooks/" + fBid, null);
-                                runOnUiThread(() -> { Toast.makeText(this, rr.has("message")?rr.get("message").getAsString():"已下架", Toast.LENGTH_SHORT).show(); loadBooks(); });
+                            try {
+                                JsonObject rr = ApiClient.get().delete("/api/wordbooks/" + fBid, null);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已下架", Toast.LENGTH_SHORT).show();
+                                    loadBooks();
+                                });
                             } catch (Exception e) {}
-                        }).start()).setNegativeButton("取消", null).show());
+                        }).start())
+                        .setNegativeButton("取消", null)
+                        .show());
 
-                Button addWordBtn = btn(btns, "添加单词", 0xFF318af8, 0xFFFFFFFF);
-                addWordBtn.setOnClickListener(v -> { Intent in = new Intent(this, AddEditBookActivity.class); in.putExtra("bookId", bid); startActivity(in); });
+                Button addWordBtn = cardBtn(btns, "添加单词", 0xFF318af8, 0xFFFFFFFF);
+                addWordBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, AddEditBookActivity.class);
+                    in.putExtra("bookId", bid);
+                    startActivity(in);
+                });
 
-                Button viewWordBtn = btn(btns, "查看单词", 0xFF318af8, 0xFFFFFFFF);
+                Button viewWordBtn = cardBtn(btns, "查看单词", 0xFF318af8, 0xFFFFFFFF);
                 viewWordBtn.setOnClickListener(v -> startActivity(new Intent(this, WordSearchActivity.class)));
 
                 btns.addView(editBtn);
@@ -311,22 +350,33 @@ public class WordBooksActivity extends AppCompatActivity {
     private void addCardRow(LinearLayout card, String text) {
         TextView tv = new TextView(this);
         tv.setText(text);
-        tv.setTextSize(14);
-        tv.setTextColor(0xFF273245);
+        tv.setTextSize(12);
+        tv.setTextColor(0xFF4a5568);
         tv.setPadding(0, 0, 0, dp(4));
         card.addView(tv);
     }
 
-    private Button btn(LinearLayout parent, String text, int bgColor, int textColor) {
+    private Button cardBtn(LinearLayout parent, String text, int bgColor, int textColor) {
         Button b = new Button(this);
-        b.setText(text); b.setTextColor(textColor); b.setTextSize(12); b.setPadding(dp(5), dp(5), dp(9), dp(5));
-        GradientDrawable bg = new GradientDrawable(); bg.setColor(bgColor); bg.setCornerRadius(dp(11));
+        b.setText(text);
+        b.setTextColor(textColor);
+        b.setTextSize(11);
+        b.setPadding(dp(6), dp(3), dp(6), dp(3));
+        b.setMinWidth(0);
+        b.setMinHeight(0);
+        b.setMinimumWidth(0);
+        b.setMinimumHeight(0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(bgColor);
+        bg.setCornerRadius(dp(5));
         b.setBackground(bg);
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bp.setMargins(0, 0, dp(2), 0);
+        bp.setMargins(0, 0, dp(4), 0);
         b.setLayoutParams(bp);
         return b;
     }
 
-    private int dp(int val) { return (int)(val * getResources().getDisplayMetrics().density + 0.5f); }
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
+    }
 }

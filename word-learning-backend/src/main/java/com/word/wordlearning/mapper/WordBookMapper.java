@@ -31,4 +31,10 @@ public interface WordBookMapper {
 
     @Select("SELECT * FROM t_word_book WHERE wordBookName = #{name}")
     WordBook findByName(String name);
+
+    @Select("SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = #{wordBookId}")
+    int countWordsInBook(String wordBookId);
+
+    @Update("UPDATE t_word_book SET wordCount = (SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = #{wordBookId}) WHERE wordBookId = #{wordBookId}")
+    void syncWordCount(String wordBookId);
 }

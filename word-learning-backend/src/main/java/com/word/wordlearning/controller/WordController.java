@@ -2,6 +2,7 @@ package com.word.wordlearning.controller;
 
 import com.word.wordlearning.dto.Result;
 import com.word.wordlearning.entity.Word;
+import com.word.wordlearning.mapper.WordBookMapper;
 import com.word.wordlearning.mapper.WordMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +15,11 @@ import java.util.Map;
 public class WordController {
 
     private final WordMapper wordMapper;
+    private final WordBookMapper wordBookMapper;
 
-    public WordController(WordMapper wordMapper) {
+    public WordController(WordMapper wordMapper, WordBookMapper wordBookMapper) {
         this.wordMapper = wordMapper;
+        this.wordBookMapper = wordBookMapper;
     }
 
     @GetMapping
@@ -66,6 +69,7 @@ public class WordController {
             wordMapper.insert(w);
         }
         wordMapper.insertBookRef(bookId, wordId);
+        wordBookMapper.syncWordCount(bookId);
         return Result.success("单词添加成功");
     }
 
@@ -114,6 +118,7 @@ public class WordController {
                 success++;
             } catch (Exception e) { fail++; }
         }
+        wordBookMapper.syncWordCount(bookId);
         return Result.success("批量添加完成：成功" + success + "个" + (fail > 0 ? "，失败" + fail + "个" : ""));
     }
 
@@ -127,6 +132,7 @@ public class WordController {
                 if (wordMapper.countBookRefs(wordId) == 0) {
                     wordMapper.delete(wordId);
                 }
+                wordBookMapper.syncWordCount(wordBookId);
                 return Result.success("已从词书移除");
             }
             return Result.error(404, "未找到关联");

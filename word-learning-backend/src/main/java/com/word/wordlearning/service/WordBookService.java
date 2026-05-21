@@ -16,7 +16,11 @@ public class WordBookService {
     }
 
     public List<WordBook> listAvailable() {
-        return wordBookMapper.findAll();
+        List<WordBook> books = wordBookMapper.findAll();
+        for (WordBook book : books) {
+            book.setWordCount(wordBookMapper.countWordsInBook(book.getWordBookId()));
+        }
+        return books;
     }
 
     public void add(WordBook book) {

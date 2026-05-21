@@ -14,4 +14,5 @@ public class Word {
     private String wordPronunciation;
     private String wordImage;
     private LocalDateTime createTime;
+    private String wordBookId;
 }

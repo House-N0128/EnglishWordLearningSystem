@@ -160,6 +160,7 @@ public class UserManageActivity extends AppCompatActivity {
         root.addView(navbar);
 
         setContentView(root);
+        doSearch();
     }
 
     private void addNav(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
@@ -176,7 +177,6 @@ public class UserManageActivity extends AppCompatActivity {
 
     private void doSearch() {
         String kw = etSearch.getText().toString().trim();
-        if (kw.isEmpty()) return;
         String statusFilter = spStatus.getSelectedItem() != null ? spStatus.getSelectedItem().toString() : "账号状态";
 
         new Thread(() -> {

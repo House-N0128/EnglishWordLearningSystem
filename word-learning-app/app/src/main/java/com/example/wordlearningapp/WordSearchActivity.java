@@ -1,16 +1,19 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,195 +25,410 @@ import com.example.wordlearningapp.util.AuthManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WordSearchActivity extends AppCompatActivity {
 
     private LinearLayout listArea;
     private EditText etSearch;
+    private Spinner spBook, spStatus;
     private boolean isAdmin;
+    private JsonArray allWords;
+    private Map<String, String> bookIdToName = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         isAdmin = "admin".equals(AuthManager.get().getRole());
-
-        ScrollView scroll = new ScrollView(this);
-        scroll.setBackgroundColor(0xFFf2f8fc);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFFf2f8fc);
 
-        // Header
-        LinearLayout h = new LinearLayout(this);
-        h.setBackgroundColor(0xFF318af8);
-        h.setPadding(32, 24, 32, 24);
-        h.setGravity(Gravity.CENTER_VERTICAL);
-        TextView back = new TextView(this);
-        back.setText("← 返回"); back.setTextSize(15); back.setTextColor(0xFFFFFFFF);
-        back.setOnClickListener(v -> finish());
-        h.addView(back);
-        TextView t = new TextView(this);
-        t.setText(isAdmin ? "单词管理" : "单词查询");
-        t.setTextSize(18); t.setTextColor(0xFFFFFFFF); t.setGravity(Gravity.CENTER);
-        t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        h.addView(t);
-        h.addView(new View(this) {{ setLayoutParams(new LinearLayout.LayoutParams(48, 1)); }});
-        root.addView(h);
+        // ===== TOP BAR: 48dp, #318af8 =====
+        LinearLayout topBar = new LinearLayout(this);
+        topBar.setOrientation(LinearLayout.HORIZONTAL);
+        topBar.setBackgroundColor(0xFF318af8);
+        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setGravity(Gravity.CENTER_VERTICAL);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
+        TextView adminUser = new TextView(this);
+        adminUser.setText("管理员：" + AuthManager.get().getUserId());
+        adminUser.setTextSize(16);
+        adminUser.setTextColor(0xFFFFFFFF);
+        adminUser.setTypeface(null, Typeface.BOLD);
+        adminUser.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        topBar.addView(adminUser);
+
+        TextView btnLogout = new TextView(this);
+        btnLogout.setText("退出登录");
+        btnLogout.setTextSize(15);
+        btnLogout.setTextColor(0xFF318af8);
+        btnLogout.setGravity(Gravity.CENTER);
+        btnLogout.setPadding(dp(20), dp(7), dp(20), dp(7));
+        GradientDrawable lgBg = new GradientDrawable();
+        lgBg.setColor(0xFFFFFFFF);
+        lgBg.setCornerRadius(dp(16));
+        btnLogout.setBackground(lgBg);
+        btnLogout.setOnClickListener(v -> {
+            AuthManager.get().clearAuth();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
+        topBar.addView(btnLogout);
+        root.addView(topBar);
+
+        // ===== SCROLLABLE MAIN =====
+        ScrollView scroll = new ScrollView(this);
         LinearLayout main = new LinearLayout(this);
         main.setOrientation(LinearLayout.VERTICAL);
-        main.setPadding(24, 16, 24, 80);
+        main.setPadding(dp(12), dp(8), dp(12), dp(70));
 
-        // Search row
-        LinearLayout searchRow = new LinearLayout(this);
-        searchRow.setOrientation(LinearLayout.HORIZONTAL);
+        // Title
+        TextView title = new TextView(this);
+        title.setText("单词管理");
+        title.setTextSize(19);
+        title.setTextColor(0xFF318af8);
+        title.setTypeface(null, Typeface.BOLD);
+        title.setPadding(0, dp(15), 0, dp(15));
+        main.addView(title);
+
+        // Search area: two rows
+        LinearLayout searchArea = new LinearLayout(this);
+        searchArea.setOrientation(LinearLayout.VERTICAL);
+        searchArea.setPadding(0, 0, 0, dp(12));
+
+        // Row 1: input + search button
+        LinearLayout searchRow1 = new LinearLayout(this);
+        searchRow1.setOrientation(LinearLayout.HORIZONTAL);
+        searchRow1.setPadding(0, 0, 0, dp(8));
 
         etSearch = new EditText(this);
-        etSearch.setHint("输入英文搜索单词");
-        etSearch.setTextSize(15);
-        etSearch.setPadding(20, 16, 20, 16);
-        etSearch.setGravity(Gravity.CENTER_VERTICAL);
-        GradientDrawable sd = new GradientDrawable();
-        sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
-        etSearch.setBackground(sd);
-        etSearch.setMinHeight(0);
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 1);
-        edp.gravity = Gravity.CENTER_VERTICAL;
-        etSearch.setLayoutParams(edp);
-        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+        etSearch.setHint("英文拼写/单词ID");
+        etSearch.setTextSize(14);
+        etSearch.setSingleLine(true);
+        etSearch.setPadding(dp(10), 0, dp(10), 0);
+        bg(etSearch, 0xFFf6f8fc, dp(7), 1, 0xFFc7d9ee);
+        etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { doSearch(); }
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterWords(); }
             @Override public void afterTextChanged(android.text.Editable e) {}
         });
-        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) { doSearch(); return true; } return false; });
-        searchRow.addView(etSearch);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(42), 1);
+        edp.gravity = Gravity.CENTER_VERTICAL;
+        etSearch.setLayoutParams(edp);
+        searchRow1.addView(etSearch);
 
-        main.addView(searchRow);
+        Button searchBtn = new Button(this);
+        searchBtn.setText("查询");
+        searchBtn.setTextColor(0xFFFFFFFF);
+        searchBtn.setTextSize(13);
+        searchBtn.setPadding(dp(8), 0, dp(8), 0);
+        searchBtn.setMinWidth(0);
+        searchBtn.setMinimumWidth(0);
+        searchBtn.setGravity(Gravity.CENTER);
+        GradientDrawable sbtnBg = new GradientDrawable();
+        sbtnBg.setColor(0xFF318af8);
+        sbtnBg.setCornerRadius(dp(8));
+        searchBtn.setBackground(sbtnBg);
+        LinearLayout.LayoutParams sbtnLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(42));
+        sbtnLp.setMargins(dp(8), 0, 0, 0);
+        searchBtn.setLayoutParams(sbtnLp);
+        searchBtn.setOnClickListener(v -> filterWords());
+        searchRow1.addView(searchBtn);
 
+        // Row 2: book spinner + status spinner
+        LinearLayout searchRow2 = new LinearLayout(this);
+        searchRow2.setOrientation(LinearLayout.HORIZONTAL);
+
+        spBook = new Spinner(this);
+        spBook.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"所属词书"}));
+        styleSpinner(spBook);
+        LinearLayout.LayoutParams bkp = new LinearLayout.LayoutParams(0, dp(42), 1);
+        bkp.gravity = Gravity.CENTER_VERTICAL;
+        spBook.setLayoutParams(bkp);
+        spBook.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { filterWords(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
+        });
+        searchRow2.addView(spBook);
+
+        spStatus = new Spinner(this);
+        spStatus.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                new String[]{"单词状态", "全部", "已上架", "未上架"}));
+        styleSpinner(spStatus);
+        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(0, dp(42), 1);
+        stp.setMargins(dp(8), 0, 0, 0);
+        stp.gravity = Gravity.CENTER_VERTICAL;
+        spStatus.setLayoutParams(stp);
+        spStatus.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { filterWords(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
+        });
+        searchRow2.addView(spStatus);
+
+        searchArea.addView(searchRow1);
+        searchArea.addView(searchRow2);
+        main.addView(searchArea);
+
+        // Two buttons: 新增单词 + 批量导入
         if (isAdmin) {
+            LinearLayout btnGroup = new LinearLayout(this);
+            btnGroup.setOrientation(LinearLayout.HORIZONTAL);
+            btnGroup.setPadding(0, 0, 0, dp(11));
+
             Button addBtn = new Button(this);
-            addBtn.setText("+ 新增单词");
+            addBtn.setText("新增单词");
             addBtn.setTextColor(0xFFFFFFFF);
-            addBtn.setTextSize(15); addBtn.setPadding(14, 12, 14, 12);
-            GradientDrawable ab = new GradientDrawable();
-            ab.setColor(0xFF318af8); ab.setCornerRadius(24);
-            addBtn.setBackground(ab);
-            LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            abp.setMargins(0, 12, 0, 12);
+            addBtn.setTextSize(14);
+            addBtn.setPadding(0, dp(10), 0, dp(10));
+            GradientDrawable abBg = new GradientDrawable();
+            abBg.setColor(0xFF318af8);
+            abBg.setCornerRadius(dp(8));
+            addBtn.setBackground(abBg);
+            LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+            abp.setMargins(0, 0, dp(8), 0);
             addBtn.setLayoutParams(abp);
             addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditWordActivity.class)));
-            main.addView(addBtn);
+            btnGroup.addView(addBtn);
+
+            Button batchBtn = new Button(this);
+            batchBtn.setText("批量导入");
+            batchBtn.setTextColor(0xFFFFFFFF);
+            batchBtn.setTextSize(14);
+            batchBtn.setPadding(0, dp(10), 0, dp(10));
+            GradientDrawable bbBg = new GradientDrawable();
+            bbBg.setColor(0xFF318af8);
+            bbBg.setCornerRadius(dp(8));
+            batchBtn.setBackground(bbBg);
+            LinearLayout.LayoutParams bbp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+            bbp.setMargins(dp(8), 0, 0, 0);
+            batchBtn.setLayoutParams(bbp);
+            batchBtn.setOnClickListener(v -> startActivity(new Intent(this, BatchAddWordActivity.class)));
+            btnGroup.addView(batchBtn);
+
+            main.addView(btnGroup);
         }
 
         listArea = new LinearLayout(this);
         listArea.setOrientation(LinearLayout.VERTICAL);
         main.addView(listArea);
 
-        root.addView(main);
-        scroll.addView(root);
-        setContentView(scroll);
+        scroll.addView(main);
+        root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+
+        // ===== BOTTOM NAVBAR =====
+        root.addView(makeNavbar());
+
+        setContentView(root);
+        loadData();
     }
 
-    private void doSearch() {
-        String kw = etSearch.getText().toString().trim();
-        if (kw.isEmpty()) return;
+    private void styleSpinner(Spinner sp) {
+        sp.setPadding(dp(6), 0, dp(2), 0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xFFf6f8fc);
+        bg.setCornerRadius(dp(7));
+        bg.setStroke(1, 0xFFc7d9ee);
+        sp.setBackground(bg);
+    }
 
+    private LinearLayout makeNavbar() {
+        LinearLayout navbar = new LinearLayout(this);
+        navbar.setOrientation(LinearLayout.HORIZONTAL);
+        navbar.setBackgroundColor(0xFFFFFFFF);
+        navbar.setPadding(0, dp(8), 0, dp(12));
+        navbar.setElevation(dp(8));
+        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
+        navbar.setGravity(Gravity.CENTER);
+        navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
+        navItem(navbar, "👥", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
+        navItem(navbar, "📚", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
+        navItem(navbar, "🗃️", "单词管理", true, () -> {});
+        return navbar;
+    }
+
+    private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
+        TextView item = new TextView(this);
+        item.setText(icon + "\n" + label);
+        item.setTextSize(15);
+        item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
+        item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
+        item.setGravity(Gravity.CENTER);
+        item.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        item.setOnClickListener(v -> action.run());
+        parent.addView(item);
+    }
+
+    private void bg(View v, int color, int radius, int borderW, int borderC) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(color);
+        g.setCornerRadius(radius);
+        if (borderW > 0) g.setStroke(borderW, borderC);
+        v.setBackground(g);
+    }
+
+    private void loadData() {
         new Thread(() -> {
             try {
-                JsonObject r = ApiClient.get().get("/api/words/search?keyword=" + kw);
-                runOnUiThread(() -> {
-                    listArea.removeAllViews();
-                    if (r.get("code").getAsInt() == 200 && r.getAsJsonArray("data").size() > 0) {
-                        JsonArray data = r.getAsJsonArray("data");
-                        for (int i = 0; i < data.size(); i++) {
-                            JsonObject w = data.get(i).getAsJsonObject();
-                            LinearLayout card = new LinearLayout(this);
-                            card.setOrientation(LinearLayout.VERTICAL);
-                            card.setBackgroundColor(0xFFFFFFFF);
-                            card.setPadding(24, 18, 24, 18);
-                            GradientDrawable cd = new GradientDrawable();
-                            cd.setColor(0xFFFFFFFF); cd.setCornerRadius(16);
-                            card.setBackground(cd);
-                            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            cp.setMargins(0, 0, 0, 14);
-                            card.setLayoutParams(cp);
-
-                            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
-                            String phonetic = w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull() ? w.get("phoneticSymbol").getAsString() : "";
-                            String chinese = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
-                            String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
-
-                            TextView nm = new TextView(this);
-                            nm.setText(spelling + "  " + phonetic);
-                            nm.setTextSize(16); nm.setTextColor(0xFF318af8);
-                            card.addView(nm);
-
-                            TextView def = new TextView(this);
-                            def.setText(chinese);
-                            def.setTextSize(14); def.setTextColor(0xFF273245);
-                            def.setPadding(0, 4, 0, 4);
-                            card.addView(def);
-
-                            if (w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull()) {
-                                TextView ex = new TextView(this);
-                                ex.setText("例句：" + w.get("exampleSentence").getAsString());
-                                ex.setTextSize(12); ex.setTextColor(0xFF8899aa);
-                                ex.setPadding(0, 0, 0, 6);
-                                card.addView(ex);
-                            }
-
-                            if (isAdmin) {
-                                LinearLayout btns = new LinearLayout(this);
-                                btns.setOrientation(LinearLayout.HORIZONTAL);
-
-                                Button edit = new Button(this);
-                                edit.setText("编辑"); edit.setTextColor(0xFFFFFFFF); edit.setTextSize(13); edit.setPadding(20, 8, 20, 8);
-                                GradientDrawable eb = new GradientDrawable();
-                                eb.setColor(0xFF318af8); eb.setCornerRadius(20);
-                                edit.setBackground(eb);
-                                LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                ep.setMargins(0, 0, 12, 0);
-                                edit.setLayoutParams(ep);
-                                String fid = wordId;
-                                edit.setOnClickListener(v -> { Intent in = new Intent(this, AddEditWordActivity.class); in.putExtra("wordId", fid); startActivity(in); });
-                                btns.addView(edit);
-
-                                Button del = new Button(this);
-                                del.setText("删除"); del.setTextColor(0xFF318af8); del.setTextSize(13); del.setPadding(20, 8, 20, 8);
-                                GradientDrawable db = new GradientDrawable();
-                                db.setColor(0xFFe0e6f2); db.setCornerRadius(20);
-                                del.setBackground(db);
-                                String did = wordId;
-                                del.setOnClickListener(v -> {
-                                    new AlertDialog.Builder(this).setTitle("确认删除").setMessage("确定删除\"" + spelling + "\"？")
-                                            .setPositiveButton("确定", (d, w2) -> {
-                                                new Thread(() -> {
-                                                    try {
-                                                        JsonObject rr = ApiClient.get().delete("/api/words/" + did, null);
-                                                        runOnUiThread(() -> { Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已删除", Toast.LENGTH_SHORT).show(); doSearch(); });
-                                                    } catch (Exception e) {}
-                                                }).start();
-                                            }).setNegativeButton("取消", null).show();
-                                });
-                                btns.addView(del);
-
-                                card.addView(btns);
-                            } else {
-                                card.setOnClickListener(v -> { Intent in = new Intent(this, WordDetailActivity.class); in.putExtra("wordId", wordId); startActivity(in); });
-                            }
-
-                            listArea.addView(card);
+                // Load books for name mapping and spinner
+                JsonObject rb = ApiClient.get().get("/api/wordbooks");
+                if (rb.get("code").getAsInt() == 200) {
+                    JsonArray books = rb.getAsJsonArray("data");
+                    java.util.List<String> bookItems = new java.util.ArrayList<>();
+                    bookItems.add("所属词书");
+                    for (int i = 0; i < books.size(); i++) {
+                        JsonObject b = books.get(i).getAsJsonObject();
+                        String bid = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
+                        String bname = b.has("wordBookName") ? b.get("wordBookName").getAsString() : "";
+                        if (!bid.isEmpty() && !bname.isEmpty()) {
+                            bookIdToName.put(bid, bname);
+                            bookItems.add(bname);
                         }
-                    } else {
-                        TextView emp = new TextView(this);
-                        emp.setText("未找到相关单词");
-                        emp.setTextSize(14); emp.setTextColor(0xFF8899aa);
-                        emp.setGravity(Gravity.CENTER); emp.setPadding(0, 40, 0, 40);
-                        listArea.addView(emp);
                     }
-                });
+                    runOnUiThread(() -> spBook.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                            bookItems.toArray(new String[0]))));
+                }
+
+                // Load all words
+                JsonObject r = ApiClient.get().get("/api/words/all");
+                if (r.get("code").getAsInt() == 200) {
+                    allWords = r.getAsJsonArray("data");
+                    runOnUiThread(() -> filterWords());
+                }
             } catch (Exception e) {}
         }).start();
+    }
+
+    private void filterWords() {
+        String kw = etSearch.getText().toString().trim().toLowerCase();
+        String bookName = spBook.getSelectedItem() != null ? spBook.getSelectedItem().toString() : "所属词书";
+        String status = spStatus.getSelectedItem() != null ? spStatus.getSelectedItem().toString() : "单词状态";
+
+        listArea.removeAllViews();
+        if (allWords == null) return;
+
+        for (int i = 0; i < allWords.size(); i++) {
+            JsonObject w = allWords.get(i).getAsJsonObject();
+            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+            String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+            String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
+            String phonetic = w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull() ? w.get("phoneticSymbol").getAsString() : "";
+            String pos = w.has("partOfSpeech") && !w.get("partOfSpeech").isJsonNull() ? w.get("partOfSpeech").getAsString() : "";
+            String createTime = w.has("createTime") && !w.get("createTime").isJsonNull() ? w.get("createTime").getAsString().substring(0, 10) : "";
+            String wBookId = w.has("wordBookId") && !w.get("wordBookId").isJsonNull() ? w.get("wordBookId").getAsString() : "";
+            String wBookName = bookIdToName.getOrDefault(wBookId, "");
+
+            if (!kw.isEmpty() && !spelling.toLowerCase().contains(kw) && !wordId.toLowerCase().contains(kw)) continue;
+            if (!"所属词书".equals(bookName) && !bookName.isEmpty() && !bookName.equals(wBookName)) continue;
+            if (!"单词状态".equals(status) && !"全部".equals(status)) {
+                continue; // Words don't have real status yet, skip filter for non-全部
+            }
+
+            // Card
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setPadding(dp(12), dp(12), dp(12), dp(12));
+            GradientDrawable cBg = new GradientDrawable();
+            cBg.setColor(0xFFFFFFFF);
+            cBg.setCornerRadius(dp(12));
+            card.setBackground(cBg);
+            card.setElevation(dp(2));
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            cp.setMargins(0, 0, 0, dp(12));
+            card.setLayoutParams(cp);
+
+            // Row 1: 单词ID + 词书 + 拼写 + 词性 + 音标
+            StringBuilder row1 = new StringBuilder();
+            row1.append("单词ID: ").append(wordId);
+            if (!wBookName.isEmpty()) row1.append(" | 词书: ").append(wBookName);
+            row1.append(" | 拼写: ").append(spelling);
+            if (!pos.isEmpty()) row1.append(" | 词性: ").append(pos);
+            if (!phonetic.isEmpty()) row1.append(" | 音标: ").append(phonetic);
+            addCardRow(card, row1.toString());
+
+            // Row 2: 释义 + 创建
+            StringBuilder row2 = new StringBuilder();
+            row2.append("释义: ").append(definition);
+            if (!createTime.isEmpty()) row2.append(" | 创建: ").append(createTime);
+            addCardRow(card, row2.toString());
+
+            // Buttons
+            if (isAdmin) {
+                LinearLayout btns = new LinearLayout(this);
+                btns.setOrientation(LinearLayout.HORIZONTAL);
+                btns.setPadding(0, dp(6), 0, 0);
+
+                Button editBtn = cardBtn(btns, "编辑", 0xFF318af8, 0xFFFFFFFF);
+                editBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, AddEditWordActivity.class);
+                    in.putExtra("wordId", wordId);
+                    startActivity(in);
+                });
+
+                Button delBtn = cardBtn(btns, "删除", 0xFFe8ecf1, 0xFF5a6b80);
+                String fWordId = wordId, fSpelling = spelling;
+                delBtn.setOnClickListener(v -> new AlertDialog.Builder(this)
+                        .setTitle("确认删除")
+                        .setMessage("确定删除\"" + fSpelling + "\"？")
+                        .setPositiveButton("确定", (d, w2) -> new Thread(() -> {
+                            try {
+                                JsonObject rr = ApiClient.get().delete("/api/words/" + fWordId, null);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已删除", Toast.LENGTH_SHORT).show();
+                                    loadData();
+                                });
+                            } catch (Exception e) {}
+                        }).start())
+                        .setNegativeButton("取消", null)
+                        .show());
+
+                Button detailBtn = cardBtn(btns, "详情", 0xFF318af8, 0xFFFFFFFF);
+                detailBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, WordDetailActivity.class);
+                    in.putExtra("wordId", wordId);
+                    startActivity(in);
+                });
+
+                btns.addView(editBtn);
+                btns.addView(delBtn);
+                btns.addView(detailBtn);
+                card.addView(btns);
+            }
+
+            listArea.addView(card);
+        }
+    }
+
+    private void addCardRow(LinearLayout card, String text) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(12);
+        tv.setTextColor(0xFF4a5568);
+        tv.setPadding(0, 0, 0, dp(3));
+        card.addView(tv);
+    }
+
+    private Button cardBtn(LinearLayout parent, String text, int bgColor, int textColor) {
+        Button b = new Button(this);
+        b.setText(text);
+        b.setTextColor(textColor);
+        b.setTextSize(12);
+        b.setPadding(dp(8), dp(4), dp(8), dp(4));
+        b.setMinWidth(0);
+        b.setMinHeight(0);
+        b.setMinimumWidth(0);
+        b.setMinimumHeight(0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(bgColor);
+        bg.setCornerRadius(dp(5));
+        b.setBackground(bg);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(0, 0, dp(6), 0);
+        b.setLayoutParams(bp);
+        return b;
     }
 
     private int dp(int val) {
