@@ -230,6 +230,12 @@ public class WordBooksActivity extends AppCompatActivity {
         loadBooks();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (allBooks != null) loadBooks();
+    }
+
     private void styleSpinner(Spinner sp) {
         sp.setPadding(dp(8), 0, dp(4), 0);
         GradientDrawable bg = new GradientDrawable();
@@ -324,7 +330,13 @@ public class WordBooksActivity extends AppCompatActivity {
 
             addCardRow(card, "ID: " + bid + " | 名称: " + name + " | 难度: " + bookDiff);
             addCardRow(card, "词数: " + wc + " | 创建管理员: " + adminId);
-            addCardRow(card, "创建: " + cTime + " | 更新: " + uTime + " | 状态: " + status);
+            addCardRow(card, "创建: " + cTime + " | 更新: " + uTime);
+            TextView stv = new TextView(this);
+            stv.setText("状态: " + status);
+            stv.setTextSize(12);
+            stv.setTextColor("未上架".equals(status) ? 0xFFe37b4b : 0xFF25cb75);
+            stv.setPadding(0, 0, 0, dp(4));
+            card.addView(stv);
 
             if (isAdmin) {
                 LinearLayout btns = new LinearLayout(this);
