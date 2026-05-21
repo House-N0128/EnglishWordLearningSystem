@@ -241,16 +241,16 @@ public class WordBooksActivity extends AppCompatActivity {
         navbar.setElevation(dp(8));
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
-        navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
-        navItem(navbar, "👥", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
-        navItem(navbar, "📚", "词书管理", true, () -> {});
-        navItem(navbar, "🗃️", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
+        navItem(navbar, "", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
+        navItem(navbar, "", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
+        navItem(navbar, "", "词书管理", true, () -> {});
+        navItem(navbar, "", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
         return navbar;
     }
 
     private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
         TextView item = new TextView(this);
-        item.setText(icon + "\n" + label);
+        item.setText(icon.isEmpty() ? label : icon + "\n" + label);
         item.setTextSize(15);
         item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
