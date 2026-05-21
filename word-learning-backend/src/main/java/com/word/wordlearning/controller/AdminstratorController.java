@@ -66,10 +66,26 @@ public class AdminstratorController {
     }
 
     @PutMapping("/users/{userId}")
-    public Result<String> updateUserStatus(@PathVariable String userId, @RequestBody Map<String, String> body) {
+    public Result<String> updateUser(@PathVariable String userId, @RequestBody Map<String, String> body) {
+        OrdinaryUser user = userMapper.findByUserId(userId);
+        if (user == null) return Result.error(404, "用户不存在");
+
         String status = body.get("accountStatus");
-        userMapper.updateStatus(userId, status);
-        return Result.success("用户状态已更新");
+        if (status != null && !status.isEmpty()) {
+            userMapper.updateStatus(userId, status);
+        }
+
+        String userName = body.get("userName");
+        String phone = body.get("phoneNumber");
+        String email = body.get("email");
+        if (userName != null || phone != null || email != null) {
+            if (userName != null) user.setUserName(userName);
+            if (phone != null) user.setPhoneNumber(phone);
+            if (email != null) user.setEmail(email);
+            userMapper.updateProfile(user);
+        }
+
+        return Result.success("用户信息已更新");
     }
 
     @GetMapping("/records")
