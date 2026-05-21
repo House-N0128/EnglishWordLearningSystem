@@ -68,22 +68,27 @@ public class WordSearchActivity extends AppCompatActivity {
         etSearch = new EditText(this);
         etSearch.setHint("输入英文搜索单词");
         etSearch.setTextSize(15);
-        etSearch.setPadding(24, 14, 24, 14);
+        etSearch.setPadding(20, 16, 20, 16);
+        etSearch.setGravity(Gravity.CENTER_VERTICAL);
         GradientDrawable sd = new GradientDrawable();
         sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(sd);
-        etSearch.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        etSearch.setMinHeight(0);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 1);
+        edp.gravity = Gravity.CENTER_VERTICAL;
+        etSearch.setLayoutParams(edp);
         searchRow.addView(etSearch);
 
         Button searchBtn = new Button(this);
         searchBtn.setText("搜索");
         searchBtn.setTextColor(0xFFFFFFFF);
-        searchBtn.setTextSize(13);
-        searchBtn.setPadding(14, 10, 14, 10);
+        searchBtn.setTextSize(14);
+        searchBtn.setPadding(16, 0, 16, 0);
+        searchBtn.setGravity(Gravity.CENTER);
         GradientDrawable sbb = new GradientDrawable();
-        sbb.setColor(0xFF318af8); sbb.setCornerRadius(8);
+        sbb.setColor(0xFF318af8); sbb.setCornerRadius(12);
         searchBtn.setBackground(sbb);
-        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
         sbp.setMargins(8, 0, 0, 0);
         searchBtn.setLayoutParams(sbp);
         searchBtn.setOnClickListener(v -> doSearch());
@@ -218,5 +223,9 @@ public class WordSearchActivity extends AppCompatActivity {
                 });
             } catch (Exception e) {}
         }).start();
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }
