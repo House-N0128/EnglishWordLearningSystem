@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -47,22 +48,45 @@ public class WordBooksActivity extends AppCompatActivity {
         main.setOrientation(LinearLayout.VERTICAL);
         main.setPadding(24, 16, 24, 80);
 
-        // Search
+        // Search row: input + button, same as WordSearchActivity
+        LinearLayout searchRow = new LinearLayout(this);
+        searchRow.setOrientation(LinearLayout.HORIZONTAL);
+
         etSearch = new EditText(this);
         etSearch.setHint("词书名称搜索");
         etSearch.setTextSize(15);
-        etSearch.setPadding(24, 14, 24, 14);
-        etSearch.setBackgroundColor(0xFFf6f8fc);
+        etSearch.setPadding(20, 16, 20, 16);
+        etSearch.setGravity(Gravity.CENTER_VERTICAL);
+        etSearch.setSingleLine(true);
         bg(etSearch, 0xFFf6f8fc, 12, 1, 0xFFc7d9ee);
-        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        sp.setMargins(0, 0, 0, 14);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(48), 1);
+        sp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(sp);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
             @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterBooks(); }
             @Override public void afterTextChanged(android.text.Editable e) {}
         });
-        main.addView(etSearch);
+        searchRow.addView(etSearch);
+
+        Button searchBtn = new Button(this);
+        searchBtn.setText("搜索");
+        searchBtn.setTextColor(0xFFFFFFFF);
+        searchBtn.setTextSize(14);
+        searchBtn.setPadding(16, 0, 16, 0);
+        searchBtn.setGravity(Gravity.CENTER);
+        GradientDrawable sbb = new GradientDrawable();
+        sbb.setColor(0xFF318af8); sbb.setCornerRadius(12);
+        searchBtn.setBackground(sbb);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
+        sbp.setMargins(8, 0, 0, 14);
+        searchBtn.setLayoutParams(sbp);
+        searchBtn.setOnClickListener(v -> filterBooks());
+        searchRow.addView(searchBtn);
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) { filterBooks(); return true; } return false; });
+
+        main.addView(searchRow);
 
         if (isAdmin) {
             Button addBtn = new Button(this);
@@ -120,6 +144,10 @@ public class WordBooksActivity extends AppCompatActivity {
         g.setCornerRadius(radius);
         if (borderW > 0) g.setStroke(borderW, borderC);
         v.setBackground(g);
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     private void loadBooks() {

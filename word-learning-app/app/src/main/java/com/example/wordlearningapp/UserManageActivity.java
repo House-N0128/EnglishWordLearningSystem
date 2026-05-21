@@ -57,16 +57,43 @@ public class UserManageActivity extends AppCompatActivity {
         main.setOrientation(LinearLayout.VERTICAL);
         main.setPadding(24, 16, 24, 80);
 
+        // Search row: input + button, same style as WordSearchActivity
+        LinearLayout searchRow = new LinearLayout(this);
+        searchRow.setOrientation(LinearLayout.HORIZONTAL);
+
         etSearch = new EditText(this);
         etSearch.setHint("输入用户ID/昵称搜索");
         etSearch.setTextSize(15);
-        etSearch.setPadding(24, 14, 24, 14);
+        etSearch.setPadding(20, 16, 20, 16);
+        etSearch.setGravity(Gravity.CENTER_VERTICAL);
+        etSearch.setSingleLine(true);
         GradientDrawable sd = new GradientDrawable();
         sd.setColor(0xFFf6f8fc); sd.setCornerRadius(12); sd.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(sd);
-        etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH) { doSearch(); return true; } return false; });
-        main.addView(etSearch);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 1);
+        edp.gravity = Gravity.CENTER_VERTICAL;
+        etSearch.setLayoutParams(edp);
+        searchRow.addView(etSearch);
+
+        Button searchBtn = new Button(this);
+        searchBtn.setText("搜索");
+        searchBtn.setTextColor(0xFFFFFFFF);
+        searchBtn.setTextSize(14);
+        searchBtn.setPadding(16, 0, 16, 0);
+        searchBtn.setGravity(Gravity.CENTER);
+        GradientDrawable sbb = new GradientDrawable();
+        sbb.setColor(0xFF318af8); sbb.setCornerRadius(12);
+        searchBtn.setBackground(sbb);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
+        sbp.setMargins(8, 0, 0, 0);
+        searchBtn.setLayoutParams(sbp);
+        searchBtn.setOnClickListener(v -> doSearch());
+        searchRow.addView(searchBtn);
+
+        // Enter key triggers search
+        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) { doSearch(); return true; } return false; });
+
+        main.addView(searchRow);
 
         listArea = new LinearLayout(this);
         listArea.setOrientation(LinearLayout.VERTICAL);
@@ -182,5 +209,9 @@ public class UserManageActivity extends AppCompatActivity {
                 });
             } catch (Exception e) {}
         }).start();
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }
