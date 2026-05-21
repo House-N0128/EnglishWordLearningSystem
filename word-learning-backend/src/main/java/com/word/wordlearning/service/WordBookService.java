@@ -16,8 +16,7 @@ public class WordBookService {
     }
 
     public List<WordBook> listAvailable() {
-        // User-facing: only 已上架 books
-        List<WordBook> books = wordBookMapper.findAllOnline();
+        List<WordBook> books = wordBookMapper.findAll();
         for (WordBook book : books) {
             book.setWordCount(wordBookMapper.countWordsInBook(book.getWordBookId()));
         }
