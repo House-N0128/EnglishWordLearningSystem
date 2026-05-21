@@ -102,7 +102,7 @@ public class UserManageActivity extends AppCompatActivity {
         GradientDrawable edBg = new GradientDrawable();
         edBg.setColor(0xFFf6f8fc); edBg.setCornerRadius(dp(7)); edBg.setStroke(1, 0xFFc7d9ee);
         etSearch.setBackground(edBg);
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 3);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 2);
         edp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(edp);
         etSearch.setOnEditorActionListener((v, a, e) -> { if (a == EditorInfo.IME_ACTION_SEARCH || a == EditorInfo.IME_ACTION_DONE) { doSearch(); return true; } return false; });
@@ -126,7 +126,7 @@ public class UserManageActivity extends AppCompatActivity {
         searchBtn.setText("查询");
         searchBtn.setTextColor(0xFFFFFFFF);
         searchBtn.setTextSize(14);
-        searchBtn.setPadding(dp(20), 0, dp(20), 0);
+        searchBtn.setPadding(dp(12), 0, dp(12), 0);
         searchBtn.setGravity(Gravity.CENTER);
         GradientDrawable sbBg = new GradientDrawable();
         sbBg.setColor(0xFF318af8); sbBg.setCornerRadius(dp(12));
