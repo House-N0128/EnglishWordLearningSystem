@@ -104,7 +104,7 @@ public class WordBooksActivity extends AppCompatActivity {
             @Override public void onTextChanged(CharSequence s, int st, int b, int c) { filterBooks(); }
             @Override public void afterTextChanged(android.text.Editable e) {}
         });
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 3);
+        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, dp(48), 2.5f);
         edp.gravity = Gravity.CENTER_VERTICAL;
         etSearch.setLayoutParams(edp);
         searchRow.addView(etSearch);
@@ -113,7 +113,7 @@ public class WordBooksActivity extends AppCompatActivity {
         spDifficulty.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 new String[]{"难度等级", "全部", "初级", "中级", "高级"}));
         styleSpinner(spDifficulty);
-        LinearLayout.LayoutParams dpp = new LinearLayout.LayoutParams(0, dp(48), 1.5f);
+        LinearLayout.LayoutParams dpp = new LinearLayout.LayoutParams(0, dp(48), 1.2f);
         dpp.setMargins(dp(8), 0, 0, 0); dpp.gravity = Gravity.CENTER_VERTICAL;
         spDifficulty.setLayoutParams(dpp);
         spDifficulty.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
@@ -126,7 +126,7 @@ public class WordBooksActivity extends AppCompatActivity {
         spStatus.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 new String[]{"词书状态", "全部", "已上架", "未上架"}));
         styleSpinner(spStatus);
-        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(0, dp(48), 1.5f);
+        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(0, dp(48), 1.2f);
         stp.setMargins(dp(8), 0, 0, 0); stp.gravity = Gravity.CENTER_VERTICAL;
         spStatus.setLayoutParams(stp);
         spStatus.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
@@ -139,7 +139,7 @@ public class WordBooksActivity extends AppCompatActivity {
         searchBtn.setText("查询");
         searchBtn.setTextColor(0xFFFFFFFF);
         searchBtn.setTextSize(14);
-        searchBtn.setPadding(dp(20), 0, dp(20), 0);
+        searchBtn.setPadding(dp(14), 0, dp(14), 0);
         searchBtn.setGravity(Gravity.CENTER);
         GradientDrawable sbBg = new GradientDrawable();
         sbBg.setColor(0xFF318af8); sbBg.setCornerRadius(dp(12));
@@ -319,11 +319,11 @@ public class WordBooksActivity extends AppCompatActivity {
 
     private Button btn(LinearLayout parent, String text, int bgColor, int textColor) {
         Button b = new Button(this);
-        b.setText(text); b.setTextColor(textColor); b.setTextSize(13); b.setPadding(dp(6), dp(6), dp(14), dp(6));
+        b.setText(text); b.setTextColor(textColor); b.setTextSize(12); b.setPadding(dp(5), dp(5), dp(9), dp(5));
         GradientDrawable bg = new GradientDrawable(); bg.setColor(bgColor); bg.setCornerRadius(dp(11));
         b.setBackground(bg);
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bp.setMargins(0, 0, dp(4), 0);
+        bp.setMargins(0, 0, dp(2), 0);
         b.setLayoutParams(bp);
         return b;
     }
