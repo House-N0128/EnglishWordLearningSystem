@@ -78,16 +78,19 @@ public class WordSearchActivity extends AppCompatActivity {
         Button searchBtn = new Button(this);
         searchBtn.setText("搜索");
         searchBtn.setTextColor(0xFFFFFFFF);
-        searchBtn.setTextSize(14);
-        searchBtn.setPadding(20, 14, 20, 14);
+        searchBtn.setTextSize(13);
+        searchBtn.setPadding(14, 10, 14, 10);
         GradientDrawable sbb = new GradientDrawable();
-        sbb.setColor(0xFF318af8); sbb.setCornerRadius(12);
+        sbb.setColor(0xFF318af8); sbb.setCornerRadius(8);
         searchBtn.setBackground(sbb);
         LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        sbp.setMargins(12, 0, 0, 0);
+        sbp.setMargins(8, 0, 0, 0);
         searchBtn.setLayoutParams(sbp);
         searchBtn.setOnClickListener(v -> doSearch());
         searchRow.addView(searchBtn);
+
+        // Enter key also triggers search
+        etSearch.setOnEditorActionListener((v, actionId, event) -> { if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) { doSearch(); return true; } return false; });
 
         main.addView(searchRow);
 
