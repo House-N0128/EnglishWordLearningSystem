@@ -277,7 +277,8 @@ public class WordBooksActivity extends AppCompatActivity {
     private void loadBooks() {
         new Thread(() -> {
             try {
-                JsonObject r = ApiClient.get().get("/api/wordbooks");
+                String url = isAdmin ? "/api/admin/wordbooks" : "/api/wordbooks";
+                JsonObject r = ApiClient.get().get(url);
                 if (r.get("code").getAsInt() == 200) {
                     allBooks = r.getAsJsonArray("data");
                     runOnUiThread(() -> filterBooks());
