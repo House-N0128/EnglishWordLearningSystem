@@ -83,7 +83,7 @@ public class WordSearchActivity extends AppCompatActivity {
         GradientDrawable sbb = new GradientDrawable();
         sbb.setColor(0xFF318af8); sbb.setCornerRadius(8);
         searchBtn.setBackground(sbb);
-        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         sbp.setMargins(8, 0, 0, 0);
         searchBtn.setLayoutParams(sbp);
         searchBtn.setOnClickListener(v -> doSearch());
