@@ -1,169 +1,146 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>用户学习记录</title>
-<script src="/mobile/api.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>用户学习记录（管理员）</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif; background: #f0f4f8; min-height: 100vh; padding-bottom: 75px; color: #2d3748; }
-.header { background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%); padding: 16px 18px; border-radius: 0 0 20px 20px; box-shadow: 0 4px 20px rgba(26,86,219,0.2); display: flex; align-items: center; gap: 12px; }
-.btn-back { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; }
-.header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
-.section { padding: 0 14px; margin-top: 16px; }
-.card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 12px; }
-.section-title { font-size: 14px; font-weight: 700; color: #4a5568; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #edf2f7; }
+body {
+  margin:0;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  font-family:'PingFang SC','Inter','HarmonyOS Sans',Arial,sans-serif;
+  padding-bottom:20px;
+}
 
-/* Stats */
-.stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
-.stat-item { flex: 1; text-align: center; padding: 14px 8px; border-radius: 12px; }
-.stat-item.blue  { background: #eff6ff; }
-.stat-item.green { background: #f0fff4; }
-.stat-item.amber { background: #fffbeb; }
-.stat-num { font-size: 24px; font-weight: 700; color: #2d3748; }
-.stat-lbl { font-size: 11px; color: #8899aa; margin-top: 4px; }
+/* 顶部栏（加入返回按钮版） */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:13px 18px 12px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:11px;
+}
 
-/* Date filter */
-.filter-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-.filter-row input[type="date"] { flex: 1; padding: 10px; border: 2px solid #cbd5e0; border-radius: 10px; font-size: 14px; background: #eff6ff; font-family: inherit; }
-.filter-row span { font-size: 14px; color: #8899aa; }
-.filter-row .btn-filter { padding: 10px 16px; background: #3577ef; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.back-btn {
+  background:none;
+  border:none;
+  outline:none;
+  cursor:pointer;
+  padding:5px 5px 5px 2px;
+  display:flex;
+  align-items:center;
+}
 
-/* Record list */
-.record-table { width: 100%; border-collapse: collapse; }
-.record-table th { text-align: left; padding: 8px 4px; font-size: 12px; color: #8899aa; border-bottom: 2px solid #edf2f7; }
-.record-table td { padding: 10px 4px; font-size: 14px; color: #2d3748; border-bottom: 1px solid #f7fafc; }
-.record-table .date-col { color: #3577ef; font-weight: 600; }
-.record-table .count-col { font-weight: 600; }
+.back-icon { width:30px; height:30px; display:inline-block; }
 
-.empty { text-align: center; color: #8899aa; padding: 24px; font-size: 14px; }
-.btn { padding: 8px 16px; border-radius: 20px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.btn-primary { background: #3577ef; color: #fff; }
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }
+.main-panel { padding:20px 16px; }
+
+.user-info-box {
+  background:#fff;
+  padding:14px;
+  border-radius:12px;
+  box-shadow:0 1px 6px #dde6fa50;
+  font-size:15px;
+  margin-bottom:18px;
+  color:#273245;
+}
+
+.section-title {
+  font-size:18px;
+  font-weight:700;
+  color:#318af8;
+  margin:18px 0 10px 0;
+}
+
+.stats-bar {
+  font-size:15px;
+  margin-bottom:12px;
+  color:#273245;
+}
+
+.record-table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 2px 10px #dde6fa40;
+}
+
+.record-table th, .record-table td {
+  padding:11px 0;
+  text-align:center;
+  font-size:14px;
+  border-bottom:1px solid #f2f2fc;
+  color:#318af8;
+}
+
+.record-table th {
+  background:#f7faff;
+  font-weight:600;
+}
+
+.record-table tr:last-child td {
+  border-bottom:none;
+}
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
 
-<div class="header">
-  <span class="btn-back" onclick="history.back()">← 返回</span>
-  <span class="header-title">用户学习记录</span>
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='getUserInfo.html'">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  用户学习记录
 </div>
 
-<div class="section">
-  <!-- 用户信息 -->
-  <div class="card" id="user-card">
-    <div class="section-title" id="user-name-title">用户加载中...</div>
+<div class="main-panel">
+
+  <!-- 用户基本信息 -->
+  <div class="user-info-box" id="userInfoBox">
+    用户ID：<strong><span id="uid-display">-</span></strong><br>
+    账号：<span id="uname-display">-</span><br>
+    昵称：<span id="nick-display">-</span><br>
+    注册时间：<span id="reg-display">-</span>
   </div>
 
-  <!-- 日期筛选 -->
-  <div class="card">
-    <div class="section-title">日期筛选</div>
-    <div class="filter-row">
-      <input type="date" id="filter-from">
-      <span>至</span>
-      <input type="date" id="filter-to">
-      <button class="btn-filter" onclick="doFilter()">筛选</button>
-      <button class="btn-filter" style="background:#8899aa;" onclick="clearFilter()">清除</button>
-    </div>
+  <!-- 统计数据 -->
+  <div class="section-title">学习统计</div>
+  <div class="stats-bar">
+    总学习: <strong id="stat-total">-</strong> ｜ 日均: <strong id="stat-avg">-</strong>
   </div>
 
-  <!-- 统计卡片 -->
-  <div class="card">
-    <div class="section-title">学习统计</div>
-    <div class="stats-row">
-      <div class="stat-item blue"><div class="stat-num" id="stat-total">-</div><div class="stat-lbl">总学习词数</div></div>
-      <div class="stat-item green"><div class="stat-num" id="stat-days">-</div><div class="stat-lbl">学习天数</div></div>
-      <div class="stat-item amber"><div class="stat-num" id="stat-avg">-</div><div class="stat-lbl">每日人均</div></div>
-    </div>
+  <!-- 学习记录表 -->
+  <div class="section-title">学习记录明细</div>
 
-    <!-- 记录表 -->
-    <div class="section-title" style="margin-top:8px;">记录明细</div>
-    <table class="record-table">
-      <thead><tr><th>日期</th><th>学习词书</th><th>词数</th></tr></thead>
-      <tbody id="record-body"><tr><td colspan="3" class="empty">加载中...</td></tr></tbody>
-    </table>
-  </div>
+  <table class="record-table"><thead><tr><th>日期</th><th>词书</th><th>词数</th></tr></thead><tbody id="record-body"><tr><td colspan="3" style="text-align:center;color:#8899aa;padding:16px;">加载中...</td></tr></tbody></table>
+
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+// 从URL取用户ID
+const urlParams = new URLSearchParams(window.location.search);
+const uid = urlParams.get('userId');
+console.log("管理员正在查看用户ID:", uid);
+</script>
 
-var params = new URLSearchParams(window.location.search);
-var userId = params.get("userId") || "";
-var allRecords = [];
-var bookNames = {};
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
 
-// Load book names
-apiGet("/api/wordbooks").then(function(r) {
-  if (r.code === 200 && r.data) r.data.forEach(function(b) { bookNames[b.wordBookId] = b.wordBookName; });
-});
-
-// Load user profile
-apiGet("/api/user/profile").then(function(r) {
-  if (r.code === 200 && r.data) {
-    document.getElementById("user-name-title").innerText = r.data.userName + " (" + r.data.userId + ")";
-  }
-});
-
-// Load records
-function loadRecords() {
-  document.getElementById("record-body").innerHTML = '<tr><td colspan="3" class="empty">加载中...</td></tr>';
-  apiGet("/api/admin/records?userId=" + userId).then(function(r) {
-    if (r.code === 200 && r.data) {
-      allRecords = r.data;
-      renderStats(allRecords, allRecords);
-    }
-  });
-}
-
-function renderStats(all, filtered) {
-  // Aggregate by date
-  var dateMap = {};
-  filtered.forEach(function(rec) {
-    var d = rec.learningDate || "";
-    if (!dateMap[d]) dateMap[d] = { date: d, count: 0 };
-    dateMap[d].count++;
-  });
-  var aggregated = Object.values(dateMap).sort(function(a,b) { return (b.date||"").localeCompare(a.date||""); });
-
-  // Stats
-  var totalWords = filtered.length;
-  var totalDays = aggregated.length;
-  var avgPerDay = totalDays > 0 ? (totalWords / totalDays).toFixed(1) : "0";
-
-  document.getElementById("stat-total").innerText = totalWords;
-  document.getElementById("stat-days").innerText = totalDays;
-  document.getElementById("stat-avg").innerText = avgPerDay;
-
-  // Table
-  var tbody = document.getElementById("record-body");
-  if (aggregated.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" class="empty">暂无记录</td></tr>';
-  } else {
-    tbody.innerHTML = aggregated.map(function(a) {
-      return '<tr><td class="date-col">' + a.date + '</td><td>多种词书</td><td class="count-col">' + a.count + '词</td></tr>';
-    }).join("");
-  }
-}
-
-function doFilter() {
-  var from = document.getElementById("filter-from").value;
-  var to = document.getElementById("filter-to").value;
-  var filtered = allRecords.filter(function(r) {
-    if (from && r.learningDate < from) return false;
-    if (to && r.learningDate > to) return false;
-    return true;
-  });
-  renderStats(allRecords, filtered);
-}
-
-function clearFilter() {
-  document.getElementById("filter-from").value = "";
-  document.getElementById("filter-to").value = "";
-  renderStats(allRecords, allRecords);
-}
-
-if (userId) loadRecords();
+<script>
+var uid=new URLSearchParams(window.location.search).get('userId')||'';
+if(uid){document.getElementById('uid-display').innerText=uid;
+apiGet('/api/admin/records?userId='+uid).then(function(r){var d=r.code===200&&r.data?r.data:[];document.getElementById('stat-total').innerText=d.length;var m={};d.forEach(function(x){var k=x.learningDate;m[k]=(m[k]||0)+1});var days=Object.keys(m).length;document.getElementById('stat-avg').innerText=days?(d.length/days).toFixed(1):0;var agg=[];Object.keys(m).forEach(function(k){agg.push({date:k,count:m[k]})});agg.sort(function(a,b){return b.date.localeCompare(a.date)});var tb=document.getElementById('record-body');tb.innerHTML=agg.length?agg.map(function(x){return'<tr><td>'+x.date+'</td><td>-</td><td>'+x.count+'词</td></tr>'}).join(''):'<tr><td colspan=3 style=text-align:center;color:#8899aa;padding:16px;>暂无记录</td></tr>';});}
 </script>
 </body>
 </html>

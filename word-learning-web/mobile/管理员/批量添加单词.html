@@ -180,8 +180,10 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 });
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
+
+<script>
+function submitBatch(){var bid=document.querySelector('input[placeholder*=词书]')?document.querySelector('input[placeholder*=词书]').value:'';if(!bid){alert('请填写目标词书');return}if(!parsedWords||!parsedWords.length){alert('请先导入Excel');return}var s=0;parsedWords.forEach(function(w){apiPost('/api/words',{wordId:'WD'+Date.now().toString(36)+Math.random().toString(36).substr(2,4),wordBookId:bid,englishSpelling:w.spelling||w.english||'',chineseDefinition:w.chinese||w.definition||'',phoneticSymbol:w.phonetic||'',exampleSentence:w.example||''}).then(function(r){if(r.code===200)s++;});});setTimeout(function(){alert('批量完成：成功'+s+'个');location.href='单词管理.html'},2000);}
 </script>
-`n</body>
+</body>
 </html>

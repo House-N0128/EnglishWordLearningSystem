@@ -94,7 +94,7 @@ textarea {resize:vertical; min-height:70px;}
 
     <div class="form-group">
       <label>词书 ID</label>
-      <input type="text" id="bookId" placeholder="如：BK001" required>
+      <input type="text" id="bookId" readonly placeholder="系统自动生成" style="color:#8899aa;">
     </div>
 
     <div class="form-group">
@@ -132,59 +132,39 @@ textarea {resize:vertical; min-height:70px;}
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+const form = document.getElementById('addBookForm');
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookId: document.getElementById("book-id").value.trim(),
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookId || !b.wordBookName) { showMsg("请填写词书ID和名称", "error"); return; }
-  
-  document.getElementById("submit-btn").disabled = true;
-  apiPost("/api/wordbooks", b).then(function(r) {
-    document.getElementById("submit-btn").disabled = false;
-    if (r.code === 200) { showMsg("词书添加成功！", "success"); setTimeout(function(){ location.href="词书管理.html"; }, 1000); }
-    else { showMsg(r.message, "error"); }
-  });
+form.onsubmit = function(e){
+  e.preventDefault();
+
+  const id = bookId.value.trim();
+  const name = bookName.value.trim();
+  const desc = bookDesc.value.trim();
+  const level = level.value;
+  const status = status.value;
+
+  if (!id || !name || !level || !status){
+    alert("请填写所有必填字段！");
+    return;
+  }
+
+  alert(
+    "词书创建成功！\n" +
+    `词书 ID：${id}\n` +
+    `名称：${name}\n` +
+    `简介：${desc}\n` +
+    `难度：${level}\n` +
+    `状态：${status}`
+  );
+
+  form.reset();
 };
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookId: document.getElementById("book-id").value.trim(),
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookId || !b.wordBookName) { showMsg("请填写词书ID和名称", "error"); return; }
-  
-  document.getElementById("submit-btn").disabled = true;
-  apiPost("/api/wordbooks", b).then(function(r) {
-    document.getElementById("submit-btn").disabled = false;
-    if (r.code === 200) { showMsg("词书添加成功！", "success"); setTimeout(function(){ location.href="词书管理.html"; }, 1000); }
-    else { showMsg(r.message, "error"); }
-  });
-};
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
+<script>
+document.getElementById('addBookForm').onsubmit=function(e){e.preventDefault();var n=document.getElementById('bookName').value.trim();var d=document.getElementById('bookDesc').value.trim();var l=document.getElementById('level').value;if(!n||!l){alert('请填写必填字段');return}apiPost('/api/wordbooks',{wordBookName:n,difficultyLevel:l,wordBookDescription:d}).then(function(r){if(r.code===200){alert('创建成功！');location.href='词书管理.html'}else{alert(r.message)}});};
 </script>
-`n</body>
+</body>
 </html>
