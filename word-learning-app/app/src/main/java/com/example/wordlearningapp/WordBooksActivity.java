@@ -46,45 +46,68 @@ public class WordBooksActivity extends AppCompatActivity {
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setPadding(dp(12), 0, dp(16), 0);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
         topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
-        TextView adminUser = new TextView(this);
-        adminUser.setText("管理员：" + AuthManager.get().getUserId());
-        adminUser.setTextSize(16);
-        adminUser.setTextColor(0xFFFFFFFF);
-        adminUser.setTypeface(null, Typeface.BOLD);
-        adminUser.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        topBar.addView(adminUser);
+        if (isAdmin) {
+            TextView adminUser = new TextView(this);
+            adminUser.setText("管理员：" + AuthManager.get().getUserId());
+            adminUser.setTextSize(16);
+            adminUser.setTextColor(0xFFFFFFFF);
+            adminUser.setTypeface(null, Typeface.BOLD);
+            adminUser.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            topBar.addView(adminUser);
 
-        TextView btnLogout = new TextView(this);
-        btnLogout.setText("退出登录");
-        btnLogout.setTextSize(15);
-        btnLogout.setTextColor(0xFF318af8);
-        btnLogout.setGravity(Gravity.CENTER);
-        btnLogout.setPadding(dp(20), dp(7), dp(20), dp(7));
-        GradientDrawable lgBg = new GradientDrawable();
-        lgBg.setColor(0xFFFFFFFF);
-        lgBg.setCornerRadius(dp(16));
-        btnLogout.setBackground(lgBg);
-        btnLogout.setOnClickListener(v -> {
-            AuthManager.get().clearAuth();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        });
-        topBar.addView(btnLogout);
+            TextView btnLogout = new TextView(this);
+            btnLogout.setText("退出登录");
+            btnLogout.setTextSize(14);
+            btnLogout.setTextColor(0xFF318af8);
+            btnLogout.setGravity(Gravity.CENTER);
+            btnLogout.setPadding(dp(16), dp(6), dp(16), dp(6));
+            GradientDrawable lgBg = new GradientDrawable();
+            lgBg.setColor(0xFFFFFFFF);
+            lgBg.setCornerRadius(dp(14));
+            btnLogout.setBackground(lgBg);
+            btnLogout.setOnClickListener(v -> {
+                AuthManager.get().clearAuth();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            });
+            topBar.addView(btnLogout);
+        } else {
+            TextView btnBack = new TextView(this);
+            btnBack.setText("←");
+            btnBack.setTextSize(22);
+            btnBack.setTextColor(0xFFFFFFFF);
+            btnBack.setTypeface(null, Typeface.BOLD);
+            btnBack.setPadding(0, 0, dp(12), 0);
+            btnBack.setOnClickListener(v -> finish());
+            topBar.addView(btnBack);
+
+            TextView userTitle = new TextView(this);
+            userTitle.setText("词书浏览");
+            userTitle.setTextSize(18);
+            userTitle.setTextColor(0xFFFFFFFF);
+            userTitle.setTypeface(null, Typeface.BOLD);
+            userTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            topBar.addView(userTitle);
+
+            TextView place = new TextView(this);
+            place.setLayoutParams(new LinearLayout.LayoutParams(dp(48), 1));
+            topBar.addView(place);
+        }
         root.addView(topBar);
 
         // ===== SCROLLABLE MAIN =====
         ScrollView scroll = new ScrollView(this);
         LinearLayout main = new LinearLayout(this);
         main.setOrientation(LinearLayout.VERTICAL);
-        main.setPadding(dp(12), dp(8), dp(12), dp(70));
+        main.setPadding(dp(12), dp(8), dp(12), isAdmin ? dp(70) : dp(16));
 
         // Title
         TextView title = new TextView(this);
-        title.setText("词书管理");
+        title.setText(isAdmin ? "词书管理" : "词书浏览");
         title.setTextSize(19);
         title.setTextColor(0xFF318af8);
         title.setTypeface(null, Typeface.BOLD);
@@ -195,8 +218,10 @@ public class WordBooksActivity extends AppCompatActivity {
         scroll.addView(main);
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
 
-        // ===== BOTTOM NAVBAR =====
-        root.addView(makeNavbar());
+        // ===== BOTTOM NAVBAR (admin only) =====
+        if (isAdmin) {
+            root.addView(makeNavbar());
+        }
 
         setContentView(root);
         loadBooks();
