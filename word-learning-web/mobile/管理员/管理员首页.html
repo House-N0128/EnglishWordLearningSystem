@@ -4,7 +4,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta charset="UTF-8">
 <title>管理员首页(App端)</title>
-<script src="/mobile/api.js"></script>
 <style>
 body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
 .top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
@@ -26,6 +25,7 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
 .admin-nav-btn.active{color:#17c2ae;}
 .admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
 </style>
+<script src="/mobile/api.js"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -35,67 +35,38 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
   <main class="main-panel">
     <div class="dashboard-title">平台数据总览</div>
     <div class="info-grid">
-      <div class="info-card">
-        <span class="num" id="stat-users">-</span>
-        <span>总用户数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-books">-</span>
-        <span>总词书数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-words">-</span>
-        <span>总单词数</span>
-      </div>
-      <div class="info-card">
-        <span class="num" id="stat-today">-</span>
-        <span>今日新增学习记录</span>
-      </div>
+      <div class="info-card"><span class="num" id="stat-today">-</span><span>今日学习记录</span></div>
     </div>
     <div class="section-block">
       <div class="section-title">热门词书TOP3</div>
-      <div class="top-books-list" id="top-books">
-        <div style="text-align:center;color:#8899aa;padding:10px;">加载中...</div>
+      <div class="top-books-list">
+        <div class="top-book-item">
+          <span class="book-name">英语四级词书</span>
+          <span class="count">1225人</span>
+        </div>
+        <div class="top-book-item">
+          <span class="book-name">雅思进阶</span>
+          <span class="count">932人</span>
+        </div>
+        <div class="top-book-item">
+          <span class="book-name">托福词汇</span>
+          <span class="count">810人</span>
+        </div>
       </div>
     </div>
   </main>
   <div class="admin-navbar">
-    <button class="admin-nav-btn active" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+    <button class="admin-nav-btn active" onclick="window.location.href='管理员首页.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn" onclick="window.location.href='用户管理.html'"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='词书管理.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='单词管理.html'"><i>🗃️</i>单词管理</button>
   </div>
+
 <script>
-if (!requireAuth('admin')) { throw new Error('unauthorized'); }
-document.getElementById('display-name').innerText = localStorage.getItem('userId') || 'admin';
-
-(async function() {
-  // Load admin stats
-  try {
-    var statsRes = await apiGet('/api/admin/stats');
-    if (statsRes.code === 200 && statsRes.data) {
-      var s = statsRes.data;
-      document.getElementById('stat-users').innerText = s.userCount || 0;
-      document.getElementById('stat-books').innerText = s.wordBookCount || 0;
-      document.getElementById('stat-words').innerText = s.wordCount || 0;
-      document.getElementById('stat-today').innerText = s.todayRecordCount || 0;
-    }
-  } catch(e) {}
-
-  // Load top books
-  try {
-    var booksRes = await apiGet('/api/wordbooks');
-    var box = document.getElementById('top-books');
-    if (booksRes.code === 200 && booksRes.data && booksRes.data.length > 0) {
-      var books = booksRes.data.slice(0, 3);
-      box.innerHTML = books.map(function(b) {
-        return '<div class="top-book-item"><span class="book-name">' + (b.wordBookName || '') + '</span><span class="count">' + (b.wordCount || 0) + '词</span></div>';
-      }).join('');
-    } else {
-      box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:10px;">暂无词书</div>';
-    }
-  } catch(e) {}
-})();
+if (!requireAuth('admin')) throw new Error('unauthorized');
+document.getElementById('display-name').innerText = localStorage.getItem('userId')||'admin';
+apiGet('/api/admin/stats').then(function(r){if(r.code===200&&r.data){document.getElementById('stat-users').innerText=r.data.userCount;document.getElementById('stat-books').innerText=r.data.wordBookCount;document.getElementById('stat-words').innerText=r.data.wordCount;document.getElementById('stat-today').innerText=r.data.todayRecordCount;}});
+apiGet('/api/wordbooks').then(function(r){var b=document.getElementById('book-list');if(r.code===200&&r.data&&r.data.length>0){b.innerHTML=r.data.slice(0,5).map(function(x){return '<div class=top-book-item><span class=book-name>'+x.wordBookName+'</span><span class=count>'+x.wordCount+'词</span></div>';}).join('');}});
 </script>
 </body>
 </html>

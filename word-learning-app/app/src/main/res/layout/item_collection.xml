@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#fff"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp"
+    android:elevation="2dp">
+
+    <!-- 第一行：单词和音标 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="consequence"
+            android:textSize="22sp"
+            android:textColor="#2196F3"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_phonetic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="['ka:nsɪkwens/]"
+            android:textSize="14sp"
+            android:textColor="#666"
+            android:layout_marginLeft="8dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- 第二行：收藏时间 -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="收藏时间：2026-05-20"
+        android:textSize="13sp"
+        android:textColor="#999"
+        android:layout_marginTop="8dp" />
+
+    <!-- 按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_detail"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="详情"
+            android:textSize="14sp"
+            android:textColor="#fff"
+            android:background="@drawable/bg_btn_blue_round"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="取消收藏"
+            android:textSize="14sp"
+            android:textColor="#fff"
+            android:background="@drawable/bg_btn_blue_round" />
+    </LinearLayout>
+</LinearLayout>

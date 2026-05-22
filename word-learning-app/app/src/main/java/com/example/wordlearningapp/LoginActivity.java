@@ -1,7 +1,6 @@
 package com.example.wordlearningapp;
 
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,10 +18,10 @@ import com.google.gson.JsonObject;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextView tabUser, tabAdmin, loginTitle, tvError;
+    private TextView tabUser, tabAdmin, loginTitle, tvError, tvForgotPassword, tvHelpLinks;
     private EditText etAccount, etPassword;
     private Button btnLogin;
-    private View btnRegister;
+    private TextView btnRegister;
     private String currentRole = "user";
 
     @Override
@@ -46,6 +45,8 @@ public class LoginActivity extends AppCompatActivity {
         tabAdmin = findViewById(R.id.tab_admin);
         loginTitle = findViewById(R.id.login_title);
         tvError = findViewById(R.id.tv_error);
+        tvForgotPassword = findViewById(R.id.tv_forgot_password);
+        tvHelpLinks = findViewById(R.id.tv_help_links);
         etAccount = findViewById(R.id.et_account);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
@@ -60,22 +61,32 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
+
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserChangePassword1Activity.class);
+            intent.putExtra("mode", "reset");
+            startActivity(intent);
+        });
+
+        tvHelpLinks.setOnClickListener(v -> {
+            Toast.makeText(this, "请联系客服：support@wordlearning.com", Toast.LENGTH_LONG).show();
+        });
     }
 
     private void switchRole(String role) {
         currentRole = role;
         if ("admin".equals(role)) {
             tabAdmin.setBackgroundResource(R.drawable.tab_selected_bg);
-            tabAdmin.setTextColor(0xFF2363cf);
+            tabAdmin.setTextColor(0xFF3577ef);
             tabUser.setBackgroundResource(android.R.color.transparent);
-            tabUser.setTextColor(0xFF3577ef);
-            loginTitle.setText("单词学习平台 - 管理员登录");
+            tabUser.setTextColor(0xFF8899aa);
+            loginTitle.setText("管理员登录");
         } else {
             tabUser.setBackgroundResource(R.drawable.tab_selected_bg);
-            tabUser.setTextColor(0xFF2363cf);
+            tabUser.setTextColor(0xFF3577ef);
             tabAdmin.setBackgroundResource(android.R.color.transparent);
-            tabAdmin.setTextColor(0xFF3577ef);
-            loginTitle.setText("单词学习平台 - 普通用户登录");
+            tabAdmin.setTextColor(0xFF8899aa);
+            loginTitle.setText("普通用户登录");
         }
         tvError.setVisibility(View.GONE);
     }

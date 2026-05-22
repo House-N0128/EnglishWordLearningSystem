@@ -3,6 +3,7 @@ package com.word.wordlearning.controller;
 import com.word.wordlearning.dto.Result;
 import com.word.wordlearning.entity.OrdinaryUser;
 import com.word.wordlearning.mapper.OrdinaryUserMapper;
+import com.word.wordlearning.service.VerificationCodeService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,9 +11,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final OrdinaryUserMapper userMapper;
+    private final VerificationCodeService verificationCodeService;
 
-    public UserController(OrdinaryUserMapper userMapper) {
+    public UserController(OrdinaryUserMapper userMapper,
+                          VerificationCodeService verificationCodeService) {
         this.userMapper = userMapper;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @PostMapping("/register")
@@ -90,5 +94,55 @@ public class UserController {
         }
         userMapper.updatePassword(userId, newPassword);
         return Result.success("密码重置成功，请登录");
+    }
+
+    @PostMapping("/send-verification-code")
+    public Result<String> sendVerificationCode(@RequestBody java.util.Map<String, String> body) {
+        String contact = body.get("contact");
+        if (contact == null || contact.trim().isEmpty()) {
+            return Result.error(400, "请输入手机号或邮箱");
+        }
+        contact = contact.trim();
+        String error = verificationCodeService.sendCode(contact);
+        if (error != null) {
+            return Result.error(400, error);
+        }
+        return Result.success("验证码已发送");
+    }
+
+    @PostMapping("/verify-code")
+    public Result<String> verifyCode(@RequestBody java.util.Map<String, String> body) {
+        String contact = body.get("contact");
+        String code = body.get("verifyCode");
+        if (contact == null || contact.trim().isEmpty()) {
+            return Result.error(400, "参数错误");
+        }
+        if (code == null || code.trim().isEmpty()) {
+            return Result.error(400, "请输入验证码");
+        }
+        contact = contact.trim();
+        String error = verificationCodeService.verifyCode(contact, code.trim());
+        if (error != null) {
+            return Result.error(400, error);
+        }
+        return Result.success("验证通过");
+    }
+
+    @PostMapping("/reset-password")
+    public Result<String> resetPassword(@RequestBody java.util.Map<String, String> body) {
+        String contact = body.get("contact");
+        String newPassword = body.get("newPassword");
+        if (contact == null || contact.trim().isEmpty()) {
+            return Result.error(400, "参数错误，缺少联系方式");
+        }
+        if (newPassword == null || newPassword.length() < 6) {
+            return Result.error(400, "新密码长度至少6位");
+        }
+        contact = contact.trim();
+        int rows = userMapper.resetPasswordByContact(contact, newPassword);
+        if (rows == 0) {
+            return Result.error(404, "未找到该用户");
+        }
+        return Result.success("密码重置成功，请前往登录");
     }
 }

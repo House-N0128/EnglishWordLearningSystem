@@ -138,89 +138,37 @@ textarea {resize:vertical; min-height:70px;}
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+const form = document.getElementById('editBookForm');
 
-var params = new URLSearchParams(window.location.search);
-var bookId = params.get("bookId");
-if (!bookId) { showMsg("缺少词书ID参数", "error"); } else {
-  apiGet("/api/wordbooks").then(function(r) {
-    if (r.code === 200) {
-      var books = r.data;
-      for (var i=0; i<books.length; i++) {
-        if (books[i].wordBookId === bookId) {
-          document.getElementById("book-id").value = books[i].wordBookId;
-          document.getElementById("book-name").value = books[i].wordBookName || "";
-          document.getElementById("book-difficulty").value = books[i].difficultyLevel || "";
-          document.getElementById("book-desc").value = books[i].wordBookDescription || "";
-          break;
-        }
-      }
-    }
-  });
-}
+form.onsubmit = function(e){
+  e.preventDefault();
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookName) { showMsg("请填写词书名称", "error"); return; }
-  apiPut("/api/wordbooks/" + bookId, b).then(function(r) {
-    if (r.code === 200) { showMsg("修改已保存！", "success"); }
-    else { showMsg(r.message, "error"); }
-  });
+  const name = bookName.value.trim();
+  const desc = bookDesc.value.trim();
+  const levelVal = level.value;
+  const statusVal = status.value;
+
+  if (!name || !levelVal || !statusVal){
+    alert("请填写所有必填字段！");
+    return;
+  }
+
+  alert(
+    "修改已保存！\n" +
+    `词书名称：${name}\n` +
+    `描述：${desc}\n` +
+    `难度等级：${levelVal}\n` +
+    `状态：${statusVal}`
+  );
 };
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
 
-var params = new URLSearchParams(window.location.search);
-var bookId = params.get("bookId");
-if (!bookId) { showMsg("缺少词书ID参数", "error"); } else {
-  apiGet("/api/wordbooks").then(function(r) {
-    if (r.code === 200) {
-      var books = r.data;
-      for (var i=0; i<books.length; i++) {
-        if (books[i].wordBookId === bookId) {
-          document.getElementById("book-id").value = books[i].wordBookId;
-          document.getElementById("book-name").value = books[i].wordBookName || "";
-          document.getElementById("book-difficulty").value = books[i].difficultyLevel || "";
-          document.getElementById("book-desc").value = books[i].wordBookDescription || "";
-          break;
-        }
-      }
-    }
-  });
-}
-
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookName) { showMsg("请填写词书名称", "error"); return; }
-  apiPut("/api/wordbooks/" + bookId, b).then(function(r) {
-    if (r.code === 200) { showMsg("修改已保存！", "success"); }
-    else { showMsg(r.message, "error"); }
-  });
-};
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
+<script>
+var bid=new URLSearchParams(window.location.search).get('bookId');
+if(bid){apiGet('/api/wordbooks').then(function(r){if(r.code===200)r.data.forEach(function(b){if(b.wordBookId===bid){document.getElementById('bookName').value=b.wordBookName||'';document.getElementById('bookDesc').value=b.wordBookDescription||'';document.getElementById('level').value=b.difficultyLevel||'初级';}});});}
+document.getElementById('editBookForm').onsubmit=function(e){e.preventDefault();var d={wordBookName:document.getElementById('bookName').value.trim(),wordBookDescription:document.getElementById('bookDesc').value.trim(),difficultyLevel:document.getElementById('level').value};apiPut('/api/wordbooks/'+bid,d).then(function(r){alert(r.code===200?'保存成功！':r.message);});};
 </script>
-`n</body>
+</body>
 </html>

@@ -1,9 +1,10 @@
 package com.example.wordlearningapp;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,26 +16,82 @@ import com.google.gson.JsonObject;
 
 public class WordStudyActivity extends AppCompatActivity {
 
-    private LinearLayout contentArea;
+    private TextView tvBack, tvStudyTitle, tvWord, tvPhonetic, tvPos, tvChinese, tvExample, tvProgress;
+    private ImageView ivAudio;
+    private Button btnCollect, btnPrev, btnNext, btnMastered, btnFinish;
+    private ProgressBar progressBar;
     private String bookId;
+    private String bookName;
     private JsonArray words;
     private int currentIndex = 0;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_word_study);
 
         bookId = getIntent().getStringExtra("bookId");
-        ((TextView) findViewById(R.id.toolbar_title)).setText("单词学习");
-        findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
-        contentArea = findViewById(R.id.content_area);
+        bookName = getIntent().getStringExtra("bookName");
+
+        initViews();
+        initListeners();
 
         if (bookId == null) {
-            showText("缺少词书参数");
+            Toast.makeText(this, "缺少词书参数", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
+
+        if (bookName != null) {
+            tvStudyTitle.setText("学习 - " + bookName);
+        }
+
         loadWords();
+    }
+
+    private void initViews() {
+        tvBack = findViewById(R.id.tv_back);
+        tvStudyTitle = findViewById(R.id.tv_study_title);
+        tvWord = findViewById(R.id.tv_word);
+        tvPhonetic = findViewById(R.id.tv_phonetic);
+        tvPos = findViewById(R.id.tv_pos);
+        tvChinese = findViewById(R.id.tv_chinese);
+        tvExample = findViewById(R.id.tv_example);
+        tvProgress = findViewById(R.id.tv_progress);
+        ivAudio = findViewById(R.id.iv_audio);
+        btnCollect = findViewById(R.id.btn_collect);
+        btnPrev = findViewById(R.id.btn_prev);
+        btnNext = findViewById(R.id.btn_next);
+        btnMastered = findViewById(R.id.btn_mastered);
+        btnFinish = findViewById(R.id.btn_finish);
+        progressBar = findViewById(R.id.progress_bar);
+    }
+
+    private void initListeners() {
+        tvBack.setOnClickListener(v -> finish());
+
+        ivAudio.setOnClickListener(v -> playAudio());
+
+        btnCollect.setOnClickListener(v -> {
+            String wordId = getCurrentWordId();
+            if (wordId != null) {
+                collectWord(wordId);
+            }
+        });
+
+        btnPrev.setOnClickListener(v -> showWord(currentIndex - 1));
+
+        btnNext.setOnClickListener(v -> showWord(currentIndex + 1));
+
+        btnMastered.setOnClickListener(v -> {
+            String wordId = getCurrentWordId();
+            if (wordId != null) {
+                markLearned(wordId);
+            }
+        });
+
+        btnFinish.setOnClickListener(v -> finish());
     }
 
     private void loadWords() {
@@ -45,14 +102,18 @@ public class WordStudyActivity extends AppCompatActivity {
                     words = res.getAsJsonArray("data");
                     runOnUiThread(() -> {
                         if (words.size() == 0) {
-                            showText("该词书暂无单词");
+                            Toast.makeText(this, "该词书暂无单词", Toast.LENGTH_SHORT).show();
+                            finish();
                         } else {
                             showWord(0);
                         }
                     });
                 }
             } catch (Exception e) {
-                runOnUiThread(() -> showText("加载失败"));
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "加载失败", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
             }
         }).start();
     }
@@ -64,112 +125,96 @@ public class WordStudyActivity extends AppCompatActivity {
         currentIndex = index;
 
         JsonObject w = words.get(index).getAsJsonObject();
-        contentArea.removeAllViews();
 
-        // Progress
-        TextView progress = new TextView(this);
-        progress.setText("进度 " + (index + 1) + "/" + words.size());
-        progress.setTextSize(16);
-        progress.setTextColor(0xFF318af8);
-        progress.setGravity(Gravity.CENTER);
-        progress.setPadding(0, 8, 0, 24);
-        contentArea.addView(progress);
+        String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+        String phonetic = (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull())
+                ? w.get("phoneticSymbol").getAsString() : "";
+        String chinese = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+        String pos = w.has("partOfSpeech") && !w.get("partOfSpeech").isJsonNull()
+                ? w.get("partOfSpeech").getAsString() : "";
+        String example = (w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull())
+                ? w.get("exampleSentence").getAsString() : "";
 
-        // Word card container
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundColor(0xFFFFFFFF);
-        card.setPadding(26, 26, 26, 26);
-        card.setElevation(4);
-        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        cp.setMargins(0, 0, 0, 24);
-        card.setLayoutParams(cp);
+        tvWord.setText(spelling);
+        tvPhonetic.setText(phonetic.isEmpty() ? "" : "[" + phonetic + "]");
+        tvPos.setText(pos);
+        tvChinese.setText(chinese);
 
-        // Spelling
-        TextView spelling = new TextView(this);
-        spelling.setText(w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "");
-        spelling.setTextSize(22);
-        spelling.setTextColor(0xFF318af8);
-        spelling.setGravity(Gravity.CENTER);
-        card.addView(spelling);
-
-        // Phonetic
-        TextView phonetic = new TextView(this);
-        phonetic.setText(w.has("phoneticSymbol") ? w.get("phoneticSymbol").getAsString() : "");
-        phonetic.setTextSize(15);
-        phonetic.setTextColor(0xFF547bbc);
-        phonetic.setGravity(Gravity.CENTER);
-        phonetic.setPadding(0, 6, 0, 6);
-        card.addView(phonetic);
-
-        // Chinese
-        TextView chinese = new TextView(this);
-        chinese.setText(w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "");
-        chinese.setTextSize(15);
-        chinese.setTextColor(0xFF273245);
-        chinese.setGravity(Gravity.CENTER);
-        chinese.setPadding(0, 6, 0, 6);
-        card.addView(chinese);
-
-        // Example
-        if (w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull()) {
-            TextView example = new TextView(this);
-            example.setText("例句：" + w.get("exampleSentence").getAsString());
-            example.setTextSize(14);
-            example.setTextColor(0xFF6578a0);
-            example.setPadding(0, 6, 0, 6);
-            card.addView(example);
+        if (!example.isEmpty()) {
+            tvExample.setText("例句：" + example);
+            tvExample.setVisibility(TextView.VISIBLE);
+        } else {
+            tvExample.setVisibility(TextView.GONE);
         }
 
-        contentArea.addView(card);
+        int progress = (int) ((currentIndex + 1) * 100.0 / words.size());
+        progressBar.setProgress(progress);
+        tvProgress.setText("已学 " + (currentIndex + 1) + " / 总 " + words.size() + " 单词");
+    }
 
-        // Buttons row
-        LinearLayout btns = new LinearLayout(this);
-        btns.setOrientation(LinearLayout.HORIZONTAL);
-        btns.setGravity(Gravity.CENTER);
+    private void playAudio() {
+        if (words == null || currentIndex >= words.size()) return;
 
-        Button btnCollect = new Button(this);
-        btnCollect.setText("⭐ 收藏");
-        btnCollect.setTextColor(0xFFFFFFFF);
-        btnCollect.setBackgroundColor(0xFF318af8);
-        String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
-        btnCollect.setOnClickListener(v -> collectWord(wordId));
-        btns.addView(btnCollect);
+        JsonObject w = words.get(currentIndex).getAsJsonObject();
 
-        Button btnPrev = new Button(this);
-        btnPrev.setText("上一个");
-        btnPrev.setTextColor(0xFFFFFFFF);
-        btnPrev.setBackgroundColor(0xFF318af8);
-        btnPrev.setOnClickListener(v -> showWord(currentIndex - 1));
-        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        pp.setMargins(10, 0, 10, 0);
-        btnPrev.setLayoutParams(pp);
-        btns.addView(btnPrev);
+        // 尝试从后端获取音频URL（字段名可能是 audioUrl 或 wordPronunciation）
+        String audioUrl = "";
+        if (w.has("audioUrl") && !w.get("audioUrl").isJsonNull()) {
+            audioUrl = w.get("audioUrl").getAsString();
+        } else if (w.has("wordPronunciation") && !w.get("wordPronunciation").isJsonNull()) {
+            audioUrl = w.get("wordPronunciation").getAsString();
+        }
 
-        Button btnNext = new Button(this);
-        btnNext.setText("下一个");
-        btnNext.setTextColor(0xFFFFFFFF);
-        btnNext.setBackgroundColor(0xFF318af8);
-        btnNext.setOnClickListener(v -> showWord(currentIndex + 1));
-        btns.addView(btnNext);
+        // 如果后端没有提供音频URL，使用在线词典API
+        if (audioUrl.isEmpty()) {
+            String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
+            if (!spelling.isEmpty()) {
+                // 使用有道词典的在线音频API
+                audioUrl = "https://dict.youdao.com/dictvoice?audio=" + spelling + "&type=1";
+                Toast.makeText(this, "正在播放...", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "暂无音频", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
-        contentArea.addView(btns);
+        try {
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+            }
 
-        // Mark learned
-        Button btnLearned = new Button(this);
-        btnLearned.setText("标记已掌握");
-        btnLearned.setTextColor(0xFFFFFFFF);
-        btnLearned.setBackgroundColor(0xFF52e8bc);
-        btnLearned.setTextSize(16);
-        btnLearned.setPadding(13, 13, 13, 13);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 24, 0, 0);
-        btnLearned.setLayoutParams(lp);
-        btnLearned.setOnClickListener(v -> markLearned(wordId));
-        contentArea.addView(btnLearned);
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(audioUrl);
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(mp -> {
+                mp.start();
+                Toast.makeText(this, "播放中...", Toast.LENGTH_SHORT).show();
+            });
+            mediaPlayer.setOnCompletionListener(mp -> {
+                mp.release();
+                mediaPlayer = null;
+            });
+            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                Toast.makeText(this, "音频播放失败", Toast.LENGTH_SHORT).show();
+                mp.release();
+                mediaPlayer = null;
+                return true;
+            });
+        } catch (Exception e) {
+            Toast.makeText(this, "音频播放失败", Toast.LENGTH_SHORT).show();
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+        }
+    }
+
+    private String getCurrentWordId() {
+        if (words != null && currentIndex < words.size()) {
+            JsonObject w = words.get(currentIndex).getAsJsonObject();
+            return w.has("wordId") ? w.get("wordId").getAsString() : null;
+        }
+        return null;
     }
 
     private void collectWord(String wordId) {
@@ -201,14 +246,12 @@ public class WordStudyActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void showText(String msg) {
-        contentArea.removeAllViews();
-        TextView tv = new TextView(this);
-        tv.setText(msg);
-        tv.setTextSize(16);
-        tv.setTextColor(0xFF8899aa);
-        tv.setGravity(Gravity.CENTER);
-        tv.setPadding(0, 40, 0, 40);
-        contentArea.addView(tv);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

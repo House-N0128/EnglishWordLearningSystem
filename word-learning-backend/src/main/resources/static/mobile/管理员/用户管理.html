@@ -4,171 +4,57 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>用户管理(App端)</title>
-<style>* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif;
-  background: #f0f4f8; min-height: 100vh;
-  padding-bottom: 75px; color: #2d3748;
-}
-.header {
-  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
-  padding: 16px 18px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 20px rgba(26,86,219,0.2);
-  display: flex; align-items: center; gap: 12px;
-}
-.btn-back {
-  background: rgba(255,255,255,0.15); color: #fff;
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 14px; border-radius: 20px; font-size: 13px;
-  cursor: pointer; white-space: nowrap;
-}
-.header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
-.section { padding: 0 14px; margin-top: 16px; }
-.card-list { display: flex; flex-direction: column; gap: 10px; }
-.card {
-  background: #fff; border-radius: 14px;
-  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-}
-.card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.card-title { font-size: 16px; font-weight: 600; color: #2d3748; }
-.card-sub  { font-size: 13px; color: #8899aa; }
-.card-meta { font-size: 12px; color: #a0aec0; margin-top: 4px; }
-.btn {
-  padding: 8px 16px; border-radius: 20px; border: none;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: all .15s;
-}
-.btn:active { transform: scale(0.95); }
-.btn-primary { background: #3577ef; color: #fff; }
-.btn-danger  { background: #fff; color: #e53e3e; border: 1px solid #fed7d7; }
-.btn-success { background: #38a169; color: #fff; }
-.btn-outline { background: #fff; color: #3577ef; border: 1px solid #bee3f8; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
-.form-input {
-  width: 100%; padding: 12px 14px; border: 2px solid #94a3b8;
-  border-radius: 10px; font-size:16px; background: #fff;
-  font-family: inherit; transition: border .2s;
-}
-.form-input:focus { outline: none; border-color: #3577ef; box-shadow: 0 0 0 3px rgba(53,119,239,0.15); background: #fff; }
-textarea.form-input { min-height: 80px; resize: vertical; }
-select.form-input { appearance: none; }
-.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size:16px; margin: 8px 0; }
-.msg-error { background: #fff5f5; color: #c53030; }
-.msg-success { background: #f0fff4; color: #276749; }
-.navbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-  border-radius: 20px 20px 0 0;
-  display: flex; justify-content: space-around;
-  padding: 8px 0 12px 0; z-index: 100;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; border: none; background: none;
-  font-family: inherit; font-size: 11px; color: #8899aa;
-}
-.nav-item .nav-icon { font-size: 20px; }
-.nav-item.active { color: #3577ef; font-weight: 600; }
-.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-.search-bar input { flex: 1; }
-.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
-/* ==== IME中文输入强制修复 ==== */
-input, textarea, select {
-  ime-mode: auto !important;
-  -webkit-user-modify: read-write !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+<style>
+body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);}
+.top-bar {height:48px;background:#318af8;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.admin-user {font-weight:bold;}
+.btn-logout {background:#fff;color:#318af8;font-weight:600;font-size:15px;border:none;border-radius:16px;padding:7px 20px;}
+.main-panel {padding:8px 12px;}
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin:15px 0;}
+.search-row {display:flex;gap:8px;margin-bottom:14px;}
+.search-row input,.search-row select {padding:6px 8px;border-radius:7px;border:1px solid #c7d9ee;font-size:14px;background:#f6f8fc;}
+.search-btn {background:#318af8;color:#fff;border:none;border-radius:12px;font-size:14px;padding:8px 20px;}
+.pager {display:flex;gap:8px;justify-content:center;margin:10px 0;}
+.pager-btn {background:#318af8; color:#fff; border:none; border-radius:14px; padding:5px 13px;font-size:13px;}
+.admin-navbar{position:fixed;left:0;bottom:0;width:100vw;height:61px;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:14px;border-top-right-radius:14px;display:flex;justify-content:space-around;align-items:center;}
+.admin-nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.admin-nav-btn.active{color:#17c2ae;}
+.admin-navbar i{font-style:normal;font-size:22px;margin-bottom:2px;font-family:'Arial','PingFang SC';}
+</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
-  <div class="header">
-  <span class="btn-back" onclick="history.back()">← 返回</span>
-  <span class="header-title">用户管理</span>
-</div>
+  <div class="top-bar">
+    <span class="admin-user">管理员：<span id="display-name">admin001</span></span>
+    <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+  </div>
   <div class="main-panel">
     <div class="page-title">用户管理</div>
-    
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" placeholder="用户ID/账号/昵称" id="keyword" inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
-      <select>
-        <option>账号状态</option>
-        <option>全部</option>
-        <option>正常</option>
-        <option>禁用</option>
-      </select>
-      <button type="submit" class="search-btn">查询</button>
-    
-    <!-- 这里不显示具体用户卡片 -->
+    <div class="search-row"><input type="text" placeholder="用户ID/昵称" id="search-kw"><select id="filter-status"><option value="">全部状态</option><option value="正常">正常</option><option value="冻结">冻结</option></select><button class="search-btn" onclick="doSearch()">查询</button></div>
+    <div id="user-list"></div>
   </div>
 
-  <div class="navbar">
-  <span class="nav-item" onclick="location.href='管理员首页.html'"><span class="nav-icon">🏠</span>首页</span>
-  <span class="nav-item" onclick="location.href='用户管理.html'"><span class="nav-icon">👥</span>用户</span>
-  <span class="nav-item" onclick="location.href='词书管理.html'"><span class="nav-icon">📚</span>词书</span>
-  <span class="nav-item" onclick="location.href='单词管理.html'"><span class="nav-icon">📝</span>单词</span>
-</div>
+  <div class="admin-navbar">
+    <button class="admin-nav-btn" onclick="window.location.href='管理员首页.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn active"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='词书管理.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='单词管理.html'"><i>🗃️</i>单词管理</button>
+  </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-document.getElementById("search-btn").onclick = function() {
-  var kw = document.getElementById("search-keyword").value.trim();
-  if (!kw) return;
-  var box = document.getElementById("result-list");
-  box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">搜索中...</div>';
-  apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
-    if (r.code === 200 && r.data && r.data.length > 0) {
-      box.innerHTML = r.data.map(function(u) {
-        return `<div class="collection-item">
-          <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
-          <div class="book-info">状态: ` + (u.accountStatus||"") + ` | ` + (u.phoneNumber||"") + `</div>
-          <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
-          <button class="action-btn" onclick="location.href='查看用户学习记录.html?userId=` + u.userId + `'">学习记录</button>
-        </div>`;
-      }).join("");
-    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
-  });
-};
-function toggleUser(userId, currentStatus) {
-  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
-  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
-  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
-    alert(r.message);
-    document.getElementById("search-btn").onclick();
-  });
+// 搜索跳转到查询结果页面
+document.getElementById('searchForm').onsubmit = function(e){
+  e.preventDefault();
+  const keyword = document.getElementById('keyword').value.trim();
+  if(keyword) window.location.href = `查询寻用户结果.html?keyword=${encodeURIComponent(keyword)}`;
 }
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-document.getElementById("search-btn").onclick = function() {
-  var kw = document.getElementById("search-keyword").value.trim();
-  if (!kw) return;
-  var box = document.getElementById("result-list");
-  box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">搜索中...</div>';
-  apiGet("/api/admin/users?keyword=" + kw).then(function(r) {
-    if (r.code === 200 && r.data && r.data.length > 0) {
-      box.innerHTML = r.data.map(function(u) {
-        return `<div class="collection-item">
-          <div class="book-name">` + (u.userName||"") + ` (` + u.userId + `)</div>
-          <div class="book-info">状态: ` + (u.accountStatus||"") + ` | ` + (u.phoneNumber||"") + `</div>
-          <button class="action-btn" onclick="toggleUser('` + u.userId + `','` + (u.accountStatus||"正常") + `')">` + ((u.accountStatus||"正常")==="冻结"?"解冻":"冻结") + `</button>
-          <button class="action-btn" onclick="location.href='查看用户学习记录.html?userId=` + u.userId + `'">学习记录</button>
-        </div>`;
-      }).join("");
-    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">未找到匹配用户</div>'; }
-  });
-};
-function toggleUser(userId, currentStatus) {
-  var newStatus = currentStatus === "冻结" ? "正常" : "冻结";
-  if (!confirm("确定" + (newStatus==="冻结"?"冻结":"解冻") + "该账号？")) return;
-  apiPut("/api/admin/users/" + userId, {accountStatus: newStatus}).then(function(r) {
-    alert(r.message);
-    document.getElementById("search-btn").onclick();
-  });
-}
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
+
+<script>
+function doSearch(){var k=document.getElementById('search-kw').value.trim();if(!k)return;var b=document.getElementById('user-list');b.innerHTML='搜索中...';apiGet('/api/admin/users?keyword='+k).then(function(r){if(r.code===200&&r.data){var d=r.data;var s=document.getElementById('filter-status').value;if(s)d=d.filter(function(u){return u.accountStatus===s});b.innerHTML=d.length?d.map(function(u){return'<div class=book-card style=background:#fff;padding:12px;margin-bottom:10px;border-radius:12px;><div class=row>'+u.userName+' ('+u.userId+') | 状态: '+(u.accountStatus||'正常')+'</div><div class=row>'+ (u.phoneNumber||'')+' | '+(u.email||'')+'</div><div class=row>注册: '+(u.registerTime||'').substring(0,10)+'</div><div><button class=action-btn onclick=toggleUser(\''+u.userId+'\',\''+(u.accountStatus||'正常')+'\')>'+((u.accountStatus||'正常')==='冻结'?'解冻':'冻结')+'</button><button class=action-btn onclick=location.href=\'查看用户学习记录.html?userId='+u.userId+'\'>学习记录</button></div></div>';}).join(''):'<div style=text-align:center;color:#8899aa;padding:20px;>未找到</div>';}});}
+function toggleUser(id,st){var ns=st==='冻结'?'正常':'冻结';if(!confirm('确定'+(ns==='冻结'?'冻结':'解冻')+'？'))return;apiPut('/api/admin/users/'+id,{accountStatus:ns}).then(function(r){alert(r.message);doSearch();});}
 </script>
-`n</body>
+</body>
 </html>

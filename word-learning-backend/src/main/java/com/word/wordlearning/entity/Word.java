@@ -8,9 +8,11 @@ public class Word {
     private String wordId;
     private String englishSpelling;
     private String chineseDefinition;
+    private String partOfSpeech;
     private String exampleSentence;
     private String phoneticSymbol;
     private String wordPronunciation;
     private String wordImage;
     private LocalDateTime createTime;
+    private String wordBookId;
 }

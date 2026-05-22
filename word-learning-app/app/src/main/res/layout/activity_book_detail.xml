@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f5f9fc">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#1E90FF"
+        android:padding="16dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/toolbar_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="词书详情"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="1dp" />
+    </LinearLayout>
+
+    <!-- 滚动内容区域 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 词书名称 -->
+            <TextView
+                android:id="@+id/tv_book_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="英语四级词书"
+                android:textSize="24sp"
+                android:textColor="#1E90FF"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 难度和词数 -->
+            <TextView
+                android:id="@+id/tv_difficulty_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="难度: 中级 | 共 1200 词"
+                android:textSize="16sp"
+                android:textColor="#666"
+                android:layout_marginBottom="8dp" />
+
+            <!-- 创建时间 -->
+            <TextView
+                android:id="@+id/tv_create_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="创建时间: 2025-01-01"
+                android:textSize="15sp"
+                android:textColor="#888"
+                android:layout_marginBottom="20dp" />
+
+            <!-- 词书简介标题 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="词书简介"
+                android:textSize="18sp"
+                android:textColor="#1E90FF"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
+
+            <!-- 词书简介内容 -->
+            <TextView
+                android:id="@+id/tv_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="本词书主要面向准备大学英语四级考试的学习者..."
+                android:textSize="15sp"
+                android:textColor="#444"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="30dp" />
+
+            <!-- 单词列表标题 -->
+            <TextView
+                android:id="@+id/tv_words_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="单词列表"
+                android:textSize="18sp"
+                android:textColor="#1E90FF"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 单词列表容器 -->
+            <LinearLayout
+                android:id="@+id/words_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- 开始学习按钮 -->
+            <Button
+                android:id="@+id/btn_start_study"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="开始学习"
+                android:textSize="18sp"
+                android:textColor="#fff"
+                android:textStyle="bold"
+                android:background="#1E90FF"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="20dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

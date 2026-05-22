@@ -32,7 +32,10 @@
             android:text="退出"
             android:textSize="14sp"
             android:textColor="#fff"
-            android:paddingLeft="8dp" android:paddingTop="4dp" android:paddingRight="8dp" android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp"
             android:clickable="true"
             android:focusable="true" />
     </LinearLayout>
@@ -56,6 +59,7 @@
                 android:layout_marginBottom="26dp">
 
                 <LinearLayout
+                    android:id="@+id/card_today"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -64,13 +68,16 @@
                     android:padding="15dp"
                     android:layout_marginRight="7dp"
                     android:gravity="center"
-                    android:elevation="2dp">
+                    android:elevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="今日学习" android:textSize="14sp" android:textColor="#6578a0" />
                     <TextView android:id="@+id/tv_today" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="20sp" android:textColor="#318af8" android:textStyle="bold" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="词" android:textSize="12sp" android:textColor="#8899aa" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/card_total"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -80,7 +87,9 @@
                     android:layout_marginLeft="7dp"
                     android:layout_marginRight="7dp"
                     android:gravity="center"
-                    android:elevation="2dp">
+                    android:elevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="累计学习" android:textSize="14sp" android:textColor="#6578a0" />
                     <TextView android:id="@+id/tv_total" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="20sp" android:textColor="#318af8" android:textStyle="bold" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="词" android:textSize="12sp" android:textColor="#8899aa" />

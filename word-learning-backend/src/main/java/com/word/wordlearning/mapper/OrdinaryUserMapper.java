@@ -13,8 +13,8 @@ public interface OrdinaryUserMapper {
     @Select("SELECT * FROM t_ordinary_user WHERE userId = #{userId} AND loginPassword = #{loginPassword}")
     OrdinaryUser findByUserIdAndPassword(String userId, String loginPassword);
 
-    @Insert("INSERT INTO t_ordinary_user (userId, loginPassword, accountStatus, registerTime, lastLoginTime, userName, phoneNumber, email) " +
-            "VALUES (#{userId}, #{loginPassword}, '正常', NOW(), NOW(), #{userName}, #{phoneNumber}, #{email})")
+    @Insert("INSERT INTO t_ordinary_user (userId, loginPassword, userName, phoneNumber, email, accountStatus, registerTime, lastLoginTime) " +
+        "VALUES (#{userId}, #{loginPassword}, #{userName}, #{phoneNumber}, #{email}, '正常', NOW(), NOW())")
     void insert(OrdinaryUser user);
 
     @Update("UPDATE t_ordinary_user SET userName = #{user.userName}, phoneNumber = #{user.phoneNumber}, email = #{user.email} WHERE userId = #{user.userId}")
@@ -37,4 +37,11 @@ public interface OrdinaryUserMapper {
 
     @Update("UPDATE t_ordinary_user SET accountStatus=#{status} WHERE userId=#{userId}")
     void updateStatus(@Param("userId") String userId, @Param("status") String status);
+
+
+    @Select("SELECT * FROM t_ordinary_user WHERE phoneNumber = #{contact} OR email = #{contact}")
+    OrdinaryUser findByPhoneOrEmail(@Param("contact") String contact);
+
+    @Update("UPDATE t_ordinary_user SET loginPassword = #{newPassword} WHERE phoneNumber = #{contact} OR email = #{contact}")
+    int resetPasswordByContact(@Param("contact") String contact, @Param("newPassword") String newPassword);
 }

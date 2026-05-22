@@ -1,114 +1,103 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
 <title>向词书添加单词</title>
-<style>* { margin:0; padding:0; box-sizing:border-box; }
+<style>
+html, body {height:100%;margin:0;padding:0;}
 body {
-  font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif;
-  background: #f0f4f8; min-height: 100vh;
-  padding-bottom: 75px; color: #2d3748;
+  font-family:'PingFang SC',Arial,sans-serif;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  display:flex;flex-direction:column;
+  color:#273245;
 }
-.header {
-  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
-  padding: 16px 18px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 20px rgba(26,86,219,0.2);
-  display: flex; align-items: center; gap: 12px;
+
+/* ====== 顶栏 ====== */
+.top-bar {
+  display:flex;align-items:center;
+  background:#318af8;color:#fff;
+  padding:15px 18px 14px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;font-weight:600;gap:11px;
 }
-.btn-back {
-  background: rgba(255,255,255,0.15); color: #fff;
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 14px; border-radius: 20px; font-size: 13px;
-  cursor: pointer; white-space: nowrap;
+.back-btn {
+  background:none;border:none;outline:none;cursor:pointer;
+  padding:5px 5px 5px 2px;display:flex;align-items:center;
 }
-.header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
-.section { padding: 0 14px; margin-top: 16px; }
-.card-list { display: flex; flex-direction: column; gap: 10px; }
-.card {
-  background: #fff; border-radius: 14px;
-  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+.back-icon {width:30px;height:30px;display:inline-block;}
+
+/* ====== 内容区域 ====== */
+.main-panel {
+  flex-grow:1;
+  overflow-y:auto;
+  padding:16px;
 }
-.card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.card-title { font-size: 16px; font-weight: 600; color: #2d3748; }
-.card-sub  { font-size: 13px; color: #8899aa; }
-.card-meta { font-size: 12px; color: #a0aec0; margin-top: 4px; }
-.btn {
-  padding: 8px 16px; border-radius: 20px; border: none;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: all .15s;
+
+.form-group {margin-bottom:12px; display:flex; flex-direction:column;}
+.form-group label {margin-bottom:4px; font-weight:600; color:#318af8;}
+.form-group input, .form-group select, .form-group textarea {
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #c7d9ee;
+  font-size:15px;
+  background:#f6f8fc;
+  outline:none;
 }
-.btn:active { transform: scale(0.95); }
-.btn-primary { background: #3577ef; color: #fff; }
-.btn-danger  { background: #fff; color: #e53e3e; border: 1px solid #fed7d7; }
-.btn-success { background: #38a169; color: #fff; }
-.btn-outline { background: #fff; color: #3577ef; border: 1px solid #bee3f8; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
-.form-input {
-  width: 100%; padding: 12px 14px; border: 2px solid #94a3b8;
-  border-radius: 10px; font-size:16px; background: #fff;
-  font-family: inherit; transition: border .2s;
+textarea {resize:vertical; min-height:60px;}
+
+.btn-add {
+  width:100%;
+  padding:12px 0;
+  background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);
+  color:#fff;
+  font-weight:600;
+  font-size:17px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  margin-top:10px;
+  box-shadow:0 2px 8px #e3f2fd;
+  transition:background .2s, box-shadow .2s;
 }
-.form-input:focus { outline: none; border-color: #3577ef; box-shadow: 0 0 0 3px rgba(53,119,239,0.15); background: #fff; }
-textarea.form-input { min-height: 80px; resize: vertical; }
-select.form-input { appearance: none; }
-.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size:16px; margin: 8px 0; }
-.msg-error { background: #fff5f5; color: #c53030; }
-.msg-success { background: #f0fff4; color: #276749; }
-.navbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-  border-radius: 20px 20px 0 0;
-  display: flex; justify-content: space-around;
-  padding: 8px 0 12px 0; z-index: 100;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; border: none; background: none;
-  font-family: inherit; font-size: 11px; color: #8899aa;
-}
-.nav-item .nav-icon { font-size: 20px; }
-.nav-item.active { color: #3577ef; font-weight: 600; }
-.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-.search-bar input { flex: 1; }
-.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
-/* ==== IME中文输入强制修复 ==== */
-input, textarea, select {
-  ime-mode: auto !important;
-  -webkit-user-modify: read-write !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
 
 <!-- ====== 顶栏 ====== -->
-<div class="header">
-  <span class="btn-back" onclick="history.back()">← 返回</span>
-  <span class="header-title">新增单词</span>
+<div class="top-bar">
+  <button class="back-btn" onclick="window.history.back()">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  添加单词到词书
 </div>
 
 <div class="main-panel">
 
-  
+  <form id="addWordForm">
 
     <!-- 所属词书 -->
     <div class="form-group">
       <label for="book">所属词书</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="book" name="book" placeholder="如：BK001" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="book" name="book" placeholder="如：BK001" required>
     </div>
 
     <div class="form-group">
       <label for="word">单词（英文）</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="word" name="word" placeholder="请输入单词" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="word" name="word" placeholder="请输入单词" required>
     </div>
 
     <div class="form-group">
       <label for="phonetic">音标</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="phonetic" name="phonetic" placeholder="如：/ˈhæpi/" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="phonetic" name="phonetic" placeholder="如：/ˈhæpi/" required>
     </div>
 
     <div class="form-group">
@@ -125,7 +114,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
 
     <div class="form-group">
       <label for="meaning">中文释义</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="meaning" name="meaning" placeholder="请输入中文释义" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="meaning" name="meaning" placeholder="请输入中文释义" required>
     </div>
 
     <div class="form-group">
@@ -135,7 +124,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
 
     <div class="form-group">
       <label for="audioUrl">音频链接</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="audioUrl" name="audioUrl" placeholder="https://..." required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="audioUrl" name="audioUrl" placeholder="https://..." required>
     </div>
 
     <div class="form-group">
@@ -147,51 +136,52 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
     </div>
 
     <button type="submit" class="btn-add">添加单词</button>
-  
+  </form>
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-document.getElementById("submit-btn").onclick = function() {
-  var w = {
-    wordId: "WD" + Date.now().toString(36).toUpperCase(),
-    wordBookId: document.getElementById("word-bookid").value.trim(),
-    englishSpelling: document.getElementById("word-spelling").value.trim(),
-    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
-    chineseDefinition: document.getElementById("word-chinese").value.trim(),
-    exampleSentence: document.getElementById("word-example").value.trim(),
-    wordPronunciation: document.getElementById("word-audio").value.trim(),
-    wordImage: document.getElementById("word-image").value.trim()
+const form = document.getElementById('addWordForm');
+form.onsubmit = function(e){
+  e.preventDefault();
+
+  const data = {
+    book: form.book.value.trim(),
+    word: form.word.value.trim(),
+    phonetic: form.phonetic.value.trim(),
+    pos: form.partOfSpeech.value,
+    meaning: form.meaning.value.trim(),
+    example: form.example.value.trim(),
+    audioUrl: form.audioUrl.value.trim(),
+    status: form.status.value
   };
-  if (!w.englishSpelling || !w.chineseDefinition || !w.wordBookId) { showMsg("请填写英文拼写、中文释义和所属词书ID", "error"); return; }
-  apiPost("/api/words", w).then(function(r) {
-    if (r.code === 200) { showMsg("单词添加成功！", "success"); }
-    else { showMsg(r.message, "error"); }
-  });
+
+  for (let key in data) {
+    if (!data[key]) {
+      alert("请填写所有字段！");
+      return;
+    }
+  }
+
+  alert(
+    "单词添加成功！\n" +
+    `所属词书：${data.book}\n` +
+    `单词：${data.word}\n` +
+    `音标：${data.phonetic}\n` +
+    `词性：${data.pos}\n` +
+    `释义：${data.meaning}\n` +
+    `例句：${data.example}\n` +
+    `音频：${data.audioUrl}\n` +
+    `状态：${data.status}`
+  );
+
+  form.reset();
 };
-function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
-document.getElementById("submit-btn").onclick = function() {
-  var w = {
-    wordId: "WD" + Date.now().toString(36).toUpperCase(),
-    wordBookId: document.getElementById("word-bookid").value.trim(),
-    englishSpelling: document.getElementById("word-spelling").value.trim(),
-    phoneticSymbol: document.getElementById("word-phonetic").value.trim(),
-    chineseDefinition: document.getElementById("word-chinese").value.trim(),
-    exampleSentence: document.getElementById("word-example").value.trim(),
-    wordPronunciation: document.getElementById("word-audio").value.trim(),
-    wordImage: document.getElementById("word-image").value.trim()
-  };
-  if (!w.englishSpelling || !w.chineseDefinition || !w.wordBookId) { showMsg("请填写英文拼写、中文释义和所属词书ID", "error"); return; }
-  apiPost("/api/words", w).then(function(r) {
-    if (r.code === 200) { showMsg("单词添加成功！", "success"); }
-    else { showMsg(r.message, "error"); }
-  });
-};
-function showMsg(msg, type) { var el = document.getElementById("msg"); el.innerText = msg; el.style.display = "block"; el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0"; el.style.color = type === "success" ? "#1b8a2e" : "#d93025"; }
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
+
+<script>
+document.getElementById('addWordForm').onsubmit=function(e){e.preventDefault();var d={wordId:'WD'+Date.now().toString(36),wordBookId:document.getElementById('book').value.trim(),englishSpelling:document.getElementById('word').value.trim(),phoneticSymbol:document.getElementById('phonetic').value.trim(),chineseDefinition:document.getElementById('meaning').value.trim(),exampleSentence:document.getElementById('example').value.trim(),wordPronunciation:document.getElementById('audioUrl').value.trim()};if(!d.wordBookId||!d.englishSpelling||!d.chineseDefinition){alert('请填写必填字段');return}apiPost('/api/words',d).then(function(r){if(r.code===200){alert('添加成功！');location.href='单词管理.html'}else{alert(r.message)}});};
 </script>
-`n</body>
+</body>
 </html>

@@ -1,109 +1,105 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
 <title>新增词书(App端)</title>
-<style>* { margin:0; padding:0; box-sizing:border-box; }
+<style>
+html, body {height:100%;margin:0;padding:0;}
 body {
-  font-family: 'PingFang SC','HarmonyOS Sans',-apple-system,sans-serif;
-  background: #f0f4f8; min-height: 100vh;
-  padding-bottom: 75px; color: #2d3748;
+  font-family:'PingFang SC',Arial,sans-serif;
+  background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
+  display:flex;
+  flex-direction:column;
+  color:#273245;
 }
-.header {
-  background: linear-gradient(135deg, #1a56db 0%, #3577ef 50%, #4f8af7 100%);
-  padding: 16px 18px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 20px rgba(26,86,219,0.2);
-  display: flex; align-items: center; gap: 12px;
+
+/* 顶栏 */
+.top-bar {
+  display:flex;
+  align-items:center;
+  background:#318af8;
+  color:#fff;
+  padding:15px 18px 14px 6px;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  box-shadow:0 2px 12px #318af82a;
+  font-size:18px;
+  font-weight:600;
+  gap:11px;
 }
-.btn-back {
-  background: rgba(255,255,255,0.15); color: #fff;
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 14px; border-radius: 20px; font-size: 13px;
-  cursor: pointer; white-space: nowrap;
+.back-btn {
+  background:none;border:none;outline:none;cursor:pointer;
+  padding:5px;display:flex;align-items:center;
 }
-.header-title { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
-.section { padding: 0 14px; margin-top: 16px; }
-.card-list { display: flex; flex-direction: column; gap: 10px; }
-.card {
-  background: #fff; border-radius: 14px;
-  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+.back-icon {width:30px;height:30px;display:inline-block;}
+
+/* 主体内容 */
+.main-panel {
+  flex-grow:1;
+  overflow-y:auto;
+  padding:16px;
+  padding-bottom:20px;
 }
-.card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.card-title { font-size: 16px; font-weight: 600; color: #2d3748; }
-.card-sub  { font-size: 13px; color: #8899aa; }
-.card-meta { font-size: 12px; color: #a0aec0; margin-top: 4px; }
-.btn {
-  padding: 8px 16px; border-radius: 20px; border: none;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: all .15s;
+
+.page-title {font-size:19px;color:#318af8;font-weight:700;margin-bottom:14px;}
+
+.form-group {margin-bottom:12px; display:flex; flex-direction:column;}
+.form-group label {margin-bottom:4px; font-weight:600; color:#318af8;}
+.form-group input, .form-group select, .form-group textarea {
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #c7d9ee;
+  font-size:15px;
+  background:#f6f8fc;
+  outline:none;
 }
-.btn:active { transform: scale(0.95); }
-.btn-primary { background: #3577ef; color: #fff; }
-.btn-danger  { background: #fff; color: #e53e3e; border: 1px solid #fed7d7; }
-.btn-success { background: #38a169; color: #fff; }
-.btn-outline { background: #fff; color: #3577ef; border: 1px solid #bee3f8; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
-.form-input {
-  width: 100%; padding: 12px 14px; border: 2px solid #94a3b8;
-  border-radius: 10px; font-size:16px; background: #fff;
-  font-family: inherit; transition: border .2s;
+textarea {resize:vertical; min-height:70px;}
+
+.btn-add {
+  width:100%;
+  padding:12px 0;
+  background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);
+  color:#fff;
+  font-weight:600;
+  font-size:17px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  margin-top:10px;
+  box-shadow:0 2px 8px #e3f2fd;
 }
-.form-input:focus { outline: none; border-color: #3577ef; box-shadow: 0 0 0 3px rgba(53,119,239,0.15); background: #fff; }
-textarea.form-input { min-height: 80px; resize: vertical; }
-select.form-input { appearance: none; }
-.msg { display: none; text-align: center; padding: 10px; border-radius: 10px; font-size:16px; margin: 8px 0; }
-.msg-error { background: #fff5f5; color: #c53030; }
-.msg-success { background: #f0fff4; color: #276749; }
-.navbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-  border-radius: 20px 20px 0 0;
-  display: flex; justify-content: space-around;
-  padding: 8px 0 12px 0; z-index: 100;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; border: none; background: none;
-  font-family: inherit; font-size: 11px; color: #8899aa;
-}
-.nav-item .nav-icon { font-size: 20px; }
-.nav-item.active { color: #3577ef; font-weight: 600; }
-.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-.search-bar input { flex: 1; }
-.empty { text-align: center; color: #8899aa; padding: 32px; font-size:16px; }
-/* ==== IME中文输入强制修复 ==== */
-input, textarea, select {
-  ime-mode: auto !important;
-  -webkit-user-modify: read-write !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
 
 <!-- 顶栏 -->
-<div class="header">
-  <span class="btn-back" onclick="history.back()">← 返回</span>
-  <span class="header-title">新增词书</span>
+<div class="top-bar">
+  <button class="back-btn" onclick="window.history.back()">
+    <span class="back-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M18 6l-8 8 8 8" stroke="#fff" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+  新增词书
 </div>
 
 <div class="main-panel">
   <div class="page-title">创建新的词书</div>
 
-  
+  <form id="addBookForm">
 
     <div class="form-group">
       <label>词书 ID</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="bookId" placeholder="如：BK001" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="bookId" readonly placeholder="系统自动生成" style="color:#8899aa;">
     </div>
 
     <div class="form-group">
       <label>词书名称</label>
-      <input  type="text" inputmode="text" autocomplete="off" spellcheck="false" type="text" id="bookName" placeholder="请输入词书名称" required inputmode="text" autocomplete="off" spellcheck="false" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" id="bookName" placeholder="请输入词书名称" required>
     </div>
 
     <div class="form-group">
@@ -131,64 +127,44 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
     </div>
 
     <button type="submit" class="btn-add">创建词书</button>
-  
+  </form>
 
 </div>
 
 <script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+const form = document.getElementById('addBookForm');
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookId: document.getElementById("book-id").value.trim(),
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookId || !b.wordBookName) { showMsg("请填写词书ID和名称", "error"); return; }
-  
-  document.getElementById("submit-btn").disabled = true;
-  apiPost("/api/wordbooks", b).then(function(r) {
-    document.getElementById("submit-btn").disabled = false;
-    if (r.code === 200) { showMsg("词书添加成功！", "success"); setTimeout(function(){ location.href="词书管理.html"; }, 1000); }
-    else { showMsg(r.message, "error"); }
-  });
+form.onsubmit = function(e){
+  e.preventDefault();
+
+  const id = bookId.value.trim();
+  const name = bookName.value.trim();
+  const desc = bookDesc.value.trim();
+  const level = level.value;
+  const status = status.value;
+
+  if (!id || !name || !level || !status){
+    alert("请填写所有必填字段！");
+    return;
+  }
+
+  alert(
+    "词书创建成功！\n" +
+    `词书 ID：${id}\n` +
+    `名称：${name}\n` +
+    `简介：${desc}\n` +
+    `难度：${level}\n` +
+    `状态：${status}`
+  );
+
+  form.reset();
 };
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
 </script>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");document.getElementById("display-name")?document.getElementById("display-name").innerText=localStorage.getItem("userId")||"admin":0;</script>
 
-document.getElementById("submit-btn").onclick = function() {
-  var b = {
-    wordBookId: document.getElementById("book-id").value.trim(),
-    wordBookName: document.getElementById("book-name").value.trim(),
-    difficultyLevel: document.getElementById("book-difficulty").value,
-    wordBookDescription: document.getElementById("book-desc").value.trim()
-  };
-  if (!b.wordBookId || !b.wordBookName) { showMsg("请填写词书ID和名称", "error"); return; }
-  
-  document.getElementById("submit-btn").disabled = true;
-  apiPost("/api/wordbooks", b).then(function(r) {
-    document.getElementById("submit-btn").disabled = false;
-    if (r.code === 200) { showMsg("词书添加成功！", "success"); setTimeout(function(){ location.href="词书管理.html"; }, 1000); }
-    else { showMsg(r.message, "error"); }
-  });
-};
-
-function showMsg(msg, type) {
-  var el = document.getElementById("msg");
-  el.innerText = msg; el.style.display = "block";
-  el.style.background = type === "success" ? "#e8f5e9" : "#fff0f0";
-  el.style.color = type === "success" ? "#1b8a2e" : "#d93025";
-}
+<script>
+document.getElementById('addBookForm').onsubmit=function(e){e.preventDefault();var n=document.getElementById('bookName').value.trim();var d=document.getElementById('bookDesc').value.trim();var l=document.getElementById('level').value;if(!n||!l){alert('请填写必填字段');return}apiPost('/api/wordbooks',{wordBookName:n,difficultyLevel:l,wordBookDescription:d}).then(function(r){if(r.code===200){alert('创建成功！');location.href='词书管理.html'}else{alert(r.message)}});};
 </script>
-`n</body>
+</body>
 </html>

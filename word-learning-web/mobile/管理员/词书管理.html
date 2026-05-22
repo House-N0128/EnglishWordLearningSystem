@@ -147,8 +147,8 @@
 
   <!-- 顶部栏 -->
   <div class="top-bar">
-    <span class="admin-user">管理员：admin001</span>
-    <button class="btn-logout" onclick="window.location.href='signin.html'">退出登录</button>
+    <span class="admin-user">管理员：<span id="display-name">admin001</span></span>
+    <button class="btn-logout" onclick="clearAuth()">退出登录</button>
   </div>
 
   <!-- 主体内容 -->
@@ -157,26 +157,10 @@
     <div class="page-title">词书管理</div>
 
     <!-- 查询区 -->
-    <form class="search-row">
-      <input type="text" placeholder="词书名称 / 词书ID">
-      <select>
-        <option>难度等级</option>
-        <option>全部</option>
-        <option>初级</option>
-        <option>中级</option>
-        <option>高级</option>
-      </select>
-      <select>
-        <option>词书状态</option>
-        <option>全部</option>
-        <option>已上架</option>
-        <option>未上架</option>
-      </select>
-      <button type="submit" class="search-btn">查询</button>
-    </form>
+    <div class="search-row"><input type="text" placeholder="词书名称搜索" id="filter-name"><select id="filter-diff"><option value="">全部难度</option><option value="初级">初级</option><option value="中级">中级</option><option value="高级">高级</option></select><button class="search-btn" onclick="doFilter()">查询</button></div>
 
     <!-- 新增词书按钮 -->
-    <button class="add-btn" onclick="window.location.href='addWordBook.html'">新增词书</button>
+    <button class="add-btn" onclick="window.location.href='添加词书.html'">新增词书</button>
 
     <!-- 词书卡片示例 -->
     <div class="book-card">
@@ -186,8 +170,8 @@
       <div class="row">
         <button class="action-btn">编辑</button>
         <button class="action-btn cancel">删除</button>
-        <button class="action-btn" onclick="window.location.href='addWordToBook.html'">添加单词</button>
-        <button class="action-btn" onclick="window.location.href='manageWordAdmin-app.html'">查看单词</button>
+        <button class="action-btn" onclick="window.location.href='编辑词书.html'">添加单词</button>
+        <button class="action-btn" onclick="window.location.href='单词管理.html'">查看单词</button>
       </div>
     </div>
 
@@ -195,40 +179,22 @@
 
   <!-- 底部导航栏 -->
   <div class="admin-navbar">
-    <button class="admin-nav-btn" onclick="window.location.href='indexAdmin-app.html'"><i>🏠</i>主页</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageUserAdmin-app.html'"><i>👥</i>用户管理</button>
-    <button class="admin-nav-btn active" onclick="window.location.href='manageWordBookAdmin-app.html'"><i>📚</i>词书管理</button>
-    <button class="admin-nav-btn" onclick="window.location.href='manageWordAdmin-app.html'"><i>🗃️</i>单词管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='管理员首页.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn" onclick="window.location.href='用户管理.html'"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn active" onclick="window.location.href='词书管理.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='单词管理.html'"><i>🗃️</i>单词管理</button>
   </div>
 
-`n<script>
-if (!requireAuth("admin")) { throw new Error("unauthorized"); }
 
-function loadBooks() {
-  apiGet("/api/wordbooks").then(function(r) {
-    var box = document.getElementById("book-list");
-    if (r.code === 200 && r.data && r.data.length > 0) {
-      box.innerHTML = r.data.map(function(b) {
-        return `<div class="collection-item">
-          <div class="book-name">` + b.wordBookName + `</div>
-          <div class="book-info">` + (b.difficultyLevel||"") + ` | ` + (b.wordCount||0) + `词</div>
-          <div class="book-meta">创建: ` + (b.createTime||"").substring(0,10) + `</div>
-          <button class="action-btn" onclick="editBook('` + b.wordBookId + `')">编辑</button>
-          <button class="action-btn cancel" onclick="delBook('` + b.wordBookId + `')">下架</button>
-        </div>`;
-      }).join("");
-    } else { box.innerHTML = '<div style="text-align:center;color:#8899aa;padding:16px;">暂无词书</div>'; }
-  });
-}
 
-function delBook(id) {
-  if (!confirm("确定下架该词书？")) return;
-  apiDelete("/api/wordbooks/" + id).then(function(r) { alert(r.message); loadBooks(); });
-}
-
-function editBook(id) { location.href = "编辑词书.html?bookId=" + id; }
-
+<script>
+var allBooks=[];
+function render(b){var d=document.getElementById('book-list');if(!b.length){d.style.display='none';return}d.style.display='block';d.innerHTML=b.map(function(x){return'<div class=row>ID: '+x.wordBookId+' | 名称: '+x.wordBookName+' | 难度: '+(x.difficultyLevel||'')+'</div><div class=row>词数: '+(x.wordCount||0)+' | 状态: '+(x.wordBookStatus||'已上线')+'</div><div class=row>创建: '+(x.createTime||'').substring(0,10)+'</div><div class=row><button class=action-btn onclick=location.href=\'编辑词书.html?bookId='+x.wordBookId+'\'>编辑</button><button class=action-btn onclick=location.href=\'编辑词书.html?bookId='+x.wordBookId+'\'>添加单词</button><button class=action-btn onclick=location.href=\'单词管理.html\'>查看单词</button><button class=action-btn cancel onclick=delBook(\''+x.wordBookId+'\')>删除</button></div>';}).join('');}
+function doFilter(){var n=(document.getElementById('filter-name').value||'').toLowerCase();var d=document.getElementById('filter-diff').value;var f=allBooks.filter(function(x){if(d&&x.difficultyLevel!==d)return false;if(n&&(x.wordBookName||'').toLowerCase().indexOf(n)===-1)return false;return true;});render(f);}
+function delBook(id){if(!confirm('确定删除？'))return;apiDelete('/api/wordbooks/'+id).then(function(r){alert(r.message);loadBooks();});}
+function loadBooks(){apiGet('/api/wordbooks').then(function(r){if(r.code===200&&r.data){allBooks=r.data;render(r.data);}});}
 loadBooks();
 </script>
-`n</body>
+<script>if(!requireAuth("admin"))throw new Error("unauthorized");</script>
+</body>
 </html>
