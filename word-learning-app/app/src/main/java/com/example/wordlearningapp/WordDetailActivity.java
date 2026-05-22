@@ -21,12 +21,14 @@ public class WordDetailActivity extends AppCompatActivity {
 
     private TextView tvWordTitle;
     private TextView tvSpelling;
+    private TextView tvPartOfSpeech;
     private TextView tvDefinition;
     private TextView tvPhonetic;
     private TextView tvExample;
     private Button btnAudio;
     private Button btnCollect;
     private ImageView ivWordImage;
+    private TextView tvNoImage;
 
     private String wordId;
     private JsonObject currentWord;
@@ -43,12 +45,14 @@ public class WordDetailActivity extends AppCompatActivity {
 
         tvWordTitle = findViewById(R.id.tv_word_title);
         tvSpelling = findViewById(R.id.tv_spelling);
+        tvPartOfSpeech = findViewById(R.id.tv_part_of_speech);
         tvDefinition = findViewById(R.id.tv_definition);
         tvPhonetic = findViewById(R.id.tv_phonetic);
         tvExample = findViewById(R.id.tv_example);
         btnAudio = findViewById(R.id.btn_audio);
         btnCollect = findViewById(R.id.btn_collect);
         ivWordImage = findViewById(R.id.iv_word_image);
+        tvNoImage = findViewById(R.id.tv_no_image);
 
         ((TextView) findViewById(R.id.toolbar_title)).setText("单词详情");
         findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
@@ -92,6 +96,8 @@ public class WordDetailActivity extends AppCompatActivity {
     private void buildUI(JsonObject w) {
         String spelling = w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "";
         String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
+        String partOfSpeech = w.has("partOfSpeech") && !w.get("partOfSpeech").isJsonNull()
+                ? w.get("partOfSpeech").getAsString() : "";
         String phonetic = w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull()
                 ? w.get("phoneticSymbol").getAsString() : "";
         String example = w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull()
@@ -99,6 +105,7 @@ public class WordDetailActivity extends AppCompatActivity {
 
         tvWordTitle.setText(spelling);
         tvSpelling.setText(spelling);
+        tvPartOfSpeech.setText(partOfSpeech.isEmpty() ? "-" : partOfSpeech);
         tvDefinition.setText(definition);
         tvPhonetic.setText(phonetic.isEmpty() ? "-" : "/" + phonetic + "/");
         tvExample.setText(example.isEmpty() ? "-" : example);
@@ -129,27 +136,37 @@ public class WordDetailActivity extends AppCompatActivity {
     private void loadWordImage(String spelling) {
         if (spelling == null || spelling.isEmpty()) {
             ivWordImage.setVisibility(ImageView.GONE);
+            tvNoImage.setVisibility(TextView.VISIBLE);
             return;
         }
 
         try {
             String imageName = spelling.toLowerCase().trim();
-            int imageResId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+
+            // 从mipmap目录查找图片
+            // Android会根据设备密度自动选择合适的分辨率图片
+            // 例如：mipmap/abandon/abandon.png (xhdpi)
+            int imageResId = getResources().getIdentifier(imageName, "mipmap", getPackageName());
 
             Log.d(TAG, "查找图片: " + imageName + ", 资源ID: " + imageResId);
 
             if (imageResId != 0) {
+                // 找到图片，显示图片，隐藏"暂无示意图"文字
                 ivWordImage.setVisibility(ImageView.VISIBLE);
+                tvNoImage.setVisibility(TextView.GONE);
                 ivWordImage.setImageResource(imageResId);
                 ivWordImage.setContentDescription(spelling + " - 示意图");
                 Log.d(TAG, "成功加载图片: " + spelling);
             } else {
+                // 未找到图片，隐藏图片，显示"暂无示意图"文字
                 ivWordImage.setVisibility(ImageView.GONE);
-                Log.d(TAG, "未找到图片: " + spelling);
+                tvNoImage.setVisibility(TextView.VISIBLE);
+                Log.d(TAG, "未找到图片: " + spelling + "，显示暂无示意图");
             }
         } catch (Exception e) {
             Log.e(TAG, "加载图片失败: " + e.getMessage());
             ivWordImage.setVisibility(ImageView.GONE);
+            tvNoImage.setVisibility(TextView.VISIBLE);
         }
     }
 

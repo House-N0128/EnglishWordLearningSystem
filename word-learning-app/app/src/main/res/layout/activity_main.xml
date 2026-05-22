@@ -11,7 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="#318af8"
-        android:padding="14dp"
+        android:paddingTop="35dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:gravity="center_vertical"
         android:elevation="4dp">
 
@@ -32,10 +35,11 @@
             android:text="退出"
             android:textSize="14sp"
             android:textColor="#fff"
-            android:paddingLeft="8dp"
-            android:paddingTop="4dp"
-            android:paddingRight="8dp"
-            android:paddingBottom="4dp"
+            android:paddingLeft="12dp"
+            android:paddingTop="6dp"
+            android:paddingRight="12dp"
+            android:paddingBottom="6dp"
+            android:background="@drawable/bg_btn_blue_round"
             android:clickable="true"
             android:focusable="true" />
     </LinearLayout>
@@ -44,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="14dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="26dp">
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:id="@+id/card_today"
@@ -64,15 +68,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:background="#fff"
-                    android:padding="15dp"
-                    android:layout_marginRight="7dp"
+                    android:background="@drawable/bg_white_card_small"
+                    android:padding="16dp"
+                    android:layout_marginRight="8dp"
                     android:gravity="center"
                     android:elevation="2dp"
                     android:clickable="true"
                     android:focusable="true">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="今日学习" android:textSize="14sp" android:textColor="#6578a0" />
-                    <TextView android:id="@+id/tv_today" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="20sp" android:textColor="#318af8" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="今日学习" android:textSize="13sp" android:textColor="#6578a0" />
+                    <TextView android:id="@+id/tv_today" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="22sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginTop="4dp" android:layout_marginBottom="2dp" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="词" android:textSize="12sp" android:textColor="#8899aa" />
                 </LinearLayout>
 
@@ -82,45 +86,48 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:background="#fff"
-                    android:padding="15dp"
-                    android:layout_marginLeft="7dp"
-                    android:layout_marginRight="7dp"
+                    android:background="@drawable/bg_white_card_small"
+                    android:padding="16dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
                     android:gravity="center"
                     android:elevation="2dp"
                     android:clickable="true"
                     android:focusable="true">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="累计学习" android:textSize="14sp" android:textColor="#6578a0" />
-                    <TextView android:id="@+id/tv_total" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="20sp" android:textColor="#318af8" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="累计学习" android:textSize="13sp" android:textColor="#6578a0" />
+                    <TextView android:id="@+id/tv_total" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="22sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginTop="4dp" android:layout_marginBottom="2dp" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="词" android:textSize="12sp" android:textColor="#8899aa" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/card_current_book"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:background="#fff"
-                    android:padding="15dp"
-                    android:layout_marginLeft="7dp"
+                    android:background="@drawable/bg_white_card_small"
+                    android:padding="16dp"
+                    android:layout_marginLeft="8dp"
                     android:gravity="center"
-                    android:elevation="2dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="当前词书" android:textSize="12sp" android:textColor="#6578a0" />
-                    <TextView android:id="@+id/tv_book" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="#318af8" android:textStyle="bold" />
+                    android:elevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="当前词书" android:textSize="13sp" android:textColor="#6578a0" />
+                    <TextView android:id="@+id/tv_book" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="15sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginTop="4dp" android:gravity="center" android:maxLines="2" android:ellipsize="end" />
                 </LinearLayout>
             </LinearLayout>
 
             <!-- Recommended Books -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="推荐词书" android:textSize="17sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginBottom="8dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="推荐词书" android:textSize="17sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginBottom="12dp" />
             <LinearLayout
                 android:id="@+id/book_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="18dp" />
+                android:layout_marginBottom="20dp" />
 
             <!-- Recent Words -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="最近学习" android:textSize="16sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginBottom="8dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="最近学习" android:textSize="17sp" android:textColor="#318af8" android:textStyle="bold" android:layout_marginBottom="12dp" />
             <LinearLayout
                 android:id="@+id/recent_words"
                 android:layout_width="match_parent"

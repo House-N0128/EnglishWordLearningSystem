@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".WordLearningApplication"
@@ -17,10 +18,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".MyBooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WordBooksActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -31,7 +39,6 @@
         <activity android:name=".UserChangePassword1Activity" />
         <activity android:name=".UserSetNewPasswordActivity" />
         <activity android:name=".UserDeleteAccountActivity" />
-        <activity android:name=".WordBooksActivity" />
         <activity android:name=".BookDetailActivity" />
         <activity android:name=".AddEditBookActivity" />
         <activity android:name=".WordSearchActivity" />

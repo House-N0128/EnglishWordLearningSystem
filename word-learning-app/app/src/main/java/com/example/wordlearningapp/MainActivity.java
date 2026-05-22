@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private TextView tvUsername, tvToday, tvTotal, tvBook;
-    private LinearLayout bookList, recentWords;
+    private LinearLayout cardCurrentBook, bookList, recentWords;
+    private String currentBookId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         tvToday = findViewById(R.id.tv_today);
         tvTotal = findViewById(R.id.tv_total);
         tvBook = findViewById(R.id.tv_book);
+        cardCurrentBook = findViewById(R.id.card_current_book);
         bookList = findViewById(R.id.book_list);
         recentWords = findViewById(R.id.recent_words);
 
@@ -82,6 +85,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.card_total).setOnClickListener(v -> {
             startActivity(new Intent(this, StudyRecordsActivity.class));
         });
+
+        // 当前词书卡片点击跳转至词书详情页
+        cardCurrentBook.setOnClickListener(v -> {
+            if (currentBookId != null && !currentBookId.isEmpty()) {
+                Log.d(TAG, "跳转到词书详情页，bookId: " + currentBookId);
+                Intent intent = new Intent(this, BookDetailActivity.class);
+                intent.putExtra("bookId", currentBookId);
+                startActivity(intent);
+            } else {
+                Log.d(TAG, "当前没有选择词书");
+                Toast.makeText(this, "当前没有选择词书，请先选择词书开始学习", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadData() {
@@ -102,10 +118,29 @@ public class MainActivity extends AppCompatActivity {
                     int total = s.has("totalCount") ? s.get("totalCount").getAsInt() : 0;
                     String bookName = s.has("currentBookName") && !s.get("currentBookName").isJsonNull()
                             ? s.get("currentBookName").getAsString() : "无";
+
+                    // 获取当前词书ID
+                    String bookId = "";
+                    if (s.has("currentBookId") && !s.get("currentBookId").isJsonNull()) {
+                        bookId = s.get("currentBookId").getAsString();
+                    }
+
+                    final String finalBookId = bookId;
+
                     runOnUiThread(() -> {
                         tvToday.setText(String.valueOf(today));
                         tvTotal.setText(String.valueOf(total));
                         tvBook.setText(bookName);
+                        currentBookId = finalBookId;
+
+                        // 更新卡片视觉效果
+                        if (!currentBookId.isEmpty()) {
+                            tvBook.setTextColor(0xFF318af8);
+                            tvBook.setPaintFlags(tvBook.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+                        } else {
+                            tvBook.setTextColor(0xFF8899aa);
+                            tvBook.setPaintFlags(tvBook.getPaintFlags() & (~android.graphics.Paint.UNDERLINE_TEXT_FLAG));
+                        }
                     });
                 }
 
@@ -150,8 +185,9 @@ public class MainActivity extends AppCompatActivity {
             JsonObject w = e.getAsJsonObject();
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFFFFFFF);
-            card.setPadding(13, 10, 13, 10);
+            card.setBackground(getDrawable(R.drawable.bg_white_card_small));
+            card.setPadding(16, 12, 16, 12);
+            card.setElevation(dp(2));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
             params.setMargins(0, 0, 10, 0);
             card.setLayoutParams(params);
@@ -163,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
             wordTv.setText(spelling);
             wordTv.setTextSize(15);
             wordTv.setTextColor(0xFF318af8);
+            wordTv.setTypeface(null, android.graphics.Typeface.BOLD);
             card.addView(wordTv);
 
             TextView transTv = new TextView(this);
@@ -170,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
             transTv.setText(definition);
             transTv.setTextSize(13);
             transTv.setTextColor(0xFF273245);
+            transTv.setPadding(0, dp(4), 0, 0);
             card.addView(transTv);
 
             String wordId = "";
@@ -272,57 +310,94 @@ public class MainActivity extends AppCompatActivity {
             bookList.addView(tv);
             return;
         }
-        for (JsonElement e : arr) {
-            JsonObject b = e.getAsJsonObject();
+
+        // 只展示前三个词书
+        int displayCount = Math.min(arr.size(), 3);
+
+        for (int i = 0; i < displayCount; i++) {
+            JsonObject b = arr.get(i).getAsJsonObject();
+
+            // 创建词书卡片（水平布局，与词书浏览界面一致）
             LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackgroundColor(0xFFf6f8fc);
-            card.setPadding(14, 13, 14, 13);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            card.setOrientation(LinearLayout.HORIZONTAL);
+            card.setPadding(dp(16), dp(16), dp(16), dp(16));
+            card.setBackground(getDrawable(R.drawable.bg_white_card));
+            card.setElevation(dp(2));
+            card.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0, 0, 0, 14);
-            card.setLayoutParams(params);
+            cardParams.setMargins(0, 0, 0, dp(12));
+            card.setLayoutParams(cardParams);
 
-            TextView infoTv = new TextView(this);
-            String info = (b.has("wordBookName") ? b.get("wordBookName").getAsString() : "")
-                    + "｜" + (b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
-                    + "｜" + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词";
-            infoTv.setText(info);
-            infoTv.setTextSize(15);
-            infoTv.setTextColor(0xFF333333);
-            card.addView(infoTv);
+            // 左侧信息区域
+            LinearLayout leftInfo = new LinearLayout(this);
+            leftInfo.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            leftInfo.setLayoutParams(leftParams);
 
+            // 词书名称
+            TextView bookName = new TextView(this);
+            String name = b.has("wordBookName") ? b.get("wordBookName").getAsString() : "";
+            bookName.setText(name);
+            bookName.setTextSize(18);
+            bookName.setTextColor(0xFF318af8);
+            bookName.setTypeface(null, android.graphics.Typeface.BOLD);
+            bookName.setPadding(0, 0, 0, dp(8));
+            leftInfo.addView(bookName);
+
+            // 难度和词数
+            TextView bookInfo = new TextView(this);
+            String info = (b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
+                    + " | " + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词";
+            bookInfo.setText(info);
+            bookInfo.setTextSize(14);
+            bookInfo.setTextColor(0xFF666666);
+            bookInfo.setPadding(0, 0, 0, dp(8));
+            leftInfo.addView(bookInfo);
+
+            // 词书描述
             if (b.has("wordBookDescription") && !b.get("wordBookDescription").isJsonNull()) {
                 TextView descTv = new TextView(this);
                 descTv.setText(b.get("wordBookDescription").getAsString());
                 descTv.setTextSize(13);
                 descTv.setTextColor(0xFF547bbc);
-                descTv.setPadding(0, 7, 0, 7);
-                card.addView(descTv);
+                descTv.setPadding(0, 0, 0, 0);
+                leftInfo.addView(descTv);
             }
 
-            TextView btn = new TextView(this);
-            btn.setText("选择学习");
-            btn.setTextSize(14);
-            btn.setTextColor(0xFFFFFFFF);
-            btn.setBackgroundColor(0xFF318af8);
-            btn.setPadding(24, 8, 24, 8);
-            btn.setGravity(android.view.Gravity.CENTER);
+            card.addView(leftInfo);
+
+            // 右侧开始学习按钮（使用渐变背景）
+            Button studyBtn = new Button(this);
+            studyBtn.setText("开始学习");
+            studyBtn.setTextSize(14);
+            studyBtn.setTextColor(0xFFFFFFFF);
+            studyBtn.setPadding(dp(20), dp(8), dp(20), dp(8));
+            studyBtn.setMinHeight(0);
+            studyBtn.setMinimumHeight(0);
+            studyBtn.setBackground(getDrawable(R.drawable.bg_btn_primary));
             LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            btnParams.gravity = android.view.Gravity.END;
-            btnParams.topMargin = 8;
-            btn.setLayoutParams(btnParams);
+            btnParams.setMargins(dp(16), 0, 0, 0);
+            studyBtn.setLayoutParams(btnParams);
+            studyBtn.setClickable(true);
+            studyBtn.setFocusable(true);
 
             String bookId = b.has("wordBookId") ? b.get("wordBookId").getAsString() : "";
-            btn.setOnClickListener(v -> {
+            studyBtn.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, BookDetailActivity.class);
                 intent.putExtra("bookId", bookId);
                 startActivity(intent);
             });
 
-            card.addView(btn);
+            card.addView(studyBtn);
             bookList.addView(card);
         }
+
+    }
+
+    private int dp(int val) {
+        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }

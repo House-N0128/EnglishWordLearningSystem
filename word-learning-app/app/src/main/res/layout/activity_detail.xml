@@ -11,7 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="#318af8"
-        android:padding="16dp"
+        android:paddingTop="50dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:gravity="center_vertical">
 
         <TextView
@@ -87,6 +90,25 @@
                     android:textColor="#2c3e50"
                     android:layout_marginBottom="16dp" />
 
+                <!-- 词性 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="词性"
+                    android:textSize="14sp"
+                    android:textColor="#318af8"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_part_of_speech"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="n."
+                    android:textSize="16sp"
+                    android:textColor="#2c3e50"
+                    android:layout_marginBottom="16dp" />
+
                 <!-- 中文释义 -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -105,6 +127,7 @@
                     android:textSize="16sp"
                     android:textColor="#2c3e50"
                     android:layout_marginBottom="16dp" />
+
 
                 <!-- 音标 -->
                 <TextView
@@ -183,6 +206,18 @@
                     android:scaleType="centerCrop"
                     android:background="#e8e8e8"
                     android:contentDescription="Word Image" />
+
+                <TextView
+                    android:id="@+id/tv_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="暂无示意图"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
