@@ -215,7 +215,7 @@
                     android:id="@+id/tv_progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已学 6 / 总 6 单词"
+                    android:text="第 6 个/ 总 6 个单词"
                     android:textSize="14sp"
                     android:textColor="#666"
                     android:layout_marginTop="8dp" />

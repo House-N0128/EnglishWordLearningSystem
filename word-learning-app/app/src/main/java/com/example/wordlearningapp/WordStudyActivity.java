@@ -149,7 +149,7 @@ public class WordStudyActivity extends AppCompatActivity {
 
         int progress = (int) ((currentIndex + 1) * 100.0 / words.size());
         progressBar.setProgress(progress);
-        tvProgress.setText("已学 " + (currentIndex + 1) + " / 总 " + words.size() + " 单词");
+        tvProgress.setText("第 " + (currentIndex + 1) + " 个 / 总 " + words.size() + " 个单词");
     }
 
     private void playAudio() {

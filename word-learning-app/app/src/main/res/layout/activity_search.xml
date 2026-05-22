@@ -8,60 +8,56 @@
     <!-- 顶部标题栏 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:orientation="horizontal"
-        android:background="#1E90FF"
-        android:padding="20dp"
-        android:elevation="4dp">
+        android:background="#318af8"
+        android:padding="0dp"
+        android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/tv_back"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="← 返回"
-            android:textSize="16sp"
-            android:textColor="#fff"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="4dp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="单词查询"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textColor="#fff"
             android:textStyle="bold"
             android:gravity="center" />
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="1dp" />
     </LinearLayout>
+
+    <!-- 标题文字 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="单词查询"
+        android:textSize="18sp"
+        android:textColor="#318af8"
+        android:textStyle="bold"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp" />
 
     <!-- 搜索区域 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
         android:gravity="center_vertical">
 
         <EditText
             android:id="@+id/et_search"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:hint="输入英文/中文/拼写查找单词"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textColor="#333"
             android:textColorHint="#999"
             android:background="@drawable/bg_input"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
             android:imeOptions="actionSearch"
             android:singleLine="true"
             android:layout_marginRight="12dp" />
@@ -69,59 +65,196 @@
         <Button
             android:id="@+id/btn_search"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:text="搜索"
-            android:textSize="15sp"
-            android:textColor="#333"
-            android:background="#fff"
+            android:textSize="14sp"
+            android:textColor="#fff"
+            android:background="@drawable/bg_btn_blue_round"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" />
+            android:paddingRight="20dp" />
     </LinearLayout>
 
-    <!-- 新增单词按钮（仅管理员可见） -->
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:background="#52e8bc"
-        android:text="+ 新增单词"
-        android:textColor="#fff"
-        android:textSize="15sp"
-        android:visibility="gone" />
-
     <!-- 内容区域 -->
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <LinearLayout
+            android:id="@+id/word_list_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp"
-            android:clipToPadding="false" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp">
+
+            <!-- 示例卡片1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_card"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:id="@+id/word_spelling_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="mock n."
+                    android:textSize="18sp"
+                    android:textColor="#318af8"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/word_definition_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="模拟"
+                    android:textSize="14sp"
+                    android:textColor="#333"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btn_detail_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="查看详情"
+                    android:textSize="14sp"
+                    android:textColor="#fff"
+                    android:background="@drawable/bg_btn_primary"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp" />
+            </LinearLayout>
+
+            <!-- 示例卡片2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_card"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:id="@+id/word_spelling_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="improve v."
+                    android:textSize="18sp"
+                    android:textColor="#318af8"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/word_definition_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="提升"
+                    android:textSize="14sp"
+                    android:textColor="#333"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btn_detail_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="查看详情"
+                    android:textSize="14sp"
+                    android:textColor="#fff"
+                    android:background="@drawable/bg_btn_primary"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 底部导航栏 -->
+    <LinearLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:orientation="horizontal"
+        android:background="#fff"
+        android:gravity="center"
+        android:elevation="8dp">
 
         <TextView
-            android:id="@+id/tv_empty"
-            android:layout_width="match_parent"
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🏠\n首页"
+            android:textSize="13sp"
+            android:textColor="#318af8"
             android:gravity="center"
-            android:padding="40dp"
-            android:text="输入关键词开始搜索"
-            android:textColor="#8899aa"
-            android:textSize="16sp" />
+            android:clickable="true"
+            android:focusable="true" />
 
-        <ProgressBar
-            android:id="@+id/progress"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/nav_books"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-    </FrameLayout>
+            android:layout_weight="1"
+            android:text="📚\n词书浏览"
+            android:textSize="13sp"
+            android:textColor="#318af8"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/nav_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🔍\n单词查询"
+            android:textSize="13sp"
+            android:textColor="#17c2ae"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/nav_collection"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⭐\n我的收藏"
+            android:textSize="13sp"
+            android:textColor="#318af8"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/nav_records"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📄\n学习记录"
+            android:textSize="13sp"
+            android:textColor="#318af8"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/nav_profile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="👤\n个人中心"
+            android:textSize="13sp"
+            android:textColor="#318af8"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
 </LinearLayout>
