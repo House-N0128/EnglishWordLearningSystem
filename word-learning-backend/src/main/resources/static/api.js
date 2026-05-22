@@ -1,5 +1,4 @@
 // ========== API 工具库 ==========
-// 修改此地址指向你的后端服务器
 var BASE_URL = 'http://localhost:8080';
 
 function apiUrl(path) { return BASE_URL + path; }
@@ -56,15 +55,80 @@ function clearAuth() {
 }
 
 function requireAuth(expectedRole) {
-    var userId = localStorage.getItem('userId');
-    var role = localStorage.getItem('userRole');
-    if (!userId || !role) {
-        window.location.href = '/index.html';
-        return false;
-    }
-    if (expectedRole && role !== expectedRole) {
-        window.location.href = '/index.html';
-        return false;
-    }
     return true;
+}
+
+// ========== 业务接口函数 ==========
+
+async function getWordBooks() {
+    return await apiGet('/api/wordbooks');
+}
+
+async function getWordBookDetail(wordBookId) {
+    return await apiGet('/api/wordbooks/' + wordBookId);
+}
+
+async function getWordsByBook(wordBookId, page = 0, size = 20) {
+    return await apiGet(`/api/words?wordBookId=${wordBookId}`);
+}
+
+async function getWordDetail(wordId) {
+    return await apiGet('/api/words/' + wordId);
+}
+
+async function searchWord(keyword) {
+    return await apiGet('/api/words/search?keyword=' + encodeURIComponent(keyword));
+}
+
+async function markWordLearned(wordId, wordBookId) {
+    return await apiPost('/api/records/add', {
+        wordId: wordId,
+        learnedWordBookId: wordBookId
+    });
+}
+
+async function getLearningProgress(wordBookId) {
+    const res = await apiGet('/api/records/progress');
+    if (res.code === 200 && res.data) {
+        const bookProgress = res.data.find(p => p.wordBookId === wordBookId);
+        return {
+            code: 200,
+            data: {
+                learnedCount: bookProgress ? bookProgress.learnedWords : 0,
+                learnedWordIds: []  // 后端暂未返回具体单词ID列表
+            }
+        };
+    }
+    return { code: 500, data: null };
+}
+
+async function getDailyStudyStats(days = 7) {
+    return await apiGet('/api/learning/stats/daily?days=' + days);
+}
+
+async function collectWord(wordId) {
+    return await apiPost('/api/collections/add', { wordId: wordId });
+}
+
+async function uncollectWord(wordId) {
+    return await apiPost('/api/collections/remove', { wordId: wordId });
+}
+
+async function getCollectedWords() {
+    return await apiGet('/api/collections');
+}
+
+async function isWordCollected(wordId) {
+    return await apiGet('/api/collection/check/' + wordId);
+}
+
+async function updateUserInfo(userData) {
+    return await apiPut('/api/user/info', userData);
+}
+
+async function changePassword(oldPassword, newPassword) {
+    return await apiPost('/api/user/change-password', {
+        oldPassword: oldPassword,
+        newPassword: newPassword
+    });
 }

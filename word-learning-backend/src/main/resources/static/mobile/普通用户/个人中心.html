@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
 <title>个人中心</title>
 <style>
 body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
@@ -14,12 +15,10 @@ body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-
 .btn{background:#318af8;color:#fff;border:none;border-radius:23px;padding:13px 0;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px #e3f3ff30;letter-spacing:1px;transition:.2s;}
 .btn.cancel{background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
 .navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
-.nav-btn{flex:1;text-align:center;color:#318af8;font-size:16px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;font-family:'Inter','PingFang SC',Arial,sans-serif;}
+.nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;font-family:'Inter','PingFang SC',Arial,sans-serif;}
 .nav-btn.active { color:#17c2ae;}
 .navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family:'Arial','PingFang SC';display:block;}
-
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>

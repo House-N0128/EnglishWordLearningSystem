@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* 顶部导航栏 */
         .top-nav {
             background-color: #007bff;
             color: white;
@@ -29,21 +28,9 @@
             padding: 12px 20px;
         }
 
-        .nav-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-name {
-            font-size: 14px;
-        }
-
+        .nav-title { font-size: 18px; font-weight: 600; }
+        .user-area { display: flex; align-items: center; gap: 15px; }
+        .user-name { font-size: 14px; }
         .btn-nav {
             background-color: rgba(255,255,255,0.2);
             color: white;
@@ -53,29 +40,16 @@
             cursor: pointer;
             font-size: 13px;
         }
+        .btn-nav:hover { background-color: rgba(255,255,255,0.3); }
 
-        .btn-nav:hover {
-            background-color: rgba(255,255,255,0.3);
-        }
-
-        /* 主体布局 */
-        .main-container {
-            display: flex;
-            flex: 1;
-        }
-
-        /* 左侧侧边栏 */
+        .main-container { display: flex; flex: 1; }
         .sidebar {
             width: 160px;
             background-color: white;
             border-right: 1px solid #eee;
             padding: 20px 0;
         }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
+        .sidebar-menu { list-style: none; }
         .sidebar-menu li {
             padding: 10px 20px;
             cursor: pointer;
@@ -86,26 +60,14 @@
             gap: 8px;
             transition: background-color 0.2s;
         }
-
         .sidebar-menu li:hover {
             background-color: #f0f7ff;
             color: #007bff;
         }
 
-        /* 右侧主内容区 */
-        .content-area {
-            flex: 1;
-            padding: 30px;
-        }
+        .content-area { flex: 1; padding: 30px; }
+        .page-title { font-size: 22px; color: #333; font-weight: 600; margin-bottom: 30px; }
 
-        .page-title {
-            font-size: 22px;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-
-        /* 进度条区域 */
         .progress-section {
             background-color: white;
             padding: 20px;
@@ -113,25 +75,14 @@
             margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
-        .progress-text {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .progress-percent {
-            font-size: 16px;
-            color: #007bff;
-            font-weight: 600;
-        }
-
+        .progress-text { font-size: 14px; color: #666; }
+        .progress-percent { font-size: 16px; color: #007bff; font-weight: 600; }
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -139,15 +90,14 @@
             border-radius: 4px;
             overflow: hidden;
         }
-
         .progress-fill {
-            width: 20%;
+            width: 0%;
             height: 100%;
             background-color: #007bff;
             border-radius: 4px;
+            transition: width 0.3s;
         }
 
-        /* 单词卡片 */
         .word-card {
             background-color: white;
             border-radius: 8px;
@@ -156,20 +106,8 @@
             text-align: center;
             margin-bottom: 30px;
         }
-
-        .word-name {
-            font-size: 32px;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .phonetic {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
+        .word-name { font-size: 32px; color: #333; font-weight: 600; margin-bottom: 15px; }
+        .phonetic { font-size: 18px; color: #666; margin-bottom: 15px; }
         .part-of-speech {
             display: inline-block;
             background-color: #007bff;
@@ -179,13 +117,7 @@
             font-size: 14px;
             margin-bottom: 20px;
         }
-
-        .meaning {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 30px;
-        }
-
+        .meaning { font-size: 18px; color: #555; margin-bottom: 30px; }
         .example {
             font-size: 16px;
             color: #666;
@@ -194,13 +126,7 @@
             border-left: 3px solid #007bff;
             margin-bottom: 30px;
         }
-
-        .card-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
+        .card-buttons { display: flex; justify-content: center; gap: 15px; }
         .btn-collect {
             background-color: #ffc107;
             color: white;
@@ -210,7 +136,7 @@
             cursor: pointer;
             font-size: 14px;
         }
-
+        .btn-collect.collected { background-color: #dc3545; }
         .btn-master {
             background-color: #28a745;
             color: white;
@@ -221,15 +147,13 @@
             font-size: 14px;
         }
 
-        /* 导航区域 */
         .nav-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-
-        .btn-prev {
+        .btn-prev, .btn-next {
             background-color: #6c757d;
             color: white;
             border: none;
@@ -238,23 +162,9 @@
             cursor: pointer;
             font-size: 14px;
         }
+        .btn-next { background-color: #007bff; }
+        .nav-info { font-size: 14px; color: #666; }
 
-        .nav-info {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .btn-next {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* 完成学习按钮 */
         .btn-complete {
             display: block;
             margin: 0 auto;
@@ -267,7 +177,6 @@
             font-size: 14px;
         }
 
-        /* 页脚 */
         footer {
             background-color: #343a40;
             color: #aaa;
@@ -275,97 +184,415 @@
             padding: 20px;
             font-size: 12px;
         }
+        .footer-links { margin-bottom: 8px; }
+        .footer-links a { color: #aaa; text-decoration: none; margin: 0 10px; }
+        .footer-links a:hover { color: white; }
 
-        .footer-links {
-            margin-bottom: 8px;
-        }
-
-        .footer-links a {
-            color: #aaa;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-
-        .footer-links a:hover {
+        .loading, .complete-message { text-align: center; padding: 80px; font-size: 18px; color: #666; }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
             color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
         }
     </style>
     <script src="/api.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-<!-- 顶部导航栏 -->
-<div class="top-nav">
-    <div class="nav-title">单词学习平台</div>
-    <div class="user-area">
-        <span class="user-name" id="display-name">用户</span>
-        <button class="btn-nav" onclick="window.location.href='../user/getUserInfo.html'">个人中心</button>
-        <button class="btn-nav" onclick="clearAuth()">退出登录</button>
-    </div>
+<div id="app">
+    <!-- 加载中 -->
+    <div v-if="loading" class="loading">加载中...</div>
+
+    <!-- 学习完成 -->
+    <div v-else-if="isComplete" class="complete-message">
+    <h2 style="color: #28a745;"> 恭喜！</h2>
+    <p style="margin-top: 20px;">你已完成当前词书的所有单词！</p>
+    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+        <button class="btn-master" onclick="window.location.href='/user/index.html'">返回首页</button>
+        <button class="btn-next" @click="resetAndRestudy">重新学习</button>
+    </div>   
 </div>
 
-<!-- 主体内容 -->
-<div class="main-container">
-    <!-- 左侧侧边栏 -->
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li>首页</li>
-            <li>词书浏览</li>
-            <li>单词查询</li>
-            <li>我的收藏</li>
-            <li>学习记录</li>
-            <li>个人信息</li>
-            <li>修改密码</li>
-            <li>注销账号</li>
-        </ul>
+    <!-- 正常学习界面 -->
+    <div v-else>
+        <div class="top-nav">
+            <div class="nav-title">单词学习平台</div>
+            <div class="user-area">
+                <span class="user-name">{{ userName }}</span>
+                <button class="btn-nav" onclick="window.location.href='../user/getUserInfo.html'">个人中心</button>
+                <button class="btn-nav" @click="logout">退出登录</button>
+            </div>
+        </div>
+
+        <div class="main-container">          
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li @click="goHome">首页</li>
+                    <li @click="goWordBooks">词书浏览</li>
+                    <li @click="goSearch">单词查询</li>
+                    <li @click="goCollection">我的收藏</li>
+                    <li @click="goRecord">学习记录</li>
+                    <li @click="goProfile">个人信息</li>
+                    <li @click="goChangePwd">修改密码</li>
+                    <li @click="goCancel">注销账号</li>
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <div class="page-title">学习 - {{ bookName }}</div>
+
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-text">学习进度：{{ learnedCount }} / {{ totalCount }}</div>
+                        <div class="progress-percent">{{ progressPercent }}%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" :style="{width: progressPercent + '%'}"></div>
+                    </div>
+                </div>
+
+                <div class="word-card">
+                    <div class="word-name">{{ currentWord.englishSpelling || currentWord.word || '加载中' }}</div>
+                    <div class="phonetic">{{ currentWord.phoneticSymbol || '' }}</div>
+                    <span class="part-of-speech">{{ currentWord.partOfSpeech || 'v.' }}</span>
+                    <div class="meaning">{{ currentWord.chineseDefinition || currentWord.definition || '暂无释义' }}</div>
+                    <div class="example">{{ currentWord.exampleSentence || '暂无例句' }}</div>
+                    <div class="card-buttons">
+                        <button class="btn-collect" :class="{collected: isCollected}" @click="toggleCollect">
+                            {{ isCollected ? ' 已收藏' : ' 收藏单词' }}
+                        </button>
+                        <button class="btn-master" @click="markLearned"> 标记已掌握</button>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <button class="btn-prev" @click="prevWord">上一个</button>
+                    <div class="nav-info">第 {{ currentIndex + 1 }} 个，共 {{ wordList.length }} 个</div>
+                    <button class="btn-next" @click="nextWord">下一个</button>
+                </div>
+
+                <button class="btn-complete" @click="completeBook">完成学习</button>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-links">
+                <a href="#">版权信息</a>
+                <a href="#">客服链接</a>
+            </div>
+            <div>版权所有 © 2025 单词学习平台</div>
+        </footer>
     </div>
 
-    <!-- 右侧主内容区 -->
-    <div class="content-area">
-        <div class="page-title">学习 - 四级核心词汇</div>
-
-        <!-- 进度条区域 -->
-        <div class="progress-section">
-            <div class="progress-header">
-                <div class="progress-text">学习进度：2/10</div>
-                <div class="progress-percent">20%</div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-        </div>
-
-        <!-- 单词卡片 -->
-        <div class="word-card">
-            <div class="word-name">abandon</div>
-            <div class="phonetic">/əˈbændən/</div>
-            <span class="part-of-speech">v.</span>
-            <div class="meaning">放弃，抛弃；离弃，丢弃；中止；陷入，沉湎于</div>
-            <div class="example">Never abandon your dreams, no matter how difficult the situation is.</div>
-            <div class="card-buttons">
-                <button class="btn-collect">收藏单词</button>
-                <button class="btn-master">标记已掌握</button>
-            </div>
-        </div>
-
-        <!-- 导航区域 -->
-        <div class="nav-section">
-            <button class="btn-prev">上一个</button>
-            <div class="nav-info">第 1 个，共 10 个</div>
-            <button class="btn-next">下一个</button>
-        </div>
-
-        <!-- 完成学习按钮 -->
-        <button class="btn-complete">完成学习</button>
-    </div>
+    <div class="toast" id="toastMsg">提示</div>
 </div>
 
-<!-- 页脚 -->
-<footer>
-    <div class="footer-links">
-        <a href="#">版权信息</a>
-        <a href="#">客服链接</a>
-    </div>
-    <div>版权所有 © 2025 单词学习平台</div>
-</footer>
+<script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = ref(urlParams.get('bookId') || 'WB001');
+            
+            const loading = ref(true);
+            const isComplete = ref(false);
+            const userName = ref(localStorage.getItem('userName') || '用户');
+            const bookName = ref('单词书');
+            const wordList = ref([]);
+            const currentIndex = ref(0);
+            const learnedSet = ref(new Set());
+            const collectedSet = ref(new Set());
+            const totalCount = ref(0);
+            const learnedCount = ref(0);
+            const bookInfo = ref(null);
+
+            const currentWord = computed(() => {
+                if (wordList.value.length === 0) return {};
+                return wordList.value[currentIndex.value] || {};
+            });
+
+            const progressPercent = computed(() => {
+                if (totalCount.value === 0) return 0;
+                let percent = Math.floor((learnedCount.value / totalCount.value) * 100);
+                return percent > 100 ? 100 : percent;
+            });
+
+            const isCollected = computed(() => {
+                const wid = currentWord.value.wordId || currentWord.value.id;
+                return collectedSet.value.has(wid);
+            });
+
+            function showMessage(msg, isError = false) {
+                const toast = document.getElementById('toastMsg');
+                toast.textContent = msg;
+                toast.style.display = 'block';
+                toast.style.background = isError ? 'rgba(220,53,69,0.9)' : 'rgba(0,0,0,0.8)';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2000);
+            }
+
+            async function loadData() {
+                loading.value = true;
+                try {
+                    // 获取单词列表
+                    const wordsRes = await getWordsByBook(bookId.value);
+                    if (wordsRes.code === 200) {
+                        let words = wordsRes.data;
+                        if (Array.isArray(words)) {
+                            wordList.value = words;
+                            totalCount.value = words.length;
+                        } else if (words && words.content) {
+                            wordList.value = words.content;
+                            totalCount.value = words.totalElements || words.content.length;
+                        }
+                        if (wordList.value.length > 0 && bookInfo.value === null) {
+                            bookName.value = wordList.value[0].wordBookName || '单词书';
+                        }
+                    }
+
+                    // 获取学习进度
+                    /*try {
+                        // 步骤1：获取学习进度数量（多少个单词已学）
+                        const progressRes = await getLearningProgress(bookId.value);
+                        if (progressRes.code === 200 && progressRes.data) {
+                            learnedCount.value = progressRes.data.learnedCount || 0;
+                        }
+                        
+                        // 步骤2：获取具体的学习记录（学了哪些单词的ID）
+                        const recordsRes = await apiGet('/api/records/list');
+                        if (recordsRes.code === 200 && recordsRes.data) {
+                            // 只保留当前词书的学习记录
+                            const bookRecords = recordsRes.data.filter(
+                                record => record.learnedWordBookId === bookId.value
+                            );
+                            // 提取单词ID
+                            const learnedIds = bookRecords.map(record => record.wordId);
+                            learnedSet.value = new Set(learnedIds);
+                            // 用实际ID数量覆盖之前的数量
+                            if (learnedSet.value.size > 0) {
+                                learnedCount.value = learnedSet.value.size;
+                            }
+                        }
+                    } catch (e) { 
+                        console.log('进度接口异常', e); 
+                    }*/
+                // 获取学习进度 - 优先使用本地存储
+                try {
+                    const storageKey = `learned_${bookId.value}_${localStorage.getItem('userId')}`;
+                    const saved = localStorage.getItem(storageKey);
+                    
+                    if (saved) {
+                        // 有本地进度，使用本地数据
+                        const learnedIds = JSON.parse(saved);
+                        learnedSet.value = new Set(learnedIds);
+                        learnedCount.value = learnedSet.value.size;
+                    } else {
+                        // 没有本地进度，从后端获取（首次加载）
+                        const recordsRes = await apiGet('/api/records/list');
+                        if (recordsRes.code === 200 && recordsRes.data) {
+                            const bookRecords = recordsRes.data.filter(
+                                record => record.learnedWordBookId === bookId.value
+                            );
+                            const learnedIds = [...new Set(bookRecords.map(record => record.wordId))];
+                            learnedSet.value = new Set(learnedIds);
+                            learnedCount.value = learnedSet.value.size;
+                            // 保存到本地
+                            localStorage.setItem(storageKey, JSON.stringify(learnedIds));
+                        }
+                    }
+                } catch (e) { 
+                    console.log('进度接口异常', e); 
+                }
+
+                    // 获取收藏列表
+                    try {
+                        const collectRes = await getCollectedWords();
+                        if (collectRes.code === 200 && collectRes.data) {
+                            const collectList = collectRes.data;
+                            if (Array.isArray(collectList)) {
+                                const ids = collectList.map(item => item.wordId || item.id);
+                                collectedSet.value = new Set(ids);
+                            }
+                        }
+                    } catch (e) { console.log('收藏接口未实现'); }
+
+                    // 过滤未学习单词
+                    /*const unlearned = wordList.value.filter(w => {
+                        const wid = w.wordId || w.id;
+                        return !learnedSet.value.has(wid);
+                    });
+                    if (unlearned.length === 0 && wordList.value.length > 0) {
+                        isComplete.value = true;
+                    } else if (unlearned.length > 0) {
+                        wordList.value = unlearned;
+                        currentIndex.value = 0;
+                    }*/
+                    
+                // 查找第一个未学的单词索引
+                // 查找第一个未学的单词索引
+                const firstUnlearnedIndex = wordList.value.findIndex(w => {
+                    const wid = w.wordId || w.id;
+                    return !learnedSet.value.has(wid);
+                });
+
+                if (firstUnlearnedIndex === -1) {
+                    currentIndex.value = 0;
+                } else {
+                    currentIndex.value = firstUnlearnedIndex;
+                }
+            
+                } catch (err) {
+                    showMessage('加载失败: ' + (err.message || '未知错误'), true);
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function markLearned() {
+                const word = currentWord.value;
+                const wid = word.wordId || word.id;
+                if (!wid) return;
+                try {
+                    const res = await markWordLearned(wid, bookId.value);
+                    if (res.code === 200 || res.success === true || res.status === 'success' || res.message?.includes('成功')) {
+                        //learnedCount.value++;
+                        learnedSet.value.add(wid);  // 先添加到 Set
+                        learnedCount.value = learnedSet.value.size;  // 再从 Set 获取数量
+
+                        const storageKey = `learned_${bookId.value}_${localStorage.getItem('userId')}`;
+                        localStorage.setItem(storageKey, JSON.stringify([...learnedSet.value]));
+                        showMessage(' 已标记为已掌握！');
+                        nextWord();
+                    } else {
+                        showMessage(res.message || '标记失败', true);
+                    }
+                } catch (err) {
+                    showMessage('标记失败: ' + (err.message || '请检查后端接口'), true);
+                }
+            }
+
+            function nextWord() {
+                if (currentIndex.value + 1 < wordList.value.length) {
+                    currentIndex.value++;
+                } else {
+                    showMessage('已经是最后一个单词了'); 
+                }
+            }
+
+            function prevWord() {
+                if (currentIndex.value > 0) {
+                    currentIndex.value--;
+                } else {
+                    showMessage('已经是第一个单词了');
+                }
+            }
+
+            async function toggleCollect() {
+                const word = currentWord.value;
+                const wid = word.wordId || word.id;
+                if (!wid) return;
+                if (learnedSet.value.has(wid)) {
+                showMessage('该单词已经标记过了', true);
+                return;
+                }
+                try {
+                    if (isCollected.value) {
+                        const res = await uncollectWord(wid);
+                        if (res.code === 200) {
+                            collectedSet.value.delete(wid);
+                            showMessage('已取消收藏');
+                        } else {
+                            showMessage(res.message || '取消收藏失败', true);
+                        }
+                    } else {
+                        const res = await collectWord(wid);
+                        if (res.code === 200) {
+                            collectedSet.value.add(wid);
+                            showMessage('收藏成功！');
+                        } else {
+                            showMessage(res.message || '收藏失败', true);
+                        }
+                    }
+                } catch (err) {
+                    showMessage('操作失败: ' + (err.message || '请检查后端接口'), true);
+                }
+            }
+
+        function completeBook() {
+            if (learnedCount.value >= totalCount.value) {
+                isComplete.value = true;
+            } else {
+                if (confirm('还有 ' + (totalCount.value - learnedCount.value) + ' 个单词未学习，确定要结束学习吗？')) {
+                    isComplete.value = true;
+                }
+            }
+        }
+
+        /*function resetAndRestudy() {
+        console.log('=== resetAndRestudy 被调用 ===');
+        console.trace('调用栈:');
+        location.reload();
+    }*/
+        async function resetAndRestudy() {
+            if (!confirm('重新学习会清空当前词书的所有学习进度，确定吗？')) {
+                return;
+            }
+            learnedSet.value.clear();
+            learnedCount.value = 0;
+            currentIndex.value = 0;
+            isComplete.value = false;
+
+            const storageKey = `learned_${bookId.value}_${localStorage.getItem('userId')}`;
+            localStorage.removeItem(storageKey);
+            showMessage('已重置学习进度，开始重新学习！');
+        }
+
+            function logout() {
+                console.trace('=== logout 被调用，调用栈如下 ===');  // 添加这一行
+                clearAuth();
+                window.location.href = '/user/signin.html';
+            }
+
+            // 导航函数
+            function goHome() { window.location.href = '/index.html'; }
+            function goWordBooks() { window.location.href = '/wordbook/browseWordBook.html'; }
+            function goSearch() { window.location.href = '/word/searchWord.html'; }
+            function goCollection() { window.location.href = '/collection/viewCollectedWords.html'; }
+            function goRecord() { window.location.href = '/wordlearningrecord/viewPersonalStudyRecord.html'; }
+            function goProfile() { window.location.href = '/user/getUserInfo.html'; }
+            function goChangePwd() { window.location.href = '/user/changePassword.html'; }
+            function goCancel() { window.location.href = '/user/cancelUser.html'; }
+
+            onMounted(() => {
+                if (!bookId.value) {
+                    showMessage('请从词书列表进入学习', true);
+                    setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+                    return;
+                }
+                loadData();
+            });
+
+            return {
+                loading, isComplete, userName, bookName,
+                wordList, currentIndex, currentWord,
+                isCollected, totalCount, learnedCount, progressPercent,
+                markLearned, nextWord, prevWord, toggleCollect, completeBook,
+                resetAndRestudy,
+                logout, goHome, goWordBooks, goSearch, goCollection,
+                goRecord, goProfile, goChangePwd, goCancel
+            };
+        }
+    }).mount('#app');
+</script>
 </body>
 </html>

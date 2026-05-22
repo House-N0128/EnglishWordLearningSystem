@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
   <title>我的收藏</title>
   <style>
     body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;position:relative;padding-bottom:82px;color:#273245;}
@@ -9,7 +10,7 @@
     .main-area {padding:30px 14px 17px 14px;}
     .title {font-size:18px;font-weight:600;color:#318af8;margin-bottom:20px;}
     .search-row {display:flex;gap:11px;margin-bottom:17px;}
-    .search-row input {flex:1;padding:10px 12px;border-radius:8px;border:1px solid #c7d9ee;font-size:16px;background:#f6f8fc;color:#234;}
+    .search-row input {flex:1;padding:10px 12px;border-radius:8px;border:1px solid #c7d9ee;font-size:15px;background:#f6f8fc;color:#234;}
     .search-row button {padding:0 18px;background:#318af8;border:none;border-radius:19px;color:#fff;font-weight:600;font-size:16px;cursor:pointer;transition:.17s;}
     .collection-list {display:flex;flex-direction:column;gap:14px;margin-bottom:14px;}
     .collection-item {background:#fff;border-radius:13px;box-shadow:0 1px 4px #c8e6fa22;padding:15px 13px;display:flex;align-items:center;justify-content:space-between;}
@@ -19,15 +20,13 @@
     .pos {font-size:13px;color:#47b1eb;}
     .collect-date {color:#6578a0;font-size:12px;margin-left:10px;}
     .item-actions {display:flex;gap:8px;}
-    .action-btn {background:#318af8;color:#fff;border:none;border-radius:18px;padding:7px 14px;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 1px 4px #e7f0fd;transition:background .2s;}
+    .action-btn {background:#318af8;color:#fff;border:none;border-radius:18px;padding:7px 14px;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 1px 4px #e7f0fd;transition:background .2s;}
     .cancel-btn {background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
     .navbar{position:fixed;left:0;bottom:0;width:100vw;background:#fff;box-shadow:0 -2px 18px #b4cafab8;border-top-left-radius:16px;border-top-right-radius:16px;height:62px;display:flex;justify-content:space-around;align-items:center;z-index:10;}
-    .nav-btn{flex:1;text-align:center;color:#318af8;font-size:16px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;}
+    .nav-btn{flex:1;text-align:center;color:#318af8;font-size:15px;font-weight:600;padding:0;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:color .18s;gap:2px;}
     .nav-btn.active { color:#17c2ae;}
     .navbar i {font-style:normal;font-size:21px;margin-bottom:2px;font-family: 'Arial','PingFang SC';display:block;}
-  
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+  </style>
   <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -35,7 +34,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
   <div class="main-area">
     <div class="title">我的收藏</div>
     <div class="search-row">
-      <input type="text" placeholder="搜索收藏单词（拼写）" id="filter-keyword" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" placeholder="搜索收藏单词（拼写）" id="filter-keyword">
       <button id="search-btn">搜索</button>
     </div>
     <div class="collection-list" id="collection-list">

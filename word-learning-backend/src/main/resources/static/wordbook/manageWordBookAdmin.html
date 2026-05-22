@@ -316,16 +316,60 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        
+        /* 弹窗提示 */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        /* 加载状态 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
-<script src="/api.js"></script>
+    <script src="/api.js"></script>
 </head>
 <body>
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+</div>
+
 <!-- 顶部导航栏 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
     <div class="user-area">
         <span class="user-name">管理员账号：admin</span>
-        <button class="btn-logout">退出登录</button>
+        <button class="btn-logout" id="logoutBtn">退出登录</button>
     </div>
 </div>
 
@@ -335,15 +379,11 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li>管理员首页</li>
+            <li>个人中心</li>
             <li>用户管理</li>
             <li class="sub-item">用户管理</li>
             <li class="active">词书管理</li>
-            <li class="sub-item">添加词书</li>
-            <li class="sub-item">管理词书</li>
-            <li>单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
-            <li class="sub-item">管理单词</li>
+            <li id="menuManageWord">单词管理</li>
             <li>学习记录查询</li>
         </ul>
     </div>
@@ -353,33 +393,33 @@
         <div class="page-header">
             <h1 class="page-title">词书管理</h1>
             <div class="header-buttons">
-                <button class="btn btn-green">新增词书</button>
-                <button class="btn btn-secondary">返回首页</button>
+                <button class="btn btn-green" id="addWordBookBtn">新增词书</button>
+                <button class="btn btn-secondary" id="backHomeBtn">返回首页</button>
             </div>
         </div>
 
         <!-- 搜索区域 -->
         <div class="search-area">
             <div class="search-input-wrap">
-                <input type="text" class="search-input" placeholder="输入词书名称/词书ID搜索">
-                <button class="btn-search">搜索</button>
+                <input type="text" class="search-input" id="searchKeyword" placeholder="输入词书名称/词书ID搜索">
+                <button class="btn-search" id="searchBtn">搜索</button>
             </div>
             <div class="filter-row">
                 <div>
                     <label style="font-size:14px; color:#333; margin-right:8px;">难度等级:</label>
-                    <select class="filter-select">
-                        <option>全部</option>
-                        <option>初级</option>
-                        <option>中级</option>
-                        <option>高级</option>
+                    <select class="filter-select" id="levelFilter">
+                        <option value="all">全部</option>
+                        <option value="初级">初级</option>
+                        <option value="中级">中级</option>
+                        <option value="高级">高级</option>
                     </select>
                 </div>
                 <div>
                     <label style="font-size:14px; color:#333; margin-right:8px;">词书状态:</label>
-                    <select class="filter-select">
-                        <option>全部</option>
-                        <option>已上架</option>
-                        <option>未上架</option>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">全部</option>
+                        <option value="已上线">已上线</option>
+                        <option value="未上线">未上线</option>
                     </select>
                 </div>
             </div>
@@ -387,7 +427,7 @@
 
         <!-- 表格区域 -->
         <div class="table-area">
-            <table>
+            <table id="wordbookTable">
                 <thead>
                 <tr>
                     <th>词书ID</th>
@@ -401,107 +441,405 @@
                     <th>操作</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>WB001</td>
-                    <td>四级核心词汇</td>
-                    <td class="level-intermediate">中级</td>
-                    <td>3000</td>
-                    <td>admin001</td>
-                    <td>2024-01-15 14:30:25</td>
-                    <td>2024-03-10 09:15:42</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                            <button class="btn-add">添加</button>
-                        </div>
-                        <button class="btn-view">查看单词</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>WB002</td>
-                    <td>六级高频词汇</td>
-                    <td class="level-advanced">高级</td>
-                    <td>5000</td>
-                    <td>admin001</td>
-                    <td>2024-02-10 10:20:35</td>
-                    <td>2024-03-12 16:45:18</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                            <button class="btn-add">添加</button>
-                        </div>
-                        <button class="btn-view">查看单词</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>WB003</td>
-                    <td>日常交流词汇</td>
-                    <td class="level-beginner">初级</td>
-                    <td>1500</td>
-                    <td>admin002</td>
-                    <td>2024-01-28 08:45:12</td>
-                    <td>2024-02-15 11:30:25</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                            <button class="btn-add">添加</button>
-                        </div>
-                        <button class="btn-view">查看单词</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>WB004</td>
-                    <td>商务英语词汇</td>
-                    <td class="level-intermediate">中级</td>
-                    <td>2000</td>
-                    <td>admin001</td>
-                    <td>2024-03-05 13:15:30</td>
-                    <td>2024-03-05 13:15:30</td>
-                    <td class="status-offline">未上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                            <button class="btn-add">添加</button>
-                        </div>
-                        <button class="btn-view">查看单词</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>WB005</td>
-                    <td>旅游英语词汇</td>
-                    <td class="level-beginner">初级</td>
-                    <td>1200</td>
-                    <td>admin002</td>
-                    <td>2024-02-22 16:20:45</td>
-                    <td>2024-03-08 14:55:33</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                            <button class="btn-add">添加</button>
-                        </div>
-                        <button class="btn-view">查看单词</button>
-                    </td>
-                </tr>
+                <tbody id="tableBody">
+                    <tr><td colspan="9" style="text-align:center;">加载中...</td></tr>
                 </tbody>
             </table>
-            <!-- 分页 -->
-            <div class="pagination">
-                <button class="page-btn">上一页</button>
-                <span>第 1 页, 共 2 页</span>
-                <button class="page-btn">下一页</button>
+            <div class="pagination" id="paginationArea">
+                <button class="page-btn" id="prevPageBtn">上一页</button>
+                <span id="pageInfo">第 1 页, 共 1 页</span>
+                <button class="page-btn" id="nextPageBtn">下一页</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // --------------------------------------------------------------
+    // 全局变量 - 从后端获取的数据
+    let bookData = [];           // 存储从后端获取的所有词书数据
+    let filteredData = [];       // 过滤后的数据
+    let currentPage = 1;
+    let rowsPerPage = 5;
+    
+    // 使用 api.js 中定义的 BASE_URL（已配置为 http://localhost:8080）
+    
+    // DOM 元素
+    const tbody = document.getElementById("tableBody");
+    const searchKeywordInput = document.getElementById("searchKeyword");
+    const levelFilterSelect = document.getElementById("levelFilter");
+    const statusFilterSelect = document.getElementById("statusFilter");
+    const searchBtn = document.getElementById("searchBtn");
+    const prevPageBtn = document.getElementById("prevPageBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
+    const pageInfoSpan = document.getElementById("pageInfo");
+    const addWordBookBtn = document.getElementById("addWordBookBtn");
+    const backHomeBtn = document.getElementById("backHomeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    
+    // 显示加载状态
+    function showLoading() {
+        loadingOverlay.style.display = "flex";
+    }
+    
+    function hideLoading() {
+        loadingOverlay.style.display = "none";
+    }
+    
+    // 显示提示消息
+    function showMessage(msg, isError = false) {
+        const toast = document.getElementById("toastMsg");
+        toast.textContent = msg;
+        toast.style.backgroundColor = isError ? "#dc3545" : "#28a745";
+        toast.style.opacity = "1";
+        setTimeout(() => {
+            toast.style.opacity = "0";
+        }, 2000);
+    }
+    
+    // 从后端获取词书列表
+    async function fetchWordBooksFromBackend() {
+        showLoading();
+        try {
+            // 使用 api.js 中定义的 apiGet 方法调用后端接口
+            // 后端 WordBookController 的 @RequestMapping("/api/wordbooks")
+            const result = await apiGet('/api/wordbooks');
+            
+            // 根据实际后端返回的数据结构进行适配
+            // 假设返回格式为: { code: 200, data: [...], message: "success" }
+            let data = [];
+            if (result.code === 200 && result.data && Array.isArray(result.data)) {
+                data = result.data;
+            } else {
+                throw new Error(result.message || '数据格式异常');
+            }
+            
+            // 转换后端字段名为前端使用的字段名（根据 WordBook 实体类字段映射）
+            bookData = data.map(item => ({
+                id: item.wordBookId || '',
+                name: item.wordBookName || '',
+                level: item.difficultyLevel || '中级',
+                wordCount: item.wordCount || 0,
+                adminId: item.adminId || item.creatorId || 'admin',
+                createTime: formatDateTime(item.createTime),
+                updateTime: formatDateTime(item.updateTime),
+                status: item.wordBookStatus === '已上线' || item.wordBookStatus === '已上架' || item.wordBookStatus === 'online' ? '已上线' : '未上线'
+            }));
+            
+            // 格式化日期时间
+            function formatDateTime(dateTime) {
+                if (!dateTime) return '-';
+                // 处理 Java LocalDateTime 格式（如：2024-01-15T14:30:25）
+                return String(dateTime).replace('T', ' ');
+            }
+            
+            if (bookData.length === 0) {
+                showMessage('暂无词书数据');
+            } else {
+                showMessage(`成功加载 ${bookData.length} 条词书数据`);
+            }
+            
+            // 应用过滤和渲染
+            applyFilters();
+            
+        } catch (error) {
+            console.error('获取词书列表失败:', error);
+            showMessage(`获取数据失败: ${error.message}`, true);
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#dc3545;">数据加载失败，请检查网络或后端服务</td></tr>`;
+            bookData = [];
+            filteredData = [];
+            renderTable();
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    // 删除词书（调用后端API）
+    async function deleteWordBookFromBackend(bookId) {
+        showLoading();
+        try {
+            // 使用 api.js 中定义的 apiDelete 方法
+            const result = await apiDelete(`/api/wordbooks/${bookId}`);
+            
+            // 判断删除是否成功
+            if (result.code === 200) {
+                showMessage(`词书 ${bookId} 删除成功`);
+                // 重新从后端获取最新数据
+                await fetchWordBooksFromBackend();
+                return true;
+            } else {
+                throw new Error(result.message || '删除失败');
+            }
+        } catch (error) {
+            console.error('删除词书失败:', error);
+            showMessage(`删除失败: ${error.message}`, true);
+            return false;
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    // 编辑词书（调用后端API）
+    async function updateWordBookToBackend(bookId, updatedData) {
+        showLoading();
+        try {
+            // 使用 api.js 中定义的 apiPut 方法
+            const result = await apiPut(`/api/wordbooks/${bookId}`, updatedData);
+            
+            if (result.code === 200) {
+                showMessage(`词书 ${bookId} 更新成功`);
+                await fetchWordBooksFromBackend();
+                return true;
+            } else {
+                throw new Error(result.message || '更新失败');
+            }
+        } catch (error) {
+            console.error('更新词书失败:', error);
+            showMessage(`更新失败: ${error.message}`, true);
+            return false;
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    // 渲染表格
+    function renderTable() {
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+        
+        // 确保当前页不超过总页数
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+        
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const pageData = filteredData.slice(startIndex, endIndex);
+        
+        // 更新分页信息
+        pageInfoSpan.innerText = `第 ${currentPage} 页, 共 ${totalPages} 页`;
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
+        
+        if (pageData.length === 0 && filteredData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">暂无词书数据</td></tr>`;
+            return;
+        }
+        
+        if (pageData.length === 0 && filteredData.length > 0) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">当前页无数据</td></tr>`;
+            return;
+        }
+        
+        // 生成表格内容
+        let html = '';
+        pageData.forEach(book => {
+            let levelClass = '';
+            if (book.level === '初级') levelClass = 'level-beginner';
+            else if (book.level === '中级') levelClass = 'level-intermediate';
+            else if (book.level === '高级') levelClass = 'level-advanced';
+            
+            let statusClass = book.status === '已上线' ? 'status-online' : 'status-offline';
+            
+            html += `<tr>
+                        <td>${escapeHtml(book.id)}</td>
+                        <td>${escapeHtml(book.name)}</td>
+                        <td class="${levelClass}">${escapeHtml(book.level)}</td>
+                        <td>${book.wordCount}</td>
+                        <td>${escapeHtml(book.adminId)}</td>
+                        <td>${escapeHtml(book.createTime || '-')}</td>
+                        <td>${escapeHtml(book.updateTime || '-')}</td>
+                        <td class="${statusClass}">${escapeHtml(book.status)}</td>
+                        <td class="action-buttons">
+                            <div class="action-row">
+                                <button class="btn-edit" data-id="${book.id}">编辑</button>
+                                <button class="btn-delete" data-id="${book.id}">删除</button>
+                                <button class="btn-add" data-id="${book.id}">添加</button>
+                            </div>
+                            <button class="btn-view" data-id="${book.id}">查看单词</button>
+                        </td>
+                    </tr>`;
+        });
+        tbody.innerHTML = html;
+        
+        // 绑定操作按钮事件
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const bookId = btn.getAttribute('data-id');
+                editWordBook(bookId);
+            });
+        });
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const bookId = btn.getAttribute('data-id');
+                deleteWordBook(bookId);
+            });
+        });
+        document.querySelectorAll('.btn-add').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const bookId = btn.getAttribute('data-id');
+                addWordToBook(bookId);
+            });
+        });
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const bookId = btn.getAttribute('data-id');
+                viewWordsOfBook(bookId);
+            });
+        });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // 过滤数据（前端过滤，也可以改为后端请求）
+    function applyFilters() {
+        const keyword = searchKeywordInput.value.trim().toLowerCase();
+        const levelVal = levelFilterSelect.value;
+        const statusVal = statusFilterSelect.value;
+        
+        filteredData = bookData.filter(book => {
+            let matchKeyword = true;
+            if (keyword !== "") {
+                matchKeyword = book.id.toLowerCase().includes(keyword) || 
+                              book.name.toLowerCase().includes(keyword);
+            }
+            let matchLevel = true;
+            if (levelVal !== "all") {
+                matchLevel = book.level === levelVal;
+            }
+            let matchStatus = true;
+            if (statusVal !== "all") {
+                matchStatus = book.status === statusVal;
+            }
+            return matchKeyword && matchLevel && matchStatus;
+        });
+        
+        currentPage = 1;
+        renderTable();
+    }
+    
+    // 编辑词书 - 跳转到编辑页面
+    function editWordBook(bookId) {
+        window.location.href = "editWordBook.html?bookId=" + bookId;
+    }
+    
+    // 删除词书
+    async function deleteWordBook(bookId) {
+        const confirmDel = confirm(`确定要删除词书 ${bookId} 吗？删除后无法恢复。`);
+        if (!confirmDel) return;
+        await deleteWordBookFromBackend(bookId);
+    }
+    
+    // 添加单词
+    function addWordToBook(bookId) {
+        showMessage(`准备为词书 ${bookId} 添加单词，跳转至添加单词页面`);
+        setTimeout(() => {
+            window.location.href = `addWordToBook.html?bookId=${bookId}`;
+        }, 300);
+    }
+    
+    // 查看单词
+    function viewWordsOfBook(bookId) {
+        showMessage(`查看词书 ${bookId} 包含的单词，跳转至单词管理页面`);
+        setTimeout(() => {
+            window.location.href = `managewordfromwordbook.html?bookId=${bookId}`;
+        }, 200);
+    }
+    
+    // 新增词书跳转
+    function handleAddWordBook() {
+        window.location.href = "addWordBook.html";
+    }
+    
+    // 返回首页跳转
+    function handleBackHome() {
+        window.location.href = "../admin/indexAdmin.html";
+    }
+    
+    // 退出登录
+    function handleLogout() {
+        if (confirm("确定要退出登录吗？")) {
+            showMessage("已退出登录，跳转至登录页");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 500);
+        }
+    }
+    
+    // 分页
+    function goPrevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+        }
+    }
+    
+    function goNextPage() {
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+        }
+    }
+    
+    // 初始化
+    function init() {
+        // 绑定事件
+        searchBtn.addEventListener("click", () => applyFilters());
+        levelFilterSelect.addEventListener("change", () => applyFilters());
+        statusFilterSelect.addEventListener("change", () => applyFilters());
+        searchKeywordInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") applyFilters();
+        });
+        prevPageBtn.addEventListener("click", goPrevPage);
+        nextPageBtn.addEventListener("click", goNextPage);
+        addWordBookBtn.addEventListener("click", handleAddWordBook);
+        backHomeBtn.addEventListener("click", handleBackHome);
+        logoutBtn.addEventListener("click", handleLogout);
+        
+        // 从后端获取数据
+        fetchWordBooksFromBackend();
+        
+        // 侧边栏菜单交互
+        const allMenuItems = document.querySelectorAll(".sidebar-menu li");
+        allMenuItems.forEach(item => {
+            item.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const text = item.innerText.trim();
+                if (text === "词书管理" || text === "管理词书") {
+                    // 当前页面，刷新数据
+                    fetchWordBooksFromBackend();
+                } else if (text === "管理员首页") {
+                    window.location.href = "../admin/indexAdmin.html";
+                } else if (text === "个人中心") {
+                    window.location.href = "../admin/adminPersonal.html";
+                } else if (text === "用户管理") {
+                    window.location.href = "../admin/manageUserAdmin.html";
+                } else if (text === "单词管理" || text === "管理单词") {
+                    window.location.href = "../word/manageWordAdmin.html";
+                } else if (text === "学习记录查询") {
+                    window.location.href = "../wordlearningrecord/viewUserLearningRecords.html";
+                } else {
+                    showMessage(`导航到 ${text} 页面`);
+                }
+            });
+        });
+    }
+    
+    // 启动应用
+    init();
+</script>
 </body>
 </html>

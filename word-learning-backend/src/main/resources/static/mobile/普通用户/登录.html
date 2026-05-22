@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
   <title>单词学习平台 - 登录</title>
   <style>
     body {
@@ -76,7 +77,7 @@
     }
     .input-group input::placeholder {
       color:#97adc0;
-      font-size:16px;
+      font-size:15px;
     }
     .btn {
       display:block;
@@ -102,7 +103,7 @@
       display:flex;
       justify-content:space-between;
       margin:16px 0 8px 0;
-      font-size:16px;
+      font-size:15px;
       color:#3577ef;
     }
     .actions a {
@@ -128,7 +129,7 @@
       margin:8px 0;
       padding:10px;
       border-radius:8px;
-      font-size:16px;
+      font-size:14px;
       background:#fff0f0;
       color:#d93025;
     }
@@ -136,9 +137,7 @@
       opacity:.65;
       cursor:not-allowed;
     }
-  
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+  </style>
   <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -148,10 +147,10 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
       <button class="role-tab" id="tab-admin" type="button">管理员</button>
     </div>
     <h2 id="login-title">单词学习平台 - 普通用户登录</h2>
-    
+    <form>
       <div class="form-wrap">
         <div class="input-group">
-          <input type="text" placeholder="登录账号" name="loginAccount" id="loginAccount" required inputmode="text" autocomplete="off" spellcheck="false">
+          <input type="text" placeholder="登录账号" name="loginAccount" id="loginAccount" required>
         </div>
         <div class="input-group">
           <input type="password" placeholder="登录密码" name="loginPassword" id="loginPassword" required>
@@ -160,7 +159,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
       <div class="error-msg" id="error-msg"></div>
       <button type="button" class="btn" id="login-btn">登录</button>
       <button type="button" class="btn btn-register" id="register-btn">注册账号</button>
-    
+    </form>
     <div class="actions">
       <a href="#">忘记密码</a>
       <span>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 给词书添加单词</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 45px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .header-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+        .btn-blue {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background-color: #0069d9;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+
+        .input-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #dc3545;
+        }
+
+        .upload-area.dragover {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .table-area {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-success {
+            color: #28a745;
+        }
+
+        .status-error {
+            color: #dc3545;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+        }
+
+        #toastMsg {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .tab-btn.active {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-results {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-word {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-definition {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .search-tip {
+            font-size: 12px;
+            color: #999;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        .selected-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="nav-title">单词学习平台 - 管理员系统</div>
+        <div class="user-area">
+            <span class="user-name">管理员账号: admin001</span>
+            <button class="btn-logout" id="logoutBtn">退出登录</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li id="menuAdminHome">管理员首页</li>
+                <li id="menuPersonal">个人中心</li>
+                <li id="menuUserManage">用户管理</li>
+                <li class="active">词书管理</li>
+                <li id="menuManageWord">单词管理</li>
+                <li id="menuLearningRecord">学习记录查询</li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">给词书添加单词</h1>
+                    <div class="header-info" id="bookInfo"></div>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" id="backBtn">返回词书管理</button>
+                </div>
+            </div>
+
+            <div class="tab-container">
+                <button class="tab-btn active" id="singleTab">单个添加</button>
+                <button class="tab-btn" id="batchTab">批量添加</button>
+            </div>
+
+            <div class="card tab-content active" id="singleForm">
+                <div class="card-title">单个添加单词</div>
+                <form id="singleAddForm">
+                    <div class="form-group">
+                        <label>英文拼写 * <span style="font-weight:normal;color:#999;">- 输入后自动搜索已有单词</span></label>
+                        <input type="text" class="form-control" id="englishSpelling" placeholder="请输入英文单词">
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>中文释义 *</label>
+                        <input type="text" class="form-control" id="chineseDefinition" placeholder="请输入中文释义">
+                    </div>
+                    <div class="form-group">
+                        <label>音标</label>
+                        <input type="text" class="form-control" id="phoneticSymbol" placeholder="请输入音标">
+                    </div>
+                    <div class="form-group">
+                        <label>例句</label>
+                        <textarea class="form-control" id="exampleSentence" rows="3" placeholder="请输入例句"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>音频链接</label>
+                        <input type="text" class="form-control" id="wordPronunciation" placeholder="请输入单词发音音频URL">
+                        <div class="input-tip">支持 MP3、WAV 等格式的音频链接</div>
+                    </div>
+                    <div class="form-group">
+                        <label>图片链接</label>
+                        <input type="text" class="form-control" id="wordImage" placeholder="请输入单词示意图URL">
+                        <div class="input-tip">支持 JPG、PNG、GIF 等格式的图片链接</div>
+                    </div>
+                    <div class="form-group">
+                        <label>添加方式</label>
+                        <div style="display:flex;gap:20px;">
+                            <label style="cursor:pointer;">
+                                <input type="radio" name="addType" value="new" checked> 新建单词
+                            </label>
+                            <label style="cursor:pointer;">
+                                <input type="radio" name="addType" value="existing" id="existingRadio"> 选择已有单词
+                            </label>
+                        </div>
+                        <input type="hidden" id="selectedWordId">
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-green">添加到词书</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearSingleForm()">重置</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card tab-content" id="batchForm">
+                <div class="card-title">批量添加单词</div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-text">点击选择 Excel 文件或拖拽文件到这里</div>
+                    <div class="upload-hint">支持 .xlsx 格式，文件大小不超过 10MB</div>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls">
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-blue" id="downloadTemplateBtn">下载模板文件</button>
+                </div>
+
+                <div id="batchResult" style="display:none; margin-top: 20px;">
+                    <h4 style="margin-bottom: 15px;">导入结果</h4>
+                    <div class="table-area">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>英文拼写</th>
+                                    <th>中文释义</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 14px;">
+                        <span style="color:#28a745;">成功: <span id="successCount">0</span> 个</span>
+                        <span style="margin-left: 20px; color:#dc3545;">失败: <span id="failCount">0</span> 个</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay">
+        <span class="loading-text">处理中...</span>
+    </div>
+
+    <div id="toastMsg"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function showMessage(msg, isError = false) {
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toastMsg.style.backgroundColor = isError ? "#dc3545" : "#28a745";
+            toastMsg.style.opacity = "1";
+            setTimeout(() => {
+                toastMsg.style.opacity = "0";
+            }, 2500);
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = "none";
+        }
+
+        document.getElementById('singleTab').addEventListener('click', () => {
+            document.getElementById('singleTab').classList.add('active');
+            document.getElementById('batchTab').classList.remove('active');
+            document.getElementById('singleForm').classList.add('active');
+            document.getElementById('batchForm').classList.remove('active');
+        });
+
+        document.getElementById('batchTab').addEventListener('click', () => {
+            document.getElementById('batchTab').classList.add('active');
+            document.getElementById('singleTab').classList.remove('active');
+            document.getElementById('batchForm').classList.add('active');
+            document.getElementById('singleForm').classList.remove('active');
+        });
+
+        let searchTimer = null;
+        document.getElementById('englishSpelling').addEventListener('input', (e) => {
+            const keyword = e.target.value.trim();
+            
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('selectedWordId').value = '';
+            document.getElementById('existingRadio').checked = false;
+            
+            if (!keyword) {
+                return;
+            }
+
+            if (searchTimer) {
+                clearTimeout(searchTimer);
+            }
+            
+            searchTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/words/search?keyword=${encodeURIComponent(keyword)}`);
+                    const result = await response.json();
+                    
+                    if (result.code === 200 && result.data && result.data.length > 0) {
+                        displaySearchResults(result.data);
+                    } else {
+                        document.getElementById('searchResults').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('搜索失败:', error);
+                }
+            }, 300);
+        });
+
+        function displaySearchResults(words) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = words.map(word => `
+                <div class="search-result-item" onclick="selectExistingWord('${word.wordId}', '${word.englishSpelling}', '${word.chineseDefinition}', '${word.phoneticSymbol || ''}', '${word.exampleSentence || ''}', '${word.wordPronunciation || ''}', '${word.wordImage || ''}')">
+                    <div class="result-word">${word.englishSpelling}${word.wordId === document.getElementById('selectedWordId').value ? '<span class="selected-badge">已选择</span>' : ''}</div>
+                    <div class="result-definition">${word.chineseDefinition}</div>
+                </div>
+            `).join('');
+            resultsDiv.style.display = 'block';
+        }
+
+        function selectExistingWord(wordId, spelling, definition, phonetic, example, pronunciation, image) {
+            document.getElementById('selectedWordId').value = wordId;
+            document.getElementById('englishSpelling').value = spelling;
+            document.getElementById('chineseDefinition').value = definition;
+            document.getElementById('phoneticSymbol').value = phonetic;
+            document.getElementById('exampleSentence').value = example;
+            document.getElementById('wordPronunciation').value = pronunciation;
+            document.getElementById('wordImage').value = image;
+            document.getElementById('existingRadio').checked = true;
+            
+            displaySearchResults([{wordId, englishSpelling: spelling, chineseDefinition: definition}]);
+        }
+
+        document.getElementById('singleAddForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const bookId = getUrlParam('bookId');
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            const addType = document.querySelector('input[name="addType"]:checked').value;
+            const selectedWordId = document.getElementById('selectedWordId').value;
+            
+            if (addType === 'existing') {
+                if (!selectedWordId) {
+                    showMessage('请先选择一个已有单词', true);
+                    return;
+                }
+                await addExistingWordToBook(bookId, selectedWordId);
+            } else {
+                const englishSpelling = document.getElementById('englishSpelling').value.trim();
+                const chineseDefinition = document.getElementById('chineseDefinition').value.trim();
+                const phoneticSymbol = document.getElementById('phoneticSymbol').value.trim();
+                const exampleSentence = document.getElementById('exampleSentence').value.trim();
+                const wordPronunciation = document.getElementById('wordPronunciation').value.trim();
+                const wordImage = document.getElementById('wordImage').value.trim();
+
+                if (!englishSpelling) {
+                    showMessage('请输入英文拼写', true);
+                    return;
+                }
+                if (!chineseDefinition) {
+                    showMessage('请输入中文释义', true);
+                    return;
+                }
+
+                await addNewWordToBook(bookId, englishSpelling, chineseDefinition, phoneticSymbol, exampleSentence, wordPronunciation, wordImage);
+            }
+        });
+
+        async function addNewWordToBook(bookId, englishSpelling, chineseDefinition, phoneticSymbol, exampleSentence, pronunciation, image) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/words`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        wordId: 'WD' + Date.now(),
+                        wordBookId: bookId,
+                        englishSpelling: englishSpelling,
+                        chineseDefinition: chineseDefinition,
+                        phoneticSymbol: phoneticSymbol,
+                        exampleSentence: exampleSentence,
+                        wordPronunciation: pronunciation,
+                        wordImage: image
+                    })
+                });
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    showMessage('添加成功');
+                    clearSingleForm();
+                } else {
+                    showMessage('添加失败: ' + result.message, true);
+                }
+            } catch (error) {
+                showMessage('网络请求失败: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function addExistingWordToBook(bookId, wordId) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/words/batch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        wordBookId: bookId,
+                        words: [{wordId: wordId, englishSpelling: '', chineseDefinition: ''}]
+                    })
+                });
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    showMessage('关联成功');
+                    clearSingleForm();
+                } else {
+                    showMessage('关联失败: ' + result.message, true);
+                }
+            } catch (error) {
+                showMessage('网络请求失败: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearSingleForm() {
+            document.getElementById('englishSpelling').value = '';
+            document.getElementById('chineseDefinition').value = '';
+            document.getElementById('phoneticSymbol').value = '';
+            document.getElementById('exampleSentence').value = '';
+            document.getElementById('wordPronunciation').value = '';
+            document.getElementById('wordImage').value = '';
+            document.getElementById('selectedWordId').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+            document.querySelector('input[name="addType"][value="new"]').checked = true;
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            const bookId = getUrlParam('bookId');
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            if (!file.name.match(/\.(xlsx|xls)$/)) {
+                showMessage('请选择 Excel 文件', true);
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('wordBookId', bookId);
+
+                const importResponse = await fetch(`${API_BASE_URL}/words/batch/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const importResult = await importResponse.json();
+
+                if (importResult.code === 200) {
+                    const { successCount, failCount } = importResult.data;
+                    
+                    document.getElementById('successCount').textContent = successCount;
+                    document.getElementById('failCount').textContent = failCount;
+                    document.getElementById('batchResult').style.display = 'block';
+                    
+                    showMessage(`成功导入 ${successCount} 个单词并关联到词书`);
+                } else {
+                    showMessage('批量导入失败: ' + importResult.message, true);
+                }
+            } catch (error) {
+                showMessage('批量导入失败: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
+            const templateContent = `spelling,definition,example_sentence,phonetic,pronunciation_url,image_url
+abandon,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,,
+ability,能力，才能,She has the ability to learn languages quickly.,/əˈbɪləti/,,`;
+            
+            const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'word_import_template.csv';
+            link.click();
+        });
+
+        function goBack() {
+            window.location.href = "manageWordBookAdmin.html";
+        }
+
+        function handleLogout() {
+            if (confirm("确定要退出登录吗？")) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userInfo');
+                showMessage("已退出登录，跳转至登录页");
+                setTimeout(() => {
+                    window.location.href = "../admin/signin.html";
+                }, 500);
+            }
+        }
+
+        function setupSidebarNavigation() {
+            const menuItems = {
+                'menuAdminHome': '../admin/indexAdmin.html',
+                'menuPersonal': '../admin/adminPersonal.html',
+                'menuUserManage': '../admin/manageUserAdmin.html',
+                'menuLearningRecord': '../wordlearningrecord/viewUserLearningRecords.html',
+                'menuManageWord': '../word/manageWordAdmin.html'
+            };
+
+            Object.keys(menuItems).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('click', () => {
+                        window.location.href = menuItems[id];
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookId = getUrlParam('bookId');
+            
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            document.getElementById('bookInfo').textContent = `当前词书ID: ${bookId}`;
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            setupSidebarNavigation();
+        });
+    </script>
+</body>
+</html>

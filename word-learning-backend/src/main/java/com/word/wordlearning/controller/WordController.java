@@ -88,9 +88,18 @@ public class WordController {
         // 如果提供了词书ID，则建立关联
         if (bookId != null && !bookId.trim().isEmpty()) {
             wordMapper.insertBookRef(bookId, wordId);
+            wordBookMapper.syncWordCount(bookId);
         }
-        
-    public Result<String> add(@RequestBody Map<String, String> body) {
+        return Result.success("单词添加成功");
+    }
+
+    private String generateWordId() {
+        Integer max = wordMapper.maxWordIdNum();
+        int next = (max == null) ? 1 : max + 1;
+        return "WD" + String.format("%05d", next);
+    }
+
+    public Result<String> addLegacy(@RequestBody Map<String, String> body) {
         String spelling = body.get("englishSpelling");
         String definition = body.get("chineseDefinition");
         String bookId = body.get("wordBookId");
@@ -159,12 +168,6 @@ public class WordController {
         w.setWordImage(image);
         wordMapper.insert(w);
         return Result.success("单词添加成功");
-    }
-
-    private String generateWordId() {
-        Integer max = wordMapper.maxWordIdNum();
-        int next = (max == null) ? 1 : max + 1;
-        return "WD" + String.format("%05d", next);
     }
 
     @PutMapping("/{wordId}")

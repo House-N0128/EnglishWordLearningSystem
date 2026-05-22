@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>词书浏览</title>
 <style>
 body {
@@ -44,7 +44,7 @@ body {
   padding:9px 14px;
   border-radius:8px;
   border:1px solid #c7d9ee;
-  font-size:16px;
+  font-size:15px;
   background:#f6f8fc;
   color:#234;
 }
@@ -72,7 +72,7 @@ body {
   margin-bottom:6px;
 }
 .collection-item .book-meta {
-  font-size:16px;
+  font-size:14px;
   color:#273245;
   margin-bottom:6px;
 }
@@ -83,7 +83,7 @@ body {
   color:#fff;
   border:none;
   border-radius:18px;
-  font-size:16px;
+  font-size:14px;
   font-weight:500;
   cursor:pointer;
   box-shadow:0 1px 4px #e7f0fd;
@@ -108,7 +108,7 @@ body {
   flex:1;
   text-align:center;
   color:#318af8;
-  font-size:16px;
+  font-size:15px;
   font-weight:600;
   padding:0;
   border:none;
@@ -128,9 +128,7 @@ body {
   font-family:'Arial','PingFang SC';
   display:block;
 }
-
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+</style>
 <script src="/mobile/api.js"></script>
 </head>
 <body>
@@ -144,7 +142,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
         <option value="中级">中级</option>
         <option value="高级">高级</option>
       </select>
-      <input type="text" placeholder="词书名称搜索" id="filter-name" inputmode="text" autocomplete="off" spellcheck="false">
+      <input type="text" placeholder="词书名称搜索" id="filter-name">
     </div>
     <div class="collection-list" id="book-list">
       <div style="text-align:center;color:#8899aa;padding:16px;">加载中...</div>

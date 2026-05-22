@@ -79,28 +79,58 @@ if (!requireAuth('user')) { /* redirect */ }
 document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
 
 var params = new URLSearchParams(window.location.search);
-var wordId = params.get('id');
-if (wordId) {
-    apiGet('/api/words/' + wordId).then(function(r) {
-        if (r.code === 200) {
-            var w = r.data;
-            document.getElementById('page-title').textContent = '单词详情 - ' + w.englishSpelling;
-            document.getElementById('detail-content').innerHTML =
-                '<div class="word-header"><div class="word-name">' + w.englishSpelling + '</div>' +
-                '<div class="phonetic">' + (w.phoneticSymbol || '') + '</div></div>' +
-                '<div class="section"><div class="section-title">中文释义</div>' +
-                '<div class="meaning-item">' + (w.chineseDefinition || '暂无释义') + '</div></div>' +
-                (w.exampleSentence ? '<div class="section"><div class="section-title">例句</div>' +
-                '<div class="example-item"><div class="example-en">' + w.exampleSentence + '</div></div></div>' : '') +
-                '<div class="btn-group"><button class="btn btn-favorite" onclick="collectWord(\'' + w.wordId + '\')">收藏单词</button>' +
-                '<button class="btn btn-back" onclick="history.back()">返回</button></div>';
-        }
-    });
+var wordId = params.get('id') || params.get('wordId');  // 支持 id 或 wordId
+var wordName = params.get('word');  // 支持通过单词名查询
+console.log('wordId:', wordId, 'wordName:', wordName);
+
+function loadWordDetail(wordId, wordName) {
+    if (wordId) {
+        // 通过 ID 查询
+        apiGet('/api/words/' + wordId).then(function(r) {
+            if (r.code === 200) {
+                displayWord(r.data);
+            } else {
+                document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">未找到该单词</div>';
+            }
+        });
+    } else if (wordName) {
+        // 通过单词名搜索
+        console.log('开始搜索单词:', wordName);
+        apiGet('/api/words/search?keyword=' + encodeURIComponent(wordName)).then(function(r) {
+            if (r.code === 200 && r.data && r.data.length > 0) {
+                displayWord(r.data[0]);
+            } else {
+                document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">未找到单词："' + wordName + '"</div>';
+            }
+        });
+    } else {
+        document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">请从查询页面搜索单词后查看详情</div>';
+    }
 }
+
+function displayWord(w) {
+    document.getElementById('page-title').textContent = '单词详情 - ' + w.englishSpelling;
+    document.getElementById('detail-content').innerHTML =
+        '<div class="word-header"><div class="word-name">' + w.englishSpelling + '</div>' +
+        '<div class="phonetic">' + (w.phoneticSymbol || '') + '</div></div>' +
+        '<div class="section"><div class="section-title">中文释义</div>' +
+        '<div class="meaning-item">' + (w.chineseDefinition || '暂无释义') + '</div></div>' +
+        (w.exampleSentence ? '<div class="section"><div class="section-title">例句</div>' +
+        '<div class="example-item"><div class="example-en">' + w.exampleSentence + '</div></div></div>' : '') +
+        '<div class="btn-group"><button class="btn btn-favorite" onclick="collectWord(\'' + w.wordId + '\')">收藏单词</button>' +
+        '<button class="btn btn-back" onclick="history.back()">返回</button></div>';
+}
+
+// 执行加载
+loadWordDetail(wordId, wordName);
 
 function collectWord(wordId) {
     apiPost('/api/collections/add', { wordId: wordId }).then(function(r) {
-        alert(r.code === 200 ? '收藏成功' : r.message);
+        if (r.code === 200) {
+            alert('收藏成功');
+        } else {
+            alert(r.message || '收藏失败');
+        }
     });
 }
 </script>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
 <title>修改密码 - 验证身份</title>
 <style>
 body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);font-family:'Inter','PingFang SC','HarmonyOS Sans',Arial,sans-serif;min-height:100vh;}
@@ -10,29 +11,27 @@ h2 {text-align:center;margin:8px 0 16px;font-size:23px;font-weight:600;color:#35
 .form-wrap {display:flex;flex-direction:column;gap:14px;margin-bottom:16px;}
 .input-group {display:flex;align-items:center;background:#f6f8fc;border-radius:9px;padding: 9px 14px;border:1px solid #e1e6ed;}
 .input-group input {border:none;background:transparent;outline:none;width:100%;font-size:16px;padding:5px;color:#222;}
-.input-group input::placeholder {color:#97adc0;font-size:16px;}
+.input-group input::placeholder {color:#97adc0;font-size:15px;}
 .btn {display:block;width:100%;margin:12px 0 3px 0;padding:13px 0;border-radius:25px;border:none;background:linear-gradient(90deg,#3577ef 60%,#6cc3ff 100%);color:#fff;font-weight:600;font-size:17px;box-shadow:0 2px 8px #e3f2fd;letter-spacing:2px;cursor:pointer;transition:background .2s, box-shadow .2s;}
 .tip {text-align:center;font-size:13px;color:#e38056;background:#fff7f2;padding:7px;border-radius:7px;margin-top:10px;display:none;}
-.actions {text-align:center;margin-top:16px;font-size:16px;color:#3577ef;}
+.actions {text-align:center;margin-top:16px;font-size:15px;color:#3577ef;}
 .actions a {color:#3577ef;opacity:.85;text-decoration:none;margin:0 5px;transition:opacity .2s;}
-
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+</style>
 </head>
 <body>
 <div class="container">
   <h2>修改密码 - 验证身份</h2>
-  
+  <form id="verifyForm">
     <div class="form-wrap">
       <div class="input-group">
-        <input type="text" placeholder="请输入注册手机号或邮箱" name="account" required inputmode="text" autocomplete="off" spellcheck="false">
+        <input type="text" placeholder="请输入注册手机号或邮箱" name="account" required>
       </div>
       <div class="input-group">
-        <input type="text" placeholder="请输入验证码" name="code" required inputmode="text" autocomplete="off" spellcheck="false">
+        <input type="text" placeholder="请输入验证码" name="code" required>
       </div>
     </div>
     <button type="submit" class="btn">验证并下一步</button>
-  
+  </form>
   <div class="tip" id="tip">验证码错误，请重试</div>
   <div class="actions">
     <a href="personalCenter.html">返回个人中心</a>

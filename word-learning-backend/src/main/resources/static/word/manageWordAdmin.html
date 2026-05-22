@@ -84,7 +84,8 @@
             transition: background-color 0.2s;
         }
 
-        .sidebar-menu li:hover {
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
             background-color: #f8d7da;
             color: #dc3545;
         }
@@ -138,14 +139,26 @@
             color: white;
         }
 
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
         .btn-blue {
             background-color: #007bff;
             color: white;
         }
 
+        .btn-blue:hover {
+            background-color: #0069d9;
+        }
+
         .btn-secondary {
             background-color: #6c757d;
             color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
 
         /* 搜索区域 */
@@ -224,16 +237,6 @@
             background-color: #f8f9fa;
         }
 
-        .status-online {
-            color: #28a745;
-            font-weight: 500;
-        }
-
-        .status-offline {
-            color: #dc3545;
-            font-weight: 500;
-        }
-
         .action-buttons {
             display: flex;
             flex-direction: column;
@@ -296,16 +299,53 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* 提示消息 */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
     </style>
-<script src="/api.js"></script>
 </head>
 <body>
 <!-- 顶部导航栏 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
     <div class="user-area">
-        <span class="user-name">管理员账号：admin</span>
-        <button class="btn-logout">退出登录</button>
+        <span class="user-name" id="admin-name">管理员账号：admin</span>
+        <button class="btn-logout" onclick="clearAuth()">退出登录</button>
     </div>
 </div>
 
@@ -315,14 +355,12 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li>管理员首页</li>
+            <li>个人中心</li>
             <li>用户管理</li>
             <li class="sub-item">用户管理</li>
             <li>词书管理</li>
-            <li class="sub-item">添加词书</li>
             <li class="sub-item">管理词书</li>
             <li class="active">单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
             <li class="sub-item active">管理单词</li>
             <li>学习记录查询</li>
         </ul>
@@ -333,37 +371,26 @@
         <div class="page-header">
             <h1 class="page-title">单词管理</h1>
             <div class="header-buttons">
-                <button class="btn btn-green">新增单词</button>
-                <button class="btn btn-blue">批量导入</button>
-                <button class="btn btn-secondary">返回首页</button>
+                <button class="btn btn-green" id="addWordBtn">新增单词</button>
+                <button class="btn btn-blue" id="batchAddBtn">批量导入</button>
+                <button class="btn btn-secondary" id="backHomeBtn">返回首页</button>
             </div>
         </div>
 
         <!-- 搜索区域 -->
         <div class="search-area">
             <div class="search-input-wrap">
-                <input type="text" class="search-input" placeholder="输入英文拼写 / 单词ID 搜索">
-                <button class="btn-search">搜索</button>
+                <input type="text" class="search-input" id="search-keyword" placeholder="输入英文拼写 / 单词ID 搜索">
+                <button class="btn-search" onclick="doSearch()">搜索</button>
             </div>
             <div class="filter-row">
                 <div>
                     <label style="font-size:14px; color:#333; margin-right:8px;">所属词书:</label>
-                    <select class="filter-select">
-                        <option>全部词书</option>
-                        <option>四级核心词汇</option>
-                        <option>六级高频词汇</option>
-                        <option>日常交流词汇</option>
+                    <select class="filter-select" id="bookFilter">
+                        <option value="all">全部词书</option>
                     </select>
                 </div>
-                <div>
-                    <label style="font-size:14px; color:#333; margin-right:8px;">单词状态:</label>
-                    <select class="filter-select">
-                        <option>全部</option>
-                        <option>已上架</option>
-                        <option>未上架</option>
-                    </select>
                 </div>
-            </div>
         </div>
 
         <!-- 表格区域 -->
@@ -372,112 +399,340 @@
                 <thead>
                 <tr>
                     <th>单词ID</th>
-                    <th>所属词书</th>
                     <th>英文拼写</th>
-                    <th>词性</th>
                     <th>音标</th>
+                    <th>中文释义</th>
+                    <th>例句</th>
+                    <th>读音</th>
+                    <th>示意图</th>
                     <th>创建时间</th>
-                    <th>更新时间</th>
-                    <th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>W001</td>
-                    <td>四级核心词汇</td>
-                    <td>abandon</td>
-                    <td>v.</td>
-                    <td>/əˈbændən/</td>
-                    <td>2024-01-15 14:30:25</td>
-                    <td>2024-03-10 09:15:42</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                        </div>
-                        <button class="btn-view">查看详情</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>W002</td>
-                    <td>四级核心词汇</td>
-                    <td>beneficial</td>
-                    <td>adj.</td>
-                    <td>/ˌbenɪˈfɪʃl/</td>
-                    <td>2024-01-16 10:20:35</td>
-                    <td>2024-03-12 16:45:18</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                        </div>
-                        <button class="btn-view">查看详情</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>W003</td>
-                    <td>六级高频词汇</td>
-                    <td>comprehensive</td>
-                    <td>adj.</td>
-                    <td>/ˌkɒmprɪˈhensɪv/</td>
-                    <td>2024-01-28 08:45:12</td>
-                    <td>2024-02-15 11:30:25</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                        </div>
-                        <button class="btn-view">查看详情</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>W004</td>
-                    <td>日常交流词汇</td>
-                    <td>diligent</td>
-                    <td>adj.</td>
-                    <td>/ˈdɪlɪdʒənt/</td>
-                    <td>2024-03-05 13:15:30</td>
-                    <td>2024-03-05 13:15:30</td>
-                    <td class="status-offline">未上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                        </div>
-                        <button class="btn-view">查看详情</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>W005</td>
-                    <td>四级核心词汇</td>
-                    <td>essential</td>
-                    <td>adj.</td>
-                    <td>/ɪˈsenʃl/</td>
-                    <td>2024-02-22 16:20:45</td>
-                    <td>2024-03-08 14:55:33</td>
-                    <td class="status-online">已上架</td>
-                    <td class="action-buttons">
-                        <div class="action-row">
-                            <button class="btn-edit">编辑</button>
-                            <button class="btn-delete">删除</button>
-                        </div>
-                        <button class="btn-view">查看详情</button>
-                    </td>
-                </tr>
-                </tbody>
+                <tbody id="word-tbody"></tbody>
             </table>
             <!-- 分页 -->
             <div class="pagination">
-                <button class="page-btn">上一页</button>
-                <span>第 1 页, 共 2 页</span>
-                <button class="page-btn">下一页</button>
+                <button class="page-btn" id="prevPageBtn">上一页</button>
+                <span id="pageInfo">第 1 页, 共 1 页</span>
+                <button class="page-btn" id="nextPageBtn">下一页</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 提示消息 -->
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<!-- 加载遮罩 -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+</div>
+
+<script src="../api.js"></script>
+<script>
+console.log('manageWordAdmin.html loaded');
+
+// 认证检查
+if (!requireAuth('admin')) { /* redirect */ }
+document.getElementById('admin-name').textContent = '管理员：' + (localStorage.getItem('userId') || 'admin');
+
+console.log('Authentication passed');
+
+// 全局变量
+var wordData = [];
+var filteredData = [];
+var currentPage = 1;
+var rowsPerPage = 10;
+
+// DOM 元素
+var searchKeywordInput;
+var bookFilterSelect;
+
+var wordTbody;
+var prevPageBtn;
+var nextPageBtn;
+var pageInfoSpan;
+var addWordBtn;
+var batchAddBtn;
+var backHomeBtn;
+
+// 显示/隐藏加载状态
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+// 显示提示消息
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+// 从后端获取单词数据
+async function fetchWordsFromBackend() {
+    showLoading();
+    try {
+        // 先获取所有词书列表用于筛选
+        const bookResult = await apiGet('/api/wordbooks');
+        if (bookResult.code === 200 && bookResult.data) {
+            populateBookFilter(bookResult.data);
+        }
+
+        // 获取所有单词数据
+        const result = await apiGet('/api/words/all');
+        
+        if (result.code === 200 && result.data && Array.isArray(result.data)) {
+            wordData = result.data.map(item => ({
+                id: item.wordId || '',
+                bookId: item.wordBookId || '',
+                spelling: item.englishSpelling || '',
+                phonetic: item.phoneticSymbol || '',
+                definition: item.chineseDefinition || '',
+                example: item.exampleSentence || '',
+                audio: item.wordPronunciation || '',
+                image: item.wordImage || '',
+                createTime: item.createTime ? String(item.createTime).replace('T', ' ') : '-'
+            }));
+
+            filteredData = [...wordData];
+            currentPage = 1;
+            renderTable();
+            
+            if (wordData.length === 0) {
+                showMessage('暂无单词数据');
+            }
+        } else {
+            throw new Error(result.message || '获取数据失败');
+        }
+    } catch (error) {
+        console.error('获取单词数据失败:', error);
+        showMessage('获取数据失败: ' + error.message, true);
+    } finally {
+        hideLoading();
+    }
+}
+
+// 填充词书筛选下拉框
+function populateBookFilter(books) {
+    const select = document.getElementById('bookFilter');
+    books.forEach(book => {
+        const option = document.createElement('option');
+        option.value = book.wordBookId;
+        option.textContent = book.wordBookName;
+        select.appendChild(option);
+    });
+}
+
+// 搜索和筛选
+function doSearch() {
+    const keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
+    const bookId = document.getElementById('bookFilter').value;
+
+    filteredData = wordData.filter(word => {
+        let matchKeyword = true;
+        if (keyword) {
+            matchKeyword = word.spelling.toLowerCase().includes(keyword) || 
+                          word.id.toLowerCase().includes(keyword);
+        }
+        
+        let matchBook = true;
+        if (bookId !== 'all') {
+            matchBook = word.bookId === bookId;
+        }
+        
+        return matchKeyword && matchBook;
+    });
+
+    currentPage = 1;
+    renderTable();
+}
+
+// 渲染表格
+function renderTable() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+    
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const pageData = filteredData.slice(startIndex, endIndex);
+
+    if (pageData.length === 0) {
+        wordTbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;">暂无数据</td></tr>';
+    } else {
+        wordTbody.innerHTML = pageData.map(word => {
+            return `
+                <tr>
+                    <td>${word.id}</td>
+                    <td>${word.spelling}</td>
+                    <td>${word.phonetic || '-'}</td>
+                    <td>${word.definition || '-'}</td>
+                    <td>${word.example || '-'}</td>
+                    <td>${word.audio ? '<audio controls src="' + word.audio + '" style="width:100px;"></audio>' : '-'}</td>
+                    <td>${word.image ? '<img src="' + word.image + '" style="width:60px;height:60px;object-fit:cover;" />' : '-'}</td>
+                    <td>${word.createTime}</td>
+                    <td class="action-buttons">
+                        <div class="action-row">
+                            <button class="btn-edit" data-id="${word.id}">编辑</button>
+                            <button class="btn-delete" data-id="${word.id}">删除</button>
+                        </div>
+                        <button class="btn-view" data-id="${word.id}">查看详情</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // 绑定按钮事件
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const wordId = this.getAttribute('data-id');
+                editWord(wordId);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const wordId = this.getAttribute('data-id');
+                deleteWord(wordId);
+            });
+        });
+
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const wordId = this.getAttribute('data-id');
+                viewWord(wordId);
+            });
+        });
+    }
+
+    // 更新分页信息
+    pageInfoSpan.textContent = `第 ${currentPage} 页, 共 ${totalPages} 页`;
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage >= totalPages;
+}
+
+// 翻页
+function goPrevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+}
+
+function goNextPage() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+    }
+}
+
+// 编辑单词
+function editWord(wordId) {
+    // 跳转到编辑页面
+    window.location.href = `editWord.html?wordId=${wordId}`;
+}
+
+// 删除单词
+async function deleteWord(wordId) {
+    if (!confirm(`确定要删除单词 ${wordId} 吗？`)) return;
+    
+    showLoading();
+    try {
+        const result = await apiDelete(`/api/words/${wordId}`);
+        if (result.code === 200) {
+            showMessage(`单词 ${wordId} 删除成功`);
+            await fetchWordsFromBackend();
+        } else {
+            throw new Error(result.message || '删除失败');
+        }
+    } catch (error) {
+        console.error('删除单词失败:', error);
+        showMessage('删除失败: ' + error.message, true);
+    } finally {
+        hideLoading();
+    }
+}
+
+// 查看详情
+function viewWord(wordId) {
+    window.location.href = `viewWordDetailAdmin.html?wordId=${wordId}`;
+}
+
+// 新增单词
+function handleAddWord() {
+    window.location.href = 'addWord.html';
+}
+
+// 批量导入
+function handleBatchAdd() {
+    window.location.href = 'batchAddWord.html';
+}
+
+// 返回首页
+function handleBackHome() {
+    window.location.href = '../admin/indexAdmin.html';
+}
+
+// 初始化
+function init() {
+    // 获取 DOM 元素
+    searchKeywordInput = document.getElementById('search-keyword');
+    bookFilterSelect = document.getElementById('bookFilter');
+    wordTbody = document.getElementById('word-tbody');
+    prevPageBtn = document.getElementById('prevPageBtn');
+    nextPageBtn = document.getElementById('nextPageBtn');
+    pageInfoSpan = document.getElementById('pageInfo');
+    addWordBtn = document.getElementById('addWordBtn');
+    batchAddBtn = document.getElementById('batchAddBtn');
+    backHomeBtn = document.getElementById('backHomeBtn');
+
+    // 绑定事件
+    searchKeywordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') doSearch();
+    });
+    bookFilterSelect.addEventListener('change', doSearch);
+    prevPageBtn.addEventListener('click', goPrevPage);
+    nextPageBtn.addEventListener('click', goNextPage);
+    addWordBtn.addEventListener('click', handleAddWord);
+    batchAddBtn.addEventListener('click', handleBatchAdd);
+    backHomeBtn.addEventListener('click', handleBackHome);
+
+    // 侧边栏菜单交互
+    document.querySelectorAll('.sidebar-menu li').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const text = item.innerText.trim();
+            if (text === '管理员首页') {
+                window.location.href = '../admin/indexAdmin.html';
+            } else if (text === '个人中心') {
+                window.location.href = '../admin/adminPersonal.html';
+            } else if (text === '用户管理') {
+                window.location.href = '../admin/manageUserAdmin.html';
+            } else if (text === '词书管理') {
+                window.location.href = '../wordbook/manageWordBookAdmin.html';
+            } else if (text === '管理词书') {
+                window.location.href = '../wordbook/manageWordBookAdmin.html';
+            } else if (text === '单词管理') {
+                fetchWordsFromBackend(); // 当前页面，刷新数据
+            } else if (text === '学习记录查询') {
+                window.location.href = '../wordlearningrecord/viewUserLearningRecords.html';
+            }
+        });
+    });
+
+    // 从后端获取数据
+    fetchWordsFromBackend();
+}
+
+// 页面加载完成后初始化
+init();
+</script>
 </body>
 </html>

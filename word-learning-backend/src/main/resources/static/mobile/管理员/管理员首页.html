@@ -35,21 +35,31 @@ body {margin:0;padding-bottom:65px;font-family:'PingFang SC',Arial,sans-serif;ba
   <main class="main-panel">
     <div class="dashboard-title">平台数据总览</div>
     <div class="info-grid">
-      <div class="info-card"><span class="num" id="stat-users">-</span><span>总用户数</span></div>
-      <div class="info-card"><span class="num" id="stat-books">-</span><span>总词书数</span></div>
-      <div class="info-card"><span class="num" id="stat-words">-</span><span>总单词数</span></div>
       <div class="info-card"><span class="num" id="stat-today">-</span><span>今日学习记录</span></div>
     </div>
     <div class="section-block">
-      <div class="section-title">词书列表</div>
-      <div class="top-books-list" id="book-list"><div style="text-align:center;color:#8899aa;padding:10px;">加载中...</div></div>
+      <div class="section-title">热门词书TOP3</div>
+      <div class="top-books-list">
+        <div class="top-book-item">
+          <span class="book-name">英语四级词书</span>
+          <span class="count">1225人</span>
+        </div>
+        <div class="top-book-item">
+          <span class="book-name">雅思进阶</span>
+          <span class="count">932人</span>
+        </div>
+        <div class="top-book-item">
+          <span class="book-name">托福词汇</span>
+          <span class="count">810人</span>
+        </div>
+      </div>
     </div>
   </main>
   <div class="admin-navbar">
-    <button class="admin-nav-btn active" onclick="location.href='管理员首页.html'"><i>🏠</i>主页</button>
-    <button class="admin-nav-btn" onclick="location.href='用户管理.html'"><i>👥</i>用户管理</button>
-    <button class="admin-nav-btn" onclick="location.href='词书管理.html'"><i>📚</i>词书管理</button>
-    <button class="admin-nav-btn" onclick="location.href='单词管理.html'"><i>🗃️</i>单词管理</button>
+    <button class="admin-nav-btn active" onclick="window.location.href='管理员首页.html'"><i>🏠</i>主页</button>
+    <button class="admin-nav-btn" onclick="window.location.href='用户管理.html'"><i>👥</i>用户管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='词书管理.html'"><i>📚</i>词书管理</button>
+    <button class="admin-nav-btn" onclick="window.location.href='单词管理.html'"><i>🗃️</i>单词管理</button>
   </div>
 
 <script>

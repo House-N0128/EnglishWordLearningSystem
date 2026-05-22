@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
   <title>找回密码 - 验证身份</title>
   <style>
     body {
@@ -54,7 +55,7 @@
     }
     .input-group input::placeholder {
       color:#97adc0;
-      font-size:16px;
+      font-size:15px;
     }
     .btn {
       display:block;
@@ -75,7 +76,7 @@
     .actions {
       text-align:center;
       margin-top:16px;
-      font-size:16px;
+      font-size:15px;
       color:#3577ef;
     }
     .actions a {
@@ -94,24 +95,22 @@
       border-radius:7px;
       margin-top:10px;
     }
-  
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+  </style>
 </head>
 <body>
   <div class="container">
     <h2>找回密码 - 验证身份</h2>
-    
+    <form id="verifyForm">
       <div class="form-wrap">
         <div class="input-group">
-          <input type="text" placeholder="请输入注册手机号或邮箱" name="account" required inputmode="text" autocomplete="off" spellcheck="false">
+          <input type="text" placeholder="请输入注册手机号或邮箱" name="account" required>
         </div>
         <div class="input-group">
-          <input type="text" placeholder="请输入收到的验证码" name="code" required inputmode="text" autocomplete="off" spellcheck="false">
+          <input type="text" placeholder="请输入收到的验证码" name="code" required>
         </div>
       </div>
       <button type="submit" class="btn">验证并下一步</button>
-    
+    </form>
     <div class="tip" id="tip" style="display:none;">验证码错误，请重试</div>
     <div class="actions">
       <a href="login.html">返回登录</a>

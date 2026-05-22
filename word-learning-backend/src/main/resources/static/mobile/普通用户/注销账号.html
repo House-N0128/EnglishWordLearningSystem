@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <meta charset="UTF-8">
   <title>注销账号</title>
   <style>
 body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
@@ -20,9 +21,7 @@ body {margin:0;background:linear-gradient(135deg,#f2f8fc 0%, #eaf4ff 100%);
 .btn{flex:1;background:#318af8;color:#fff;border:none;border-radius:21px;padding:12px 0;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px #dde6fa30;letter-spacing:1px;}
 .btn.cancel{background:#e0e6f2;color:#318af8;border:1px solid #b1c0e7;}
 input[type="password"]{width:100%;padding:13px 10px;border:1px solid #c7d9ee;border-radius:9px;font-size:16px;margin-bottom:13px;}
-  
-/* ==== 中文IME输入修复 ==== */
-input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !important; user-select:text !important; }</style>
+  </style>
 </head>
 <body>
   <div class="top-bar">
@@ -36,7 +35,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
     注销账号
   </div>
   <div class="main-area">
-    
+    <form class="cancel-card">
       <div class="warn">注销账号后，所有个人数据（学习记录、收藏、个人信息）将永久删除，不可恢复</div>
       <input type="password" placeholder="请输入登录密码验证" name="loginPassword" required>
       <div class="checkbox">
@@ -47,7 +46,7 @@ input, textarea { ime-mode:auto !important; -webkit-user-modify:read-write !impo
         <button type="submit" class="btn">确认注销</button>
         <button type="button" class="btn cancel" onclick="window.location.href='getUserInfo.html'">取消</button>
       </div>
-    
+    </form>
   </div>
 </body>
 </html>

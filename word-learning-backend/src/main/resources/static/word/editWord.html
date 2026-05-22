@@ -219,9 +219,28 @@
             background-color: #6c757d;
             color: white;
         }
+
+        /* 提示消息 */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
     </style>
+<script src="../api.js"></script>
 </head>
 <body>
+<!-- 提示消息 -->
+<div class="toast-msg" id="toastMsg">提示信息</div>
 <!-- 顶部导航栏 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
@@ -237,14 +256,12 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li>管理员首页</li>
+            <li>个人中心</li>
             <li>用户管理</li>
             <li class="sub-item">用户管理</li>
             <li>词书管理</li>
-            <li class="sub-item">添加词书</li>
             <li class="sub-item">管理词书</li>
             <li class="active">单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
             <li class="sub-item">管理单词</li>
             <li>学习记录查询</li>
         </ul>
@@ -257,78 +274,180 @@
             <!-- 单词ID -->
             <div class="form-group">
                 <label class="form-label">单词 ID</label>
-                <input type="text" class="form-input" value="W001" readonly>
-            </div>
-
-            <!-- 所属词书 -->
-            <div class="form-group">
-                <label class="form-label">所属词书</label>
-                <input type="text" class="form-input" value="四级核心词汇" readonly>
+                <input type="text" class="form-input" id="wordIdInput" readonly>
             </div>
 
             <!-- 英文拼写 -->
             <div class="form-group">
                 <label class="form-label">英文拼写 *</label>
-                <input type="text" class="form-input" value="abandon">
+                <input type="text" class="form-input" id="spellingInput" placeholder="请输入英文单词">
                 <div class="input-tip">请输入正确的英文单词拼写</div>
             </div>
 
-            <!-- 音标和词性 -->
-            <div class="form-group form-row">
-                <div class="form-col">
-                    <label class="form-label">音标</label>
-                    <input type="text" class="form-input" value="/əˈbændən/">
-                    <div class="input-tip">国际音标标注</div>
-                </div>
-                <div class="form-col">
-                    <label class="form-label">词性 *</label>
-                    <select class="form-select">
-                        <option selected>动词 (v.)</option>
-                        <option>名词 (n.)</option>
-                        <option>形容词 (adj.)</option>
-                        <option>副词 (adv.)</option>
-                    </select>
-                </div>
+            <!-- 音标 -->
+            <div class="form-group">
+                <label class="form-label">音标</label>
+                <input type="text" class="form-input" id="phoneticInput" placeholder="例如: /əˈbændən/">
+                <div class="input-tip">国际音标标注</div>
             </div>
 
             <!-- 中文释义 -->
             <div class="form-group">
                 <label class="form-label">中文释义 *</label>
-                <textarea class="form-textarea">放弃，抛弃；离弃，丢弃；中止；陷入，沉湎于</textarea>
+                <textarea class="form-textarea" id="definitionInput" placeholder="请输入单词的中文释义"></textarea>
                 <div class="input-tip">可以输入多个释义，用分号隔开</div>
             </div>
 
             <!-- 例句 -->
             <div class="form-group">
                 <label class="form-label">例句</label>
-                <textarea class="form-textarea">Never abandon your dreams, no matter how difficult the situation is.
-The captain was the last to abandon the sinking ship.</textarea>
+                <textarea class="form-textarea" id="exampleInput" placeholder="请输入单词的例句"></textarea>
                 <div class="input-tip">可以输入多个例句，每个例句占一行</div>
             </div>
 
-            <!-- 音频链接和单词状态 -->
-            <div class="form-group form-row">
-                <div class="form-col">
-                    <label class="form-label">音频链接</label>
-                    <input type="text" class="form-input" placeholder="请输入单词发音音频链接">
-                    <div class="input-tip">可选，用于单词发音播放</div>
-                </div>
-                <div class="form-col">
-                    <label class="form-label">单词状态</label>
-                    <select class="form-select">
-                        <option selected>已上架</option>
-                        <option>未上架</option>
-                    </select>
-                    <div class="input-tip">未上架的单词用户无法看到</div>
-                </div>
+            <!-- 音频链接 -->
+            <div class="form-group">
+                <label class="form-label">音频链接</label>
+                <input type="text" class="form-input" id="audioInput" placeholder="请输入单词发音音频链接">
+                <div class="input-tip">可选，用于单词发音播放</div>
+            </div>
+
+            <!-- 示意图链接 -->
+            <div class="form-group">
+                <label class="form-label">示意图链接</label>
+                <input type="text" class="form-input" id="imageInput" placeholder="请输入单词示意图图片链接">
+                <div class="input-tip">可选，用于展示单词相关图片</div>
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-save">保存修改</button>
-                <button class="btn btn-cancel">取消</button>
+                <button class="btn btn-save" onclick="saveWord()">保存修改</button>
+                <button class="btn btn-cancel" onclick="goBack()">取消</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// 认证检查
+if (!requireAuth('admin')) { /* redirect */ }
+
+// 侧边栏菜单交互
+function setupSidebar() {
+    document.querySelectorAll('.sidebar-menu li').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const text = item.innerText.trim();
+            if (text === '管理员首页') {
+                window.location.href = '../admin/indexAdmin.html';
+            } else if (text === '个人中心') {
+                window.location.href = '../admin/adminPersonal.html';
+            } else if (text === '用户管理') {
+                window.location.href = '../admin/manageUserAdmin.html';
+            } else if (text === '词书管理') {
+                window.location.href = '../wordbook/manageWordBookAdmin.html';
+            } else if (text === '单词管理') {
+                window.location.href = 'manageWordAdmin.html';
+            } else if (text === '学习记录查询') {
+                window.location.href = '../wordlearningrecord/viewUserLearningRecords.html';
+            }
+        });
+    });
+}
+
+// 当前编辑的单词ID
+var currentWordId = '';
+
+// 显示提示消息
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+// 加载单词信息
+async function loadWordInfo() {
+    // 从URL参数获取单词ID
+    var params = new URLSearchParams(window.location.search);
+    currentWordId = params.get('wordId');
+    
+    if (!currentWordId) {
+        showMessage('参数错误：缺少单词ID', true);
+        return;
+    }
+
+    try {
+        const result = await apiGet('/api/words/' + currentWordId);
+        if (result.code === 200 && result.data) {
+            var word = result.data;
+            document.getElementById('wordIdInput').value = word.wordId || '';
+            document.getElementById('spellingInput').value = word.englishSpelling || '';
+            document.getElementById('phoneticInput').value = word.phoneticSymbol || '';
+            document.getElementById('definitionInput').value = word.chineseDefinition || '';
+            document.getElementById('exampleInput').value = word.exampleSentence || '';
+            document.getElementById('audioInput').value = word.wordPronunciation || '';
+            document.getElementById('imageInput').value = word.wordImage || '';
+        } else {
+            showMessage('获取单词信息失败: ' + (result.message || '未知错误'), true);
+        }
+    } catch (error) {
+        console.error('加载单词信息失败:', error);
+        showMessage('加载单词信息失败: ' + error.message, true);
+    }
+}
+
+// 保存单词修改
+async function saveWord() {
+    const spelling = document.getElementById('spellingInput').value.trim();
+    const definition = document.getElementById('definitionInput').value.trim();
+    const phonetic = document.getElementById('phoneticInput').value.trim();
+    const example = document.getElementById('exampleInput').value.trim();
+    const audio = document.getElementById('audioInput').value.trim();
+    const image = document.getElementById('imageInput').value.trim();
+
+    // 验证必填字段
+    if (!spelling) {
+        showMessage('请输入英文拼写', true);
+        return;
+    }
+    if (!definition) {
+        showMessage('请输入中文释义', true);
+        return;
+    }
+
+    try {
+        const result = await apiPut('/api/words/' + currentWordId, {
+            englishSpelling: spelling,
+            chineseDefinition: definition,
+            phoneticSymbol: phonetic,
+            exampleSentence: example,
+            wordPronunciation: audio,
+            wordImage: image
+        });
+
+        if (result.code === 200) {
+            showMessage('单词修改成功！', false);
+            // 3秒后返回单词管理页面
+            setTimeout(function() {
+                window.location.href = 'manageWordAdmin.html';
+            }, 2000);
+        } else {
+            showMessage(result.message || '修改失败', true);
+        }
+    } catch (error) {
+        console.error('保存单词失败:', error);
+        showMessage('保存失败: ' + error.message, true);
+    }
+}
+
+// 返回单词管理页面
+function goBack() {
+    window.location.href = 'manageWordAdmin.html';
+}
+
+// 初始化
+loadWordInfo();
+</script>
 </body>
 </html>
