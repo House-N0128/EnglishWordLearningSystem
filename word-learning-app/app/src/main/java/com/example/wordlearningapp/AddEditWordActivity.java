@@ -163,8 +163,8 @@ public class AddEditWordActivity extends AppCompatActivity {
         boolean isEdit = wordId != null;
         new Thread(() -> {
             try {
-                if (!isEdit) {
-                    // Check duplicate by spelling
+                if (!isEdit && bookId == null) {
+                    // Only check duplicate when not adding to a specific book
                     JsonObject check = ApiClient.get().get("/api/words/search?keyword=" + spelling);
                     if (check.get("code").getAsInt() == 200 && check.getAsJsonArray("data").size() > 0) {
                         var arr = check.getAsJsonArray("data");
