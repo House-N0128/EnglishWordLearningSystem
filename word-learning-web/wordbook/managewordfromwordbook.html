@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 查看词书单词</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主体布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 45px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 右侧主内容区 */
+        .content-area {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .header-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+        /* 表格区域 */
+        .table-area {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* 加载遮罩 */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Toast消息 */
+        #toastMsg {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="nav-title">单词学习平台 - 管理员系统</div>
+        <div class="user-area">
+            <span class="user-name">管理员账号: admin001</span>
+            <button class="btn-logout" id="logoutBtn">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="main-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li id="menuAdminHome">管理员首页</li>
+                <li id="menuPersonal">个人中心</li>
+                <li id="menuUserManage">用户管理</li>
+                <li>词书管理</li>
+                <li id="menuManageWord">单词管理</li>
+                <li id="menuLearningRecord">学习记录查询</li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">查看词书单词</h1>
+                    <div class="header-info" id="bookInfo"></div>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" id="backBtn">返回词书管理</button>
+                </div>
+            </div>
+
+            <!-- 单词表格 -->
+            <div class="table-area">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>单词ID</th>
+                            <th>英文拼写</th>
+                            <th>音标</th>
+                            <th>中文释义</th>
+                            <th>例句</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wordTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay">
+        <span class="loading-text">加载中...</span>
+    </div>
+
+    <!-- Toast消息 -->
+    <div id="toastMsg"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        // 获取URL参数
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 显示提示消息
+        function showMessage(msg, isError = false) {
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toastMsg.style.backgroundColor = isError ? "#dc3545" : "#28a745";
+            toastMsg.style.opacity = "1";
+            setTimeout(() => {
+                toastMsg.style.opacity = "0";
+            }, 2500);
+        }
+
+        // 显示/隐藏加载状态
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = "none";
+        }
+
+        // 获取词书单词列表
+        async function loadWordsOfBook(bookId) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/words?wordBookId=${bookId}`);
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    renderWordList(result.data);
+                } else {
+                    showMessage('获取单词列表失败: ' + result.message, true);
+                    document.getElementById('wordTableBody').innerHTML = 
+                        '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📚</div>暂无单词数据</td></tr>';
+                }
+            } catch (error) {
+                showMessage('网络请求失败: ' + error.message, true);
+                document.getElementById('wordTableBody').innerHTML = 
+                    '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📚</div>加载失败，请重试</td></tr>';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 渲染单词列表
+        function renderWordList(words) {
+            const tbody = document.getElementById('wordTableBody');
+            
+            if (!words || words.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📚</div>该词书暂无单词</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = words.map(word => `
+                <tr>
+                    <td>${word.wordId || '-'}</td>
+                    <td>${word.englishSpelling || '-'}</td>
+                    <td>${word.phoneticSymbol || '-'}</td>
+                    <td>${word.chineseDefinition || '-'}</td>
+                    <td>${word.exampleSentence || '-'}</td>
+                    <td>
+                        <button class="btn btn-green" style="padding:4px 10px;font-size:12px;margin-right:5px;" onclick="viewWordDetail('${word.wordId}')">查看详情</button>
+                        <button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="removeWordFromBook('${word.wordId}')">移除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 查看单词详情
+        function viewWordDetail(wordId) {
+            window.location.href = `../word/viewWordDetailAdmin.html?wordId=${wordId}`;
+        }
+
+        // 从词书中移除单词
+        async function removeWordFromBook(wordId) {
+            const bookId = getUrlParam('bookId');
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            if (!confirm(`确定要将单词 ${wordId} 从词书中移除吗？`)) {
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/words/${wordId}?wordBookId=${bookId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    showMessage('移除成功');
+                    // 重新加载单词列表
+                    setTimeout(() => {
+                        loadWordsOfBook(bookId);
+                    }, 500);
+                } else {
+                    showMessage('移除失败: ' + result.message, true);
+                }
+            } catch (error) {
+                showMessage('网络请求失败: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 返回词书管理
+        function goBack() {
+            window.location.href = "manageWordBookAdmin.html";
+        }
+
+        // 退出登录
+        function handleLogout() {
+            if (confirm("确定要退出登录吗？")) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userInfo');
+                showMessage("已退出登录，跳转至登录页");
+                setTimeout(() => {
+                    window.location.href = "../admin/signin.html";
+                }, 500);
+            }
+        }
+
+        // 侧边栏导航
+        function setupSidebarNavigation() {
+            const menuItems = {
+                'menuAdminHome': '../admin/indexAdmin.html',
+                'menuPersonal': '../admin/adminPersonal.html',
+                'menuUserManage': '../admin/manageUserAdmin.html',
+                'menuManageWordBook': 'manageWordBookAdmin.html',
+                'menuAddWordBook': 'addWordBook.html',
+                'menuManageWord': '../word/manageWordAdmin.html',
+                'menuAddWord': '../word/addWord.html',
+                'menuBatchAddWord': '../word/batchAddWord.html',
+                'menuLearningRecord': '../wordlearningrecord/viewUserLearningRecords.html'
+            };
+
+            Object.keys(menuItems).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('click', () => {
+                        window.location.href = menuItems[id];
+                    });
+                }
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookId = getUrlParam('bookId');
+            
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            document.getElementById('bookInfo').textContent = `词书ID: ${bookId}`;
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            setupSidebarNavigation();
+            loadWordsOfBook(bookId);
+        });
+    </script>
+</body>
+</html>

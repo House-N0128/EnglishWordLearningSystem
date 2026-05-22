@@ -20,7 +20,7 @@ public interface WordBookMapper {
             "VALUES(#{wordBookId}, #{wordBookName}, #{difficultyLevel}, #{wordBookDescription}, 0, NOW(), NOW(), '已上线')")
     void insert(WordBook book);
 
-    @Update("UPDATE t_word_book SET wordBookName=#{wordBookName}, difficultyLevel=#{difficultyLevel}, wordBookDescription=#{wordBookDescription}, updateTime=NOW() WHERE wordBookId=#{wordBookId}")
+    @Update("UPDATE t_word_book SET wordBookName=#{wordBookName}, difficultyLevel=#{difficultyLevel}, wordBookDescription=#{wordBookDescription}, wordCount=#{wordCount}, wordBookStatus=#{wordBookStatus}, updateTime=NOW() WHERE wordBookId=#{wordBookId}")
     void update(WordBook book);
 
     @Update("UPDATE t_word_book SET wordBookStatus='已下线', updateTime=NOW() WHERE wordBookId=#{wordBookId}")

@@ -12,6 +12,7 @@
         .user-area { display:flex; align-items:center; gap:15px; }
         .user-name { font-size:14px; }
         .btn-logout { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
+        .btn-logout:hover { background-color:rgba(255,255,255,0.3); }
         .main-container { display:flex; flex:1; }
         .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
         .sidebar-menu { list-style:none; }
@@ -20,20 +21,30 @@
         .content-area { flex:1; padding:25px; }
         .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .page-title { font-size:22px; color:#333; font-weight:600; }
-        .btn-back { background:#dc3545; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; }
+        .btn-back { background:#dc3545; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:14px; }
+        .btn-back:hover { background:#c82333; }
         .search-area { background:white; padding:20px; border-radius:6px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:15px; align-items:center; }
         .search-input { flex:1; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
         .filter-select { padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; min-width:120px; }
-        .btn-search { background:#007bff; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+        .btn-search { background:#007bff; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-size:14px; }
+        .btn-search:hover { background:#0069d9; }
         .table-area { background:white; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:auto; }
         table { width:100%; border-collapse:collapse; }
         th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
         th { background:#f8f9fa; }
+        tr:hover { background-color:#f8f9fa; }
         .status-normal { color:#28a745; font-weight:500; }
         .status-frozen { color:#dc3545; font-weight:500; }
         .btn-edit { background:#007bff; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:12px; margin-right:5px; }
+        .btn-edit:hover { background:#0069d9; }
         .btn-toggle { background:#ffc107; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:12px; }
+        .btn-toggle:hover { background:#e0a800; }
+        .btn-view { background:#6c757d; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:12px; margin-left:5px; }
+        .btn-view:hover { background:#5a6268; }
         .empty-hint { text-align:center; color:#999; padding:40px; }
+        .loading-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:2000; display:none; }
+        .loading-spinner { background:white; padding:20px 30px; border-radius:8px; font-size:16px; }
+        .toast-msg { position:fixed; bottom:20px; right:20px; background:#333; color:white; padding:10px 18px; border-radius:6px; font-size:14px; z-index:1000; opacity:0; transition:opacity 0.3s; pointer-events:none; }
     </style>
 </head>
 <body>
@@ -48,9 +59,11 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li onclick="window.location.href='indexAdmin.html'">管理员首页</li>
+            <li onclick="window.location.href='adminPersonal.html'">个人中心</li>
             <li class="active">用户管理</li>
             <li onclick="window.location.href='../wordbook/manageWordBookAdmin.html'">词书管理</li>
             <li onclick="window.location.href='../word/manageWordAdmin.html'">单词管理</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewUserLearningRecords.html'">学习记录查询</li>
         </ul>
     </div>
     <div class="content-area">
@@ -68,30 +81,138 @@
         </div>
     </div>
 </div>
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+</div>
 <script src="../api.js"></script>
 <script>
 if (!requireAuth('admin')) { /* redirect */ }
 document.getElementById('admin-name').textContent = '管理员：' + (localStorage.getItem('userId') || '');
 
-// Fetch all users by querying known IDs
-var knownIds = ['10001','10002','10003','10004','10005'];
 var users = [];
-Promise.all(knownIds.map(function(id) { return apiGet('/api/user/profile').then(function(r) { if (r.code===200) users.push(r.data); }); })
-).then(renderUsers);
 
+// 显示/隐藏加载状态
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+// 显示提示消息
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+// 从后端获取用户列表
+function fetchUsers() {
+    showLoading();
+    apiGet('/api/admin/users').then(function(r) {
+        hideLoading();
+        if (r.code === 200 && r.data && Array.isArray(r.data)) {
+            users = r.data;
+            renderUsers();
+            showMessage('成功加载 ' + users.length + ' 条用户数据');
+        } else {
+            showMessage(r.message || '获取用户列表失败', true);
+            users = [];
+            renderUsers();
+        }
+    }).catch(function(error) {
+        hideLoading();
+        showMessage('网络请求失败: ' + error.message, true);
+        users = [];
+        renderUsers();
+    });
+}
+
+// 渲染用户列表
 function renderUsers() {
     var tbody = document.getElementById('user-tbody');
     var keyword = (document.getElementById('search-keyword').value || '').trim().toLowerCase();
-    var filtered = keyword ? users.filter(function(u) { return (u.userId||'').toLowerCase().indexOf(keyword)>=0 || (u.userName||'').toLowerCase().indexOf(keyword)>=0; }) : users;
-    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-hint">暂无用户</div></td></tr>'; return; }
+    var filtered = keyword ? users.filter(function(u) {
+        return (u.userId||'').toLowerCase().indexOf(keyword)>=0 || 
+               (u.userName||'').toLowerCase().indexOf(keyword)>=0 ||
+               (u.phoneNumber||'').toLowerCase().indexOf(keyword)>=0;
+    }) : users;
+    if (filtered.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-hint">暂无用户</div></td></tr>'; 
+        return; 
+    }
     var html = '';
     filtered.forEach(function(u) {
-        html += '<tr><td>'+(u.userId||'-')+'</td><td>'+(u.userName||'-')+'</td><td>'+(u.phoneNumber||'-')+'</td><td>'+(u.email||'-')+'</td><td>'+(u.registerTime||'-')+'</td><td class="'+(u.accountStatus==='正常'?'status-normal':'status-frozen')+'">'+(u.accountStatus||'-')+'</td><td></td></tr>';
+        var statusClass = u.accountStatus === '正常' ? 'status-normal' : 'status-frozen';
+        var statusText = u.accountStatus === '正常' ? '正常' : '冻结';
+        var toggleText = u.accountStatus === '正常' ? '冻结' : '解冻';
+        html += '<tr><td>'+(u.userId||'-')+'</td>'+
+                '<td>'+(escapeHtml(u.userName)||'-')+'</td>'+
+                '<td>'+(u.phoneNumber||'-')+'</td>'+
+                '<td>'+(u.email||'-')+'</td>'+
+                '<td>'+formatTime(u.registerTime)+'</td>'+
+                '<td><button class="btn-edit" onclick="editUser(\''+u.userId+'\')">编辑</button>'+
+                '<button class="btn-toggle" onclick="toggleStatus(\''+u.userId+'\', \''+u.accountStatus+'\')">'+toggleText+'</button></td></tr>';
     });
     tbody.innerHTML = html;
 }
 
+// HTML转义
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// 格式化时间
+function formatTime(time) {
+    if (!time) return '-';
+    return String(time).replace('T', ' ');
+}
+
+// 编辑用户
+function editUser(userId) {
+    window.location.href = 'editUserAdmin.html?userId=' + userId;
+}
+
+// 切换用户状态
+function toggleStatus(userId, currentStatus) {
+    var newStatus = currentStatus === '正常' ? '冻结' : '正常';
+    if (!confirm('确定要将用户 ' + userId + ' ' + (currentStatus === '正常' ? '冻结' : '解冻') + ' 吗？')) return;
+    showLoading();
+    apiPut('/api/admin/users/' + userId, { accountStatus: newStatus }).then(function(r) {
+        hideLoading();
+        if (r.code === 200) {
+            showMessage('用户状态已更新为: ' + newStatus);
+            fetchUsers();
+        } else {
+            showMessage(r.message || '操作失败', true);
+        }
+    }).catch(function(error) {
+        hideLoading();
+        showMessage('操作失败: ' + error.message, true);
+    });
+}
+
+// 查看学习记录
+function viewRecords(userId) {
+    showMessage('查看用户 ' + userId + ' 的学习记录');
+    window.location.href = 'studyRecords.html?userId=' + userId;
+}
+
+// 搜索
 function doSearch() { renderUsers(); }
+
+// 初始化
+fetchUsers();
+
+// 绑定搜索框回车键
+document.getElementById('search-keyword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') doSearch();
+});
 </script>
 </body>
 </html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 管理员个人中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            background-color: #dc3545;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主体布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        .sidebar-menu .sub-item {
+            padding-left: 45px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .sidebar-menu .sub-item:hover,
+        .sidebar-menu .sub-item.active {
+            background-color: #fff5f5;
+            color: #dc3545;
+        }
+
+        /* 主内容区 */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        /* 个人信息卡片 */
+        .info-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 35px;
+            max-width: 700px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .info-label {
+            width: 120px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #222;
+        }
+
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-edit-name {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-edit-pwd {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-cancel-account {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-edit-name:hover {
+            background-color: #0069d9;
+        }
+        .btn-edit-pwd:hover {
+            background-color: #218838;
+        }
+        .btn-cancel-account:hover {
+            background-color: #c82333;
+        }
+
+        /* 弹窗样式 */
+        .modal-mask{
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:9999;
+        }
+        .modal-box{
+            background:#fff;
+            padding:25px;
+            border-radius:8px;
+            width:400px;
+        }
+        .modal-title{
+            font-size:16px;
+            margin-bottom:20px;
+            font-weight:bold;
+        }
+        .modal-input{
+            width:100%;
+            padding:10px;
+            border:1px solid #ddd;
+            border-radius:4px;
+            margin-bottom:20px;
+            font-size:14px;
+        }
+        .modal-btn{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+        .modal-confirm{
+            background:#007bff;
+            color:#fff;
+            border:none;
+            padding:6px 15px;
+            border-radius:4px;
+            cursor:pointer;
+        }
+        .modal-close{
+            background:#999;
+            color:#fff;
+            border:none;
+            padding:6px 15px;
+            border-radius:4px;
+            cursor:pointer;
+        }
+
+        /* 提示弹窗 */
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 999;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部导航 -->
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name" id="topAdminName">管理员</span>
+        <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div class="main-container">
+    <!-- 侧边导航 -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li onclick="location.href='indexAdmin.html'">管理员首页</li>
+            <li class="active">个人中心</li>
+            <li onclick="location.href='manageUserAdmin.html'">用户管理</li>
+            <li class="sub-item" onclick="location.href='manageUserAdmin.html'">用户管理</li>
+            <li onclick="location.href='../wordbook/manageWordBookAdmin.html'">词书管理</li>
+            <li class="sub-item" onclick="location.href='../wordbook/manageWordBookAdmin.html'">管理词书</li>
+            <li onclick="location.href='../word/manageWordAdmin.html'">单词管理</li>
+            <li class="sub-item" onclick="location.href='../word/manageWordAdmin.html'">管理单词</li>
+            <li onclick="location.href='../wordlearningrecord/viewUserLearningRecords.html'">学习记录查询</li>
+        </ul>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content-area">
+        <div class="page-header">
+            <h1 class="page-title">管理员个人中心</h1>
+            <button class="btn-back" onclick="goAdminIndex()">返回管理首页</button>
+        </div>
+
+        <div class="info-card">
+            <div class="info-item">
+                <div class="info-label">管理员账号：</div>
+                <div class="info-value" id="adminUserId">--</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">账号状态：</div>
+                <div class="info-value" id="adminAccountStatus" style="color: #28a745;">--</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">创建时间：</div>
+                <div class="info-value" id="adminCreateTime">--</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">登录状态：</div>
+                <div class="info-value" style="color:#28a745">已登录</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-edit-pwd" onclick="goChangePwd()">修改登录密码</button>
+                <button class="btn-cancel-account" onclick="freezeAdminAccount()">冻结账号</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 提示框 -->
+<div class="toast-msg" id="toastMsg"></div>
+
+<script src="../api.js"></script>
+<script>
+// 登录权限校验
+if (!requireAuth('admin')) {}
+
+// 页面跳转
+function goAdminIndex(){
+    location.href = "indexAdmin.html";
+}
+function goChangePwd(){
+    location.href = "changepassword.html";
+}
+
+// 冻结账号
+function freezeAdminAccount(){
+    if(confirm("确定要冻结当前管理员账号吗？冻结后需要其他管理员解冻才能恢复！")){
+        clearAuth();
+        showMsg("账号已冻结，即将跳转登录页");
+        setTimeout(()=>{
+            location.href = "../login.html";
+        },1500);
+    }
+}
+
+// 消息提示
+function showMsg(text,isErr=false){
+    let toast = document.getElementById("toastMsg");
+    toast.innerText = text;
+    toast.style.backgroundColor = isErr ? "#dc3545" : "#28a745";
+    toast.style.opacity = "1";
+    setTimeout(()=>{
+        toast.style.opacity = "0";
+    },2000)
+}
+
+// 加载管理员信息
+function loadAdminInfo(){
+    // 从 localStorage 获取当前登录的管理员ID
+    let userId = localStorage.getItem("userId") || "admin001";
+    document.getElementById("topAdminName").innerText = "管理员：" + userId;
+    document.getElementById("adminUserId").innerText = userId;
+
+    // 模拟数据库数据（必须和登录的管理员ID完全一致）
+    const adminList = {
+        "admin001": {
+            status: "正常",
+            createTime: "2024-12-01 09:00:00"
+        },
+        "admin002": {
+            status: "正常",
+            createTime: "2024-12-10 14:30:00"
+        },
+        "admin003": {
+            status: "冻结",
+            createTime: "2025-01-15 10:20:00"
+        }
+    };
+
+    // 关键：必须能匹配到当前的 userId
+    const admin = adminList[userId] || { status: "未知", createTime: "-" };
+    
+    // 更新页面显示
+    document.getElementById("adminAccountStatus").innerText = admin.status;
+    document.getElementById("adminCreateTime").innerText = admin.createTime;
+
+    // 状态颜色处理
+    if (admin.status === "冻结") {
+        document.getElementById("adminAccountStatus").style.color = "#dc3545";
+    } else if (admin.status === "正常") {
+        document.getElementById("adminAccountStatus").style.color = "#28a745";
+    } else {
+        document.getElementById("adminAccountStatus").style.color = "#999";
+    }
+}
+
+// 初始化
+window.onload = function(){
+    loadAdminInfo();
+}
+</script>
+</body>
+</html>

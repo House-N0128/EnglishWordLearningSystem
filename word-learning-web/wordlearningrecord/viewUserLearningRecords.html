@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 查看用户学习记录</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>" type="image/svg+xml">
     <style>
         * {
             margin: 0;
@@ -80,7 +81,8 @@
             transition: background-color 0.2s;
         }
 
-        .sidebar-menu li:hover {
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active {
             background-color: #f8d7da;
             color: #dc3545;
         }
@@ -248,6 +250,44 @@
             font-size: 12px;
         }
 
+        /* 提示消息 */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
         /* 分页 */
         .pagination {
             display: flex;
@@ -265,15 +305,21 @@
             cursor: pointer;
         }
     </style>
-<script src="/api.js"></script>
+<script src="../api.js"></script>
 </head>
 <body>
+<!-- 提示消息 -->
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<!-- 加载遮罩 -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+</div>
 
 <!-- 顶部导航 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
     <div class="user-area">
-        <span class="user-name">管理员账号：admin</span>
+        <span class="user-name" id="admin-name">管理员账号：admin</span>
         <button class="btn-logout">退出登录</button>
     </div>
 </div>
@@ -284,16 +330,14 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li>管理员首页</li>
+            <li>个人中心</li>
             <li>用户管理</li>
-            <li class="sub-item active">用户学习记录</li>
+            <li class="sub-item">用户管理</li>
             <li>词书管理</li>
-            <li class="sub-item">添加词书</li>
             <li class="sub-item">管理词书</li>
             <li>单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
             <li class="sub-item">管理单词</li>
-            <li>学习记录查询</li>
+            <li class="active">学习记录查询</li>
         </ul>
     </div>
 
@@ -303,7 +347,7 @@
             <h1 class="page-title">用户学习记录管理</h1>
             <div class="header-buttons">
                 <button class="btn btn-green">导出记录</button>
-                <button class="btn btn-secondary">返回</button>
+                <button class="btn btn-secondary">返回首页</button>
             </div>
         </div>
 
@@ -311,44 +355,42 @@
         <div class="search-area">
             <div class="search-item">
                 <label>用户账号：</label>
-                <input type="text" placeholder="请输入用户账号">
+                <input type="text" id="userIdInput" placeholder="请输入用户账号">
             </div>
             <div class="search-item">
                 <label>开始日期：</label>
-                <input type="date">
+                <input type="date" id="startDateInput">
             </div>
             <div class="search-item">
                 <label>结束日期：</label>
-                <input type="date">
+                <input type="date" id="endDateInput">
             </div>
             <div class="search-item">
                 <label>所属词书：</label>
-                <select>
-                    <option>全部</option>
-                    <option>四级核心词汇</option>
-                    <option>六级高频词汇</option>
+                <select id="bookFilterSelect">
+                    <option value="all">全部</option>
                 </select>
             </div>
-            <button class="btn-search">查询</button>
+            <button class="btn-search" onclick="doSearch()">查询</button>
         </div>
 
         <!-- 统计 -->
-        <div class="stats-box">
+        <div class="stats-box" id="statsBox">
             <div class="stat-card">
                 <div class="stat-title">总学习用户数</div>
-                <div class="stat-num">128</div>
+                <div class="stat-num" id="totalUsers">-</div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">总学习单词数</div>
-                <div class="stat-num">3562</div>
+                <div class="stat-num" id="totalWords">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-title">总学习时长</div>
-                <div class="stat-num">1286 分钟</div>
+                <div class="stat-title">今日学习人数</div>
+                <div class="stat-num" id="todayUsers">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-title">平均每日学习</div>
-                <div class="stat-num">28 个</div>
+                <div class="stat-title">今日人均学习单词量</div>
+                <div class="stat-num" id="avgDaily">-</div>
             </div>
         </div>
 
@@ -361,55 +403,370 @@
                     <th>用户账号</th>
                     <th>用户姓名</th>
                     <th>学习词书</th>
-                    <th>学习单词数</th>
-                    <th>学习时长</th>
-                    <th>学习日期</th>
+                    <th>学习单词</th>
+                <th>单词拼写</th>
+                <th>学习日期</th>
                     <th>操作</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>R001</td>
-                    <td>student01</td>
-                    <td>张三</td>
-                    <td>四级核心词汇</td>
-                    <td>20</td>
-                    <td>35 分钟</td>
-                    <td>2025-11-25</td>
-                    <td><button class="btn-view">查看详情</button></td>
-                </tr>
-                <tr>
-                    <td>R002</td>
-                    <td>student02</td>
-                    <td>李四</td>
-                    <td>六级高频词汇</td>
-                    <td>15</td>
-                    <td>28 分钟</td>
-                    <td>2025-11-25</td>
-                    <td><button class="btn-view">查看详情</button></td>
-                </tr>
-                <tr>
-                    <td>R003</td>
-                    <td>student03</td>
-                    <td>王五</td>
-                    <td>四级核心词汇</td>
-                    <td>32</td>
-                    <td>45 分钟</td>
-                    <td>2025-11-24</td>
-                    <td><button class="btn-view">查看详情</button></td>
-                </tr>
-                </tbody>
+                <tbody id="recordTableBody"></tbody>
             </table>
 
             <!-- 分页 -->
             <div class="pagination">
-                <button class="page-btn">上一页</button>
-                <span>第 1 页，共 10 页</span>
-                <button class="page-btn">下一页</button>
+                <button class="page-btn" id="prevPageBtn">上一页</button>
+                <span id="pageInfo">第 1 页，共 1 页</span>
+                <button class="page-btn" id="nextPageBtn">下一页</button>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+// 认证检查
+if (!requireAuth('admin')) { /* redirect */ }
+var adminNameEl = document.getElementById('admin-name');
+if (adminNameEl) {
+    adminNameEl.textContent = '管理员：' + (localStorage.getItem('userId') || 'admin');
+}
+
+// 全局变量
+var recordData = [];
+var filteredData = [];
+var currentPage = 1;
+var rowsPerPage = 10;
+
+// 显示/隐藏加载状态
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+// 显示提示消息
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+// 获取统计数据
+async function fetchStats() {
+    try {
+        const result = await apiGet('/api/admin/stats');
+        if (result.code === 200 && result.data) {
+            document.getElementById('totalUsers').textContent = result.data.userCount || 0;
+            document.getElementById('totalWords').textContent = result.data.wordCount || 0;
+            document.getElementById('todayUsers').textContent = result.data.todayRecordCount || 0;
+            document.getElementById('avgDaily').textContent = result.data.avgWordsPerUserToday || 0;
+        }
+    } catch (error) {
+        console.error('获取统计数据失败:', error);
+    }
+}
+
+// 获取学习记录
+async function fetchRecords() {
+    showLoading();
+    console.log('开始获取学习记录...');
+    try {
+        // 并行获取词书列表、用户列表和单词列表
+        const [bookResult, userResult, wordResult] = await Promise.all([
+            apiGet('/api/wordbooks'),
+            apiGet('/api/admin/users'),
+            apiGet('/api/words/all')
+        ]);
+        
+        console.log('词书列表:', bookResult);
+        console.log('用户列表:', userResult);
+        console.log('单词列表:', wordResult);
+        
+        // 填充词书筛选
+        if (bookResult.code === 200 && bookResult.data) {
+            populateBookFilter(bookResult.data);
+        }
+
+        // 获取所有用户的学习记录（使用管理员接口）
+        const result = await apiGet('/api/admin/records?userId=all');
+        console.log('学习记录结果:', result);
+        
+        if (result.code === 200 && result.data && Array.isArray(result.data)) {
+            recordData = result.data.map(item => ({
+                id: item.recordId || item.id || '',
+                userId: item.userId || '',
+                userName: '',
+                bookId: item.learnedWordBookId || item.wordBookId || '',
+                bookName: '',
+                wordId: item.wordId || '',
+                wordName: '',
+                learningDate: item.learningDate ? String(item.learningDate).replace('T', ' ') : (item.recordCreateTime ? String(item.recordCreateTime).replace('T', ' ').split(' ')[0] : '-'),
+                createTime: item.recordCreateTime ? String(item.recordCreateTime).replace('T', ' ') : '-'
+            }));
+
+            // 构建词书映射
+            const bookMap = {};
+            if (bookResult.code === 200 && bookResult.data) {
+                bookResult.data.forEach(book => {
+                    bookMap[book.wordBookId] = book.wordBookName;
+                });
+            }
+            
+            // 构建用户映射
+            const userMap = {};
+            if (userResult.code === 200 && userResult.data) {
+                userResult.data.forEach(user => {
+                    userMap[user.userId] = user.userName || '未知';
+                });
+            }
+
+            // 构建单词映射
+            const wordMap = {};
+            if (wordResult.code === 200 && wordResult.data) {
+                wordResult.data.forEach(word => {
+                    wordMap[word.wordId] = word.englishSpelling || '未知';
+                });
+            }
+
+            // 填充词书名称、用户姓名和单词拼写
+            recordData.forEach(record => {
+                record.bookName = bookMap[record.bookId] || '未知词书';
+                record.userName = userMap[record.userId] || '未知用户';
+                record.wordSpelling = wordMap[record.wordId] || '未知';
+            });
+
+            filteredData = [...recordData];
+            currentPage = 1;
+            renderTable();
+            console.log('学习记录加载完成，共', recordData.length, '条');
+        } else {
+            console.error('获取学习记录失败:', result);
+            throw new Error(result.message || '获取学习记录失败');
+        }
+    } catch (error) {
+        console.error('获取学习记录失败:', error);
+        showMessage('获取学习记录失败: ' + error.message, true);
+        // 显示空数据
+        filteredData = [];
+        renderTable();
+    } finally {
+        hideLoading();
+    }
+}
+
+// 填充词书筛选
+function populateBookFilter(books) {
+    const select = document.getElementById('bookFilterSelect');
+    // 保留第一个"全部"选项，清空其他选项
+    while (select.options.length > 1) {
+        select.remove(1);
+    }
+    books.forEach(book => {
+        const option = document.createElement('option');
+        option.value = book.wordBookId;
+        option.textContent = book.wordBookName;
+        select.appendChild(option);
+    });
+}
+
+// 搜索筛选
+function doSearch() {
+    const userId = document.getElementById('userIdInput').value.trim().toLowerCase();
+    const startDate = document.getElementById('startDateInput').value;
+    const endDate = document.getElementById('endDateInput').value;
+    const bookId = document.getElementById('bookFilterSelect').value;
+
+    filteredData = recordData.filter(record => {
+        let matchUserId = true;
+        if (userId) {
+            matchUserId = record.userId.toLowerCase().includes(userId);
+        }
+        
+        let matchDate = true;
+        if (startDate && record.learningDate) {
+            matchDate = record.learningDate >= startDate;
+        }
+        if (endDate && record.learningDate) {
+            matchDate = matchDate && record.learningDate <= endDate;
+        }
+        
+        let matchBook = true;
+        if (bookId !== 'all') {
+            matchBook = record.bookId === bookId;
+        }
+        
+        return matchUserId && matchDate && matchBook;
+    });
+
+    currentPage = 1;
+    renderTable();
+}
+
+// 渲染表格
+function renderTable() {
+    const tbody = document.getElementById('recordTableBody');
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+    
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const pageData = filteredData.slice(startIndex, endIndex);
+
+    if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;">暂无学习记录</td></tr>';
+    } else {
+        tbody.innerHTML = pageData.map(record => {
+            return `
+                <tr>
+                    <td>${record.id}</td>
+                    <td>${record.userId}</td>
+                    <td>${record.userName || '-'}</td>
+                    <td>${record.bookName}</td>
+                    <td>${record.wordId || '-'}</td>
+                    <td>${record.wordSpelling || '-'}</td>
+                    <td>${record.learningDate}</td>
+                    <td><button class="btn-view" data-id="${record.id}">查看详情</button></td>
+                </tr>
+            `;
+        }).join('');
+
+        // 绑定查看详情事件
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const recordId = this.getAttribute('data-id');
+                viewRecord(recordId);
+            });
+        });
+    }
+
+    // 更新分页信息
+    document.getElementById('pageInfo').textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+}
+
+// 翻页
+function goPrevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+}
+
+function goNextPage() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+    }
+}
+
+// 查看详情
+function viewRecord(recordId) {
+    const record = recordData.find(r => r.id === recordId);
+    if (record) {
+        showMessage(`记录ID: ${record.id}\n用户: ${record.userId}\n词书: ${record.bookName}\n单词: ${record.wordId}`);
+    }
+}
+
+// 导出记录
+function exportRecords() {
+    if (filteredData.length === 0) {
+        showMessage('没有数据可导出', true);
+        return;
+    }
+
+    // 构建CSV内容
+    const headers = ['记录ID', '用户账号', '用户姓名', '学习词书', '学习单词', '学习日期'];
+    const rows = filteredData.map(record => [
+        record.id,
+        record.userId,
+        record.userName,
+        record.bookName,
+        record.wordId,
+        record.learningDate
+    ]);
+
+    // 添加BOM头，确保Excel正确识别UTF-8编码
+    const bom = '\uFEFF';
+    const csvContent = bom + [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+
+    // 创建下载链接
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // 设置文件名（包含时间戳）
+    const now = new Date();
+    const fileName = `学习记录_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.csv`;
+    link.download = fileName;
+    
+    // 触发下载
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showMessage('导出成功，共导出 ' + filteredData.length + ' 条记录');
+}
+
+// 返回
+function goBack() {
+    window.location.href = '../admin/indexAdmin.html';
+}
+
+// 退出登录
+function handleLogout() {
+    if (confirm('确定要退出登录吗？')) {
+        clearAuth();
+    }
+}
+
+// 侧边栏菜单交互
+function setupSidebar() {
+    document.querySelectorAll('.sidebar-menu li').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const text = item.innerText.trim();
+            if (text === '管理员首页') {
+                window.location.href = '../admin/indexAdmin.html';
+            } else if (text === '个人中心') {
+                window.location.href = '../admin/adminPersonal.html';
+            } else if (text === '用户管理') {
+                window.location.href = '../admin/manageUserAdmin.html';
+            } else if (text === '词书管理') {
+                window.location.href = '../wordbook/manageWordBookAdmin.html';
+            } else if (text === '单词管理') {
+                window.location.href = '../word/manageWordAdmin.html';
+            } else if (text === '学习记录查询') {
+                fetchRecords(); // 当前页面，刷新数据
+            }
+        });
+    });
+}
+
+// 初始化
+function init() {
+    // 绑定事件
+    document.getElementById('prevPageBtn').addEventListener('click', goPrevPage);
+    document.getElementById('nextPageBtn').addEventListener('click', goNextPage);
+    document.querySelector('.btn-green').addEventListener('click', exportRecords);
+    document.querySelector('.btn-secondary').addEventListener('click', goBack);
+    document.querySelector('.btn-logout').addEventListener('click', handleLogout);
+    
+    // 设置侧边栏
+    setupSidebar();
+    
+    // 获取数据
+    fetchStats();
+    fetchRecords();
+}
+
+// 页面加载完成后初始化
+init();
+</script>
 </body>
 </html>

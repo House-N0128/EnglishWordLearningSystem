@@ -17,8 +17,8 @@ public interface OrdinaryUserMapper {
             "VALUES (#{userId}, #{loginPassword}, '正常', NOW(), NOW(), #{userName}, #{phoneNumber}, #{email})")
     void insert(OrdinaryUser user);
 
-    @Update("UPDATE t_ordinary_user SET userName = #{userName}, phoneNumber = #{phoneNumber}, email = #{email} WHERE userId = #{userId}")
-    void updateProfile(OrdinaryUser user);
+    @Update("UPDATE t_ordinary_user SET userName = #{user.userName}, phoneNumber = #{user.phoneNumber}, email = #{user.email} WHERE userId = #{user.userId}")
+    void updateProfile(@Param("user") OrdinaryUser user);
 
     @Update("UPDATE t_ordinary_user SET loginPassword = #{newPassword} WHERE userId = #{userId}")
     void updatePassword(@Param("userId") String userId, @Param("newPassword") String newPassword);
