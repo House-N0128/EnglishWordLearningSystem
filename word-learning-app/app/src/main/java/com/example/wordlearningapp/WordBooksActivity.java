@@ -369,9 +369,8 @@ public class WordBooksActivity extends AppCompatActivity {
 
                 Button addWordBtn = cardBtn(btns, "添加单词", 0xFF318af8, 0xFFFFFFFF);
                 addWordBtn.setOnClickListener(v -> {
-                    Intent in = new Intent(this, AddWordToBookActivity.class);
+                    Intent in = new Intent(this, AddEditWordActivity.class);
                     in.putExtra("bookId", bid);
-                    in.putExtra("bookName", name);
                     startActivity(in);
                 });
 

@@ -22,13 +22,14 @@ public class AddEditWordActivity extends AppCompatActivity {
     private EditText etSpelling, etPhonetic, etChinese, etExample;
     private Button btnSubmit;
     private TextView tvTitle;
-    private String wordId;
+    private String wordId, bookId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         wordId = getIntent().getStringExtra("wordId");
+        bookId = getIntent().getStringExtra("bookId");
         boolean isEdit = wordId != null;
 
         LinearLayout root = new LinearLayout(this);
@@ -180,11 +181,11 @@ public class AddEditWordActivity extends AppCompatActivity {
                 }
 
                 JsonObject body = new JsonObject();
-                if (!isEdit) body.addProperty("wordId", "WD" + System.currentTimeMillis());
                 body.addProperty("englishSpelling", spelling);
                 body.addProperty("phoneticSymbol", etPhonetic.getText().toString().trim());
                 body.addProperty("chineseDefinition", chinese);
                 body.addProperty("exampleSentence", etExample.getText().toString().trim());
+                if (bookId != null) body.addProperty("wordBookId", bookId);
 
                 JsonObject res;
                 if (isEdit) {
