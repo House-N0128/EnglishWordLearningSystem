@@ -75,6 +75,7 @@ public class WordController {
             w.setEnglishSpelling(spelling);
             w.setChineseDefinition(definition);
             w.setPhoneticSymbol(body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "");
+            w.setPartOfSpeech(body.get("partOfSpeech") != null ? body.get("partOfSpeech") : "");
             w.setExampleSentence(body.get("exampleSentence") != null ? body.get("exampleSentence") : "");
             w.setWordPronunciation(body.get("wordPronunciation") != null ? body.get("wordPronunciation") : "");
             w.setWordImage(body.get("wordImage") != null ? body.get("wordImage") : "");
@@ -94,6 +95,7 @@ public class WordController {
             wordId = generateWordId();
         }
         String phonetic = body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "";
+        String partOfSpeech = body.get("partOfSpeech") != null ? body.get("partOfSpeech") : "";
         String example = body.get("exampleSentence") != null ? body.get("exampleSentence") : "";
         String audio = body.get("wordPronunciation") != null ? body.get("wordPronunciation") : "";
         String image = body.get("wordImage") != null ? body.get("wordImage") : "";
@@ -103,6 +105,7 @@ public class WordController {
         w.setEnglishSpelling(spelling);
         w.setChineseDefinition(definition);
         w.setPhoneticSymbol(phonetic);
+        w.setPartOfSpeech(partOfSpeech);
         w.setExampleSentence(example);
         w.setWordPronunciation(audio);
         w.setWordImage(image);

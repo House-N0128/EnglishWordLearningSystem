@@ -19,7 +19,7 @@ import com.google.gson.JsonObject;
 
 public class AddEditWordActivity extends AppCompatActivity {
 
-    private EditText etSpelling, etPhonetic, etChinese, etExample;
+    private EditText etSpelling, etPhonetic, etPos, etChinese, etExample;
     private Button btnSubmit;
     private TextView tvTitle;
     private String wordId, bookId;
@@ -72,6 +72,7 @@ public class AddEditWordActivity extends AppCompatActivity {
 
         etSpelling = addField(form, "英文拼写 *");
         etPhonetic = addField(form, "音标");
+        etPos = addField(form, "词性 (如: n. / v. / adj.)");
         etChinese = addField(form, "中文释义 *");
         etExample = addField(form, "例句");
         etExample.setLines(2);
@@ -135,6 +136,7 @@ public class AddEditWordActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         setText(etSpelling, w, "englishSpelling");
                         setText(etPhonetic, w, "phoneticSymbol");
+                        setText(etPos, w, "partOfSpeech");
                         setText(etChinese, w, "chineseDefinition");
                         setText(etExample, w, "exampleSentence");
                     });
@@ -183,6 +185,7 @@ public class AddEditWordActivity extends AppCompatActivity {
                 JsonObject body = new JsonObject();
                 body.addProperty("englishSpelling", spelling);
                 body.addProperty("phoneticSymbol", etPhonetic.getText().toString().trim());
+                body.addProperty("partOfSpeech", etPos.getText().toString().trim());
                 body.addProperty("chineseDefinition", chinese);
                 body.addProperty("exampleSentence", etExample.getText().toString().trim());
                 if (bookId != null) body.addProperty("wordBookId", bookId);
