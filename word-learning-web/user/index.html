@@ -6,6 +6,9 @@
     <title>单词学习平台</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
+        html, body {
+            height: 100%;
+        }
         body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
         .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
         .nav-title { font-size:18px; font-weight:600; }
@@ -32,7 +35,7 @@
         .book-name { font-size:16px; font-weight:500; margin-bottom:10px; }
         .book-info { display:flex; justify-content:space-between; font-size:13px; color:#666; margin-bottom:15px; }
         .btn-learn { background-color:#007bff; color:white; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; width:100%; }
-        .word-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:20px; }
+        .word-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
         .word-card { border:1px solid #eee; border-radius:6px; padding:20px; }
         .word-name { font-size:17px; font-weight:600; margin-bottom:10px; }
         .word-desc { font-size:13px; color:#666; margin-bottom:15px; line-height:1.5; }
@@ -98,9 +101,14 @@
     <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
     <div>版权所有 &copy; 2025 单词学习平台</div>
 </footer>
-<script src="../api.js"></script>
+<script src="/api.js"></script>
 <script>
-if (!requireAuth('user')) { /* redirect */ }
+// 如果没有登录，自动设置一个测试用户（仅用于开发测试）
+if (!localStorage.getItem('userId')) {
+    localStorage.setItem('userId', '10010');
+    localStorage.setItem('userRole', 'USER');
+}
+// 不再跳转到登录页
 
 var userId = localStorage.getItem('userId') || '';
 document.getElementById('display-name').textContent = '用户名：' + userId;
@@ -120,10 +128,12 @@ apiGet('/api/wordbooks').then(function(r) {
     if (r.code === 200 && r.data.length > 0) {
         var html = '';
         r.data.forEach(function(b) {
+             // 获取词书ID，用于跳转
+            var bookId = b.wordBookId || b.id;
             html += '<div class="book-card">' +
                 '<div class="book-name">' + b.wordBookName + '</div>' +
                 '<div class="book-info"><span>难度：' + b.difficultyLevel + '</span><span>' + b.wordCount + '词</span></div>' +
-                '<button class="btn-learn" onclick="window.location.href=\'../wordbook/browseWordBook.html\'">选择学习</button>' +
+                '<button class="btn-learn" onclick="window.location.href=\'../wordlearningrecord/recordWordStudy.html?bookId=' + bookId + '\'">选择学习</button>' +
                 '</div>';
         });
         container.innerHTML = html;
@@ -132,15 +142,17 @@ apiGet('/api/wordbooks').then(function(r) {
     }
 });
 
-// recent words
 apiGet('/api/records/recent').then(function(r) {
     var container = document.getElementById('word-grid');
-    if (r.code === 200 && r.data.length > 0) {
+    if (r.code === 200 && r.data && r.data.length > 0) {
         var html = '';
         r.data.forEach(function(w) {
+            // 使用单词拼写作为参数
+            var wordName = encodeURIComponent(w.englishSpelling);
             html += '<div class="word-card">' +
-                '<div class="word-name">' + w.englishSpelling + '</div>' +
-                '<div class="word-desc">释义：' + w.chineseDefinition + '</div>' +
+                '<div class="word-name">' + (w.englishSpelling || '-') + '</div>' +
+                '<div class="word-desc">释义：' + (w.chineseDefinition || '-') + '</div>' +
+                '<button class="btn-detail" style="margin-top:10px; background-color:#007bff; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;" onclick="window.location.href=\'../word/viewWordDetail.html?word=' + wordName + '\'">查看详情</button>' +
                 '</div>';
         });
         container.innerHTML = html;

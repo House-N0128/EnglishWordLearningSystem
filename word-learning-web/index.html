@@ -76,9 +76,41 @@
         </div>
         <button class="btn btn-login" onclick="doLogin()">登录</button>
         <button class="btn btn-register" id="btn-register" onclick="goRegister()">注册账号</button>
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="#" onclick="showForgotPassword()" style="color: #007bff; text-decoration: none; font-size: 14px;">忘记密码？</a>
+        </div>
         <div class="error-msg" id="error-msg"></div>
     </div>
 </div>
+<!-- 找回密码弹窗 -->
+<div id="forgotPasswordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#fff; width:400px; border-radius:10px; padding:30px; margin:100px auto;">
+        <h3 style="margin-bottom:20px; text-align:center;">找回密码</h3>
+        <div id="resetStep1">
+            <div class="form-group">
+                <label>邮箱地址</label>
+                <input type="email" id="resetEmail" placeholder="请输入注册邮箱">
+            </div>
+            <button class="btn btn-login" onclick="sendResetCode()">发送验证码</button>
+        </div>
+        <div id="resetStep2" style="display:none;">
+            <div class="form-group">
+                <label>验证码</label>
+                <input type="text" id="resetCode" placeholder="请输入验证码">
+            </div>
+            <div class="form-group">
+                <label>新密码</label>
+                <input type="password" id="newPassword" placeholder="请输入新密码">
+            </div>
+            <button class="btn btn-login" onclick="resetPassword()">重置密码</button>
+        </div>
+        <div style="text-align:center; margin-top:15px;">
+            <a href="#" onclick="closeForgotPassword()" style="color:#999;">返回登录</a>
+        </div>
+        <div id="resetErrorMsg" style="display:none; color:#e74c3c; text-align:center; margin-top:10px;"></div>
+    </div>
+</div>
+
 <script src="api.js"></script>
 <script>
 var currentRole = 'user';
@@ -98,6 +130,8 @@ function showError(msg) {
 }
 
 async function doLogin() {
+    document.getElementById('error-msg').style.display = 'none';
+
     var userId = document.getElementById('userId').value.trim();
     var password = document.getElementById('password').value.trim();
     if (!userId || !password) { showError('请输入账号和密码'); return; }
@@ -115,6 +149,91 @@ async function doLogin() {
 
 function goRegister() {
     window.location.href = '/user/signupOrdinaryUser.html';
+}
+
+
+// ========== 找回密码相关函数 ==========
+function showForgotPassword() {
+    document.getElementById('forgotPasswordModal').style.display = 'flex';
+    document.getElementById('resetStep1').style.display = 'block';
+    document.getElementById('resetStep2').style.display = 'none';
+    document.getElementById('resetErrorMsg').style.display = 'none';
+}
+
+function closeForgotPassword() {
+    document.getElementById('forgotPasswordModal').style.display = 'none';
+}
+
+function showResetError(msg) {
+    var el = document.getElementById('resetErrorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+async function sendResetCode() {
+    var email = document.getElementById('resetEmail').value.trim();
+    if (!email) {
+        showResetError('请输入邮箱地址');
+        return;
+    }
+    
+    try {
+        // 改这里：接口路径和参数名
+        var result = await apiPost('/api/user/send-verification-code', { contact: email });
+        if (result.code === 200) {
+            alert('验证码已发送到您的邮箱');
+            document.getElementById('resetStep1').style.display = 'none';
+            document.getElementById('resetStep2').style.display = 'block';
+        } else {
+            showResetError(result.message);
+        }
+    } catch(e) {
+        showResetError('发送失败，请稍后重试');
+    }
+}
+
+async function resetPassword() {
+    var email = document.getElementById('resetEmail').value.trim();
+    var code = document.getElementById('resetCode').value.trim();
+    var newPassword = document.getElementById('newPassword').value.trim();
+    
+    if (!code || !newPassword) {
+        showResetError('请输入验证码和新密码');
+        return;
+    }
+    if (newPassword.length < 6) {
+        showResetError('密码长度不能少于6位');
+        return;
+    }
+    
+    try {
+        // 注意：后端是先验证验证码，再重置密码
+        // 第一步：验证验证码
+        var verifyResult = await apiPost('/api/user/verify-code', {
+            contact: email,
+            verifyCode: code
+        });
+        
+        if (verifyResult.code !== 200) {
+            showResetError(verifyResult.message);
+            return;
+        }
+        
+        // 第二步：重置密码
+        var resetResult = await apiPost('/api/user/reset-password', {
+            contact: email,
+            newPassword: newPassword
+        });
+        
+        if (resetResult.code === 200) {
+            alert('密码重置成功，请重新登录');
+            closeForgotPassword();
+        } else {
+            showResetError(resetResult.message);
+        }
+    } catch(e) {
+        showResetError('重置失败，请稍后重试');
+    }
 }
 </script>
 </body>
