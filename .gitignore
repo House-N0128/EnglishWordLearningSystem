@@ -17,3 +17,4 @@ word-learning-web/.idea/
 .DS_Store
 Thumbs.db
 .vscode/
+word-learning-backend/src/main/resources/application.properties
