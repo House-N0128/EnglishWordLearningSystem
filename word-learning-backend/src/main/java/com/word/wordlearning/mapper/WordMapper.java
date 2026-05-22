@@ -25,6 +25,9 @@ public interface WordMapper {
             "FROM t_word WHERE spelling LIKE CONCAT('%',#{keyword},'%') OR definition LIKE CONCAT('%',#{keyword},'%')")
     List<Word> search(@Param("keyword") String keyword);
 
+    @Select("SELECT * FROM t_word WHERE spelling = #{spelling}")
+    Word findBySpelling(@Param("spelling") String spelling);
+
     @Select("SELECT COUNT(*) FROM t_word")
     int countAll();
 

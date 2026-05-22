@@ -254,6 +254,12 @@ public class WordSearchActivity extends AppCompatActivity {
         loadData();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadData();
+    }
+
     private void styleSpinner(Spinner sp) {
         sp.setPadding(dp(6), 0, dp(2), 0);
         GradientDrawable bg = new GradientDrawable();

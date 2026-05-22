@@ -43,18 +43,27 @@ public class WordController {
 
     @PostMapping
     public Result<String> add(@RequestBody Map<String, String> body) {
-        String wordId = body.get("wordId");
-        String bookId = body.get("wordBookId");
         String spelling = body.get("englishSpelling");
         String definition = body.get("chineseDefinition");
+        if (spelling == null || definition == null) {
+            return Result.error(400, "缺少必填字段");
+        }
+
+        // Check duplicate by spelling
+        Word existBySpelling = wordMapper.findBySpelling(spelling);
+        if (existBySpelling != null) {
+            return Result.error(400, "单词已存在: " + spelling);
+        }
+
+        String wordId = body.get("wordId");
+        if (wordId == null || wordId.isEmpty()) {
+            wordId = "WD" + System.currentTimeMillis();
+        }
+        String bookId = body.get("wordBookId");
         String phonetic = body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "";
         String example = body.get("exampleSentence") != null ? body.get("exampleSentence") : "";
         String audio = body.get("wordPronunciation") != null ? body.get("wordPronunciation") : "";
         String image = body.get("wordImage") != null ? body.get("wordImage") : "";
-
-        if (wordId == null || spelling == null || definition == null || bookId == null) {
-            return Result.error(400, "缺少必填字段");
-        }
 
         Word exist = wordMapper.findById(wordId);
         if (exist == null) {
@@ -68,8 +77,10 @@ public class WordController {
             w.setWordImage(image);
             wordMapper.insert(w);
         }
-        wordMapper.insertBookRef(bookId, wordId);
-        wordBookMapper.syncWordCount(bookId);
+        if (bookId != null && !bookId.isEmpty()) {
+            wordMapper.insertBookRef(bookId, wordId);
+            wordBookMapper.syncWordCount(bookId);
+        }
         return Result.success("单词添加成功");
     }
 
@@ -94,32 +105,42 @@ public class WordController {
         List<Map<String, String>> words = (List<Map<String, String>>) body.get("words");
         if (words == null || words.isEmpty()) return Result.error(400, "单词列表为空");
 
-        int success = 0, fail = 0;
+        int success = 0, fail = 0, skipped = 0;
+        int idSeq = 1;
         for (Map<String, String> w : words) {
             try {
-                String wordId = w.get("wordId");
                 String spelling = w.get("englishSpelling");
                 String definition = w.get("chineseDefinition");
-                if (wordId == null || spelling == null || definition == null) { fail++; continue; }
+                if (spelling == null || definition == null) { fail++; continue; }
 
-                Word exist = wordMapper.findById(wordId);
-                if (exist == null) {
-                    Word nw = new Word();
-                    nw.setWordId(wordId);
-                    nw.setEnglishSpelling(spelling);
-                    nw.setChineseDefinition(definition);
-                    nw.setPhoneticSymbol(w.getOrDefault("phoneticSymbol", ""));
-                    nw.setExampleSentence(w.getOrDefault("exampleSentence", ""));
-                    nw.setWordPronunciation(w.getOrDefault("wordPronunciation", ""));
-                    nw.setWordImage(w.getOrDefault("wordImage", ""));
-                    wordMapper.insert(nw);
+                // Skip if already exists by spelling
+                Word exist = wordMapper.findBySpelling(spelling);
+                if (exist != null) { skipped++; continue; }
+
+                // Auto-generate ID
+                String wordId = w.get("wordId");
+                if (wordId == null || wordId.isEmpty()) {
+                    wordId = "WD" + System.currentTimeMillis() + String.format("%03d", idSeq++);
                 }
+
+                Word nw = new Word();
+                nw.setWordId(wordId);
+                nw.setEnglishSpelling(spelling);
+                nw.setChineseDefinition(definition);
+                nw.setPhoneticSymbol(w.getOrDefault("phoneticSymbol", ""));
+                nw.setExampleSentence(w.getOrDefault("exampleSentence", ""));
+                nw.setWordPronunciation(w.getOrDefault("wordPronunciation", ""));
+                nw.setWordImage(w.getOrDefault("wordImage", ""));
+                wordMapper.insert(nw);
                 wordMapper.insertBookRef(bookId, wordId);
                 success++;
             } catch (Exception e) { fail++; }
         }
         wordBookMapper.syncWordCount(bookId);
-        return Result.success("批量添加完成：成功" + success + "个" + (fail > 0 ? "，失败" + fail + "个" : ""));
+        String msg = "成功" + success + "个";
+        if (skipped > 0) msg += "，跳过" + skipped + "个已存在";
+        if (fail > 0) msg += "，失败" + fail + "个";
+        return Result.success(msg);
     }
 
     @DeleteMapping("/{wordId}")
