@@ -159,6 +159,10 @@
             font-size: 14px;
         }
 
+        .btn-download:hover {
+            opacity: 0.9;
+        }
+
         /* 文件上传区域 */
         .upload-area {
             border: 2px dashed #ddd;
@@ -166,6 +170,13 @@
             padding: 40px 20px;
             text-align: center;
             margin-bottom: 30px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
         }
 
         .upload-icon {
@@ -207,7 +218,7 @@
         }
 
         .btn-import {
-            background-color: #6c757d;
+            background-color: #007bff;
             color: white;
         }
 
@@ -215,15 +226,35 @@
             background-color: #6c757d;
             color: white;
         }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
     </style>
+    <script src="../api.js"></script>
 </head>
 <body>
 <!-- 顶部导航栏 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
     <div class="user-area">
-        <span class="user-name">管理员账号：admin</span>
-        <button class="btn-logout">退出登录</button>
+        <span class="user-name" id="topAdminName">管理员账号：admin</span>
+        <button class="btn-logout" id="logoutBtn">退出登录</button>
     </div>
 </div>
 
@@ -232,17 +263,15 @@
     <!-- 左侧侧边栏 -->
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li>管理员首页</li>
-            <li>用户管理</li>
-            <li class="sub-item">用户管理</li>
-            <li>词书管理</li>
-            <li class="sub-item">添加词书</li>
-            <li class="sub-item">管理词书</li>
+            <li onclick="location.href='../admin/indexAdmin.html'">管理员首页</li>
+            <li onclick="location.href='../admin/adminPersonal.html'">个人中心</li>
+            <li onclick="location.href='../admin/manageUserAdmin.html'">用户管理</li>
+            <li class="sub-item" onclick="location.href='../admin/manageUserAdmin.html'">用户管理</li>
+            <li onclick="location.href='../wordbook/manageWordBookAdmin.html'">词书管理</li>
+            <li class="sub-item" onclick="location.href='../wordbook/manageWordBookAdmin.html'">管理词书</li>
             <li class="active">单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item active">批量添加单词</li>
-            <li class="sub-item">管理单词</li>
-            <li>学习记录查询</li>
+            <li class="sub-item" onclick="location.href='manageWordAdmin.html'">管理单词</li>
+            <li onclick="location.href='../wordlearningrecord/viewUserLearningRecords.html'">学习记录查询</li>
         </ul>
     </div>
 
@@ -252,28 +281,190 @@
         <div class="main-card">
             <!-- 模板下载区域 -->
             <div class="template-section">
-                <div class="template-title">Excel 模板下载</div>
+                <div class="template-title">📋 Excel 模板下载</div>
                 <div class="template-desc">
-                    下载标准模板文件，按照模板格式填写单词信息后上传，确保数据格式正确。
+                    下载标准模板文件，按照模板格式填写单词信息后上传。模板包含以下列：<br>
+                    <strong>spelling（单词拼写）、definition（释义）、example_sentence（例句）、phonetic（音标）、pronunciation_url（发音URL）、image_url（图片URL）</strong><br>
+                    <span style="color:#666;font-size:13px;">注：单词ID由系统自动生成，无需填写</span>
                 </div>
-                <button class="btn-download">下载模板文件</button>
+                <button class="btn-download" onclick="downloadTemplate()">下载模板文件</button>
             </div>
 
             <!-- 文件上传区域 -->
-            <div class="upload-area">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
                 <div class="upload-icon">📄</div>
                 <div class="upload-text">点击选择 Excel 文件或拖拽文件到这里</div>
                 <div class="upload-tip">支持 .xlsx, .xls 格式，文件大小不超过 10MB</div>
-                <div class="file-status">未选择文件</div>
+                <div class="file-status" id="fileStatus">未选择文件</div>
             </div>
 
             <!-- 按钮组 -->
             <div class="btn-group">
-                <button class="btn btn-import">开始导入</button>
-                <button class="btn btn-cancel">取消</button>
+                <button class="btn btn-import" onclick="startImport()">开始导入</button>
+                <button class="btn btn-cancel" onclick="goBack()">取消</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+let selectedFile = null;
+
+// 页面加载时初始化
+window.onload = function() {
+    // 设置管理员名称
+    let userId = localStorage.getItem("userId") || "admin";
+    document.getElementById("topAdminName").innerText = "管理员账号：" + userId;
+    
+    // 设置文件上传事件
+    setupFileUpload();
+};
+
+// 显示提示消息
+function showMsg(text, isErr = false) {
+    let toast = document.createElement("div");
+    toast.className = "toast" + (isErr ? " error" : "");
+    toast.innerText = text;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// 设置文件上传
+function setupFileUpload() {
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    
+    // 点击上传区域选择文件
+    uploadArea.addEventListener("click", () => {
+        fileInput.click();
+    });
+    
+    // 文件选择事件
+    fileInput.addEventListener("change", (e) => {
+        handleFileSelect(e.target.files[0]);
+    });
+    
+    // 拖拽上传
+    uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#007bff";
+        uploadArea.style.background = "#f8f9fa";
+    });
+    
+    uploadArea.addEventListener("dragleave", () => {
+        uploadArea.style.borderColor = "#ddd";
+        uploadArea.style.background = "white";
+    });
+    
+    uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#ddd";
+        uploadArea.style.background = "white";
+        const file = e.dataTransfer.files[0];
+        handleFileSelect(file);
+    });
+}
+
+// 处理文件选择
+function handleFileSelect(file) {
+    if (!file) return;
+    
+    // 验证文件类型
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+        showMsg("请选择有效的 Excel 文件（.xlsx 或 .xls）", true);
+        return;
+    }
+    
+    // 验证文件大小（10MB）
+    if (file.size > 10 * 1024 * 1024) {
+        showMsg("文件大小不能超过 10MB", true);
+        return;
+    }
+    
+    selectedFile = file;
+    document.getElementById("fileStatus").textContent = "已选择：" + file.name;
+    document.getElementById("fileStatus").style.color = "#28a745";
+}
+
+// 下载模板
+function downloadTemplate() {
+    const templateContent = "spelling,definition,example_sentence,phonetic,pronunciation_url,image_url\n" +
+                           "abandon,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,http://dict.example.com/abandon.mp3,images/words/abandon.png\n" +
+                           "ability,能力，才能,She has the ability to learn quickly.,/əˈbɪləti/,http://dict.example.com/ability.mp3,images/words/ability.png\n" +
+                           "consequence,后果，结果,Every action has its consequence.,/ˈkɒnsɪkwəns/,http://dict.example.com/consequence.mp3,images/words/consequence.png";
+    
+    const blob = new Blob([templateContent], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "word_import_template.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showMsg("模板文件已下载");
+}
+
+// 开始导入
+async function startImport() {
+    if (!selectedFile) {
+        showMsg("请先选择要导入的文件", true);
+        return;
+    }
+    
+    // 显示加载状态
+    const loading = document.createElement("div");
+    loading.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:2000";
+    loading.innerHTML = "<div style='background:white;padding:20px 30px;border-radius:8px;'>导入中...</div>";
+    document.body.appendChild(loading);
+    
+    try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        
+        const response = await fetch("http://localhost:8080/api/words/batch/import", {
+            method: "POST",
+            body: formData
+        });
+        
+        const res = await response.json();
+        
+        if (res.code === 200) {
+            const successCount = res.data?.successCount || 0;
+            const failCount = res.data?.failCount || 0;
+            showMsg("导入成功！成功导入 " + successCount + " 条，跳过 " + failCount + " 条");
+        } else {
+            showMsg(res.message || "导入失败", true);
+        }
+    } catch (error) {
+        showMsg("导入失败: " + error.message, true);
+    } finally {
+        loading.remove();
+    }
+}
+
+// 返回单词管理页面
+function goBack() {
+    window.location.href = "manageWordAdmin.html";
+}
+
+// 退出登录
+document.getElementById("logoutBtn").addEventListener("click", function() {
+    if (confirm("确定要退出登录吗？")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
+        showMsg("已退出登录");
+        setTimeout(() => {
+            window.location.href = "../index.html";
+        }, 1000);
+    }
+});
+</script>
 </body>
 </html>

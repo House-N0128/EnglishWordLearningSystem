@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习平台 - 修改用户信息</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
+        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
+        .top-nav { background-color:#dc3545; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
+        .nav-title { font-size:18px; font-weight:600; }
+        .user-area { display:flex; align-items:center; gap:15px; }
+        .user-name { font-size:14px; }
+        .btn-logout { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
+        .main-container { display:flex; flex:1; }
+        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
+        .sidebar-menu { list-style:none; }
+        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
+        .sidebar-menu li:hover, .sidebar-menu li.active { background-color:#f8d7da; color:#dc3545; }
+        .content-area { flex:1; padding:25px; }
+        .page-title { font-size:22px; color:#333; font-weight:600; margin-bottom:20px; }
+        .form-card { background:white; padding:30px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.05); max-width:600px; }
+        .form-group { margin-bottom:20px; }
+        .form-label { display:block; font-size:14px; color:#333; margin-bottom:8px; font-weight:500; }
+        .form-input { width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
+        .form-input:disabled { background-color:#f8f9fa; color:#666; }
+        .btn-group { display:flex; gap:15px; margin-top:30px; }
+        .btn { padding:10px 24px; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+        .btn-save { background:#28a745; color:white; }
+        .btn-save:hover { background:#218838; }
+        .btn-cancel { background:#6c757d; color:white; }
+        .btn-cancel:hover { background:#5a6268; }
+        .toast-msg { position:fixed; bottom:20px; right:20px; background:#333; color:white; padding:10px 18px; border-radius:6px; font-size:14px; z-index:1000; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+        .loading-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:2000; display:none; }
+        .loading-spinner { background:white; padding:20px 30px; border-radius:8px; font-size:16px; }
+    </style>
+</head>
+<body>
+<div class="top-nav">
+    <div class="nav-title">单词学习平台 - 管理员系统</div>
+    <div class="user-area">
+        <span class="user-name" id="admin-name">管理员</span>
+        <button class="btn-logout" onclick="clearAuth()">退出登录</button>
+    </div>
+</div>
+<div class="main-container">
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li onclick="window.location.href='indexAdmin.html'">管理员首页</li>
+            <li onclick="window.location.href='adminPersonal.html'">个人中心</li>
+            <li class="active">用户管理</li>
+            <li onclick="window.location.href='../wordbook/manageWordBookAdmin.html'">词书管理</li>
+            <li onclick="window.location.href='../word/manageWordAdmin.html'">单词管理</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewUserLearningRecords.html'">学习记录查询</li>
+        </ul>
+    </div>
+    <div class="content-area">
+        <h1 class="page-title">修改用户信息</h1>
+        <div class="form-card">
+            <div class="form-group">
+                <label class="form-label">用户ID</label>
+                <input type="text" class="form-input" id="userId" disabled>
+            </div>
+            <div class="form-group">
+                <label class="form-label">用户昵称</label>
+                <input type="text" class="form-input" id="userName" placeholder="请输入用户昵称">
+            </div>
+            <div class="form-group">
+                <label class="form-label">联系电话</label>
+                <input type="text" class="form-input" id="phoneNumber" placeholder="请输入联系电话">
+            </div>
+            <div class="form-group">
+                <label class="form-label">邮箱地址</label>
+                <input type="email" class="form-input" id="email" placeholder="请输入邮箱地址">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-save" onclick="save()">保存修改</button>
+                <button class="btn btn-cancel" onclick="goBack()">返回</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+</div>
+<script src="../api.js"></script>
+<script>
+if (!requireAuth('admin')) { /* redirect */ }
+document.getElementById('admin-name').textContent = '管理员：' + (localStorage.getItem('userId') || '');
+
+var currentUserId = '';
+
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+function loadUserInfo() {
+    var params = new URLSearchParams(window.location.search);
+    currentUserId = params.get('userId');
+    console.log('loadUserInfo, userId from URL:', currentUserId);
+    
+    if (!currentUserId) {
+        showMessage('缺少用户ID', true);
+        return;
+    }
+    
+    // 通过搜索用户列表获取用户信息
+    showLoading();
+    apiGet('/api/admin/users?keyword=' + currentUserId).then(function(r) {
+        hideLoading();
+        console.log('loadUserInfo API response:', r);
+        if (r.code === 200 && r.data && r.data.length > 0) {
+            var user = r.data.find(function(u) { return u.userId === currentUserId; });
+            if (user) {
+                document.getElementById('userId').value = user.userId || '';
+                document.getElementById('userName').value = user.userName || '';
+                document.getElementById('phoneNumber').value = user.phoneNumber || '';
+                document.getElementById('email').value = user.email || '';
+            } else {
+                showMessage('未找到用户信息', true);
+            }
+        } else {
+            showMessage(r.message || '获取用户信息失败', true);
+        }
+    }).catch(function(error) {
+        hideLoading();
+        console.error('loadUserInfo error:', error);
+        showMessage('获取用户信息失败: ' + error.message, true);
+    });
+}
+
+function save() {
+    console.log('save called, currentUserId:', currentUserId);
+    
+    var data = {
+        userName: document.getElementById('userName').value.trim(),
+        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        email: document.getElementById('email').value.trim()
+    };
+    
+    console.log('save data:', data);
+    
+    if (!data.userName) {
+        showMessage('请输入用户昵称', true);
+        return;
+    }
+    
+    if (!currentUserId) {
+        showMessage('用户ID为空，请重新进入编辑页面', true);
+        return;
+    }
+    
+    showLoading();
+    apiPut('/api/admin/users/' + currentUserId, data).then(function(r) {
+        hideLoading();
+        console.log('API response:', r);
+        if (r.code === 200) {
+            showMessage('用户信息修改成功');
+            setTimeout(function() { window.location.href = 'manageUserAdmin.html'; }, 1500);
+        } else {
+            showMessage(r.message || '修改失败', true);
+        }
+    }).catch(function(error) {
+        hideLoading();
+        console.error('API error:', error);
+        showMessage('修改失败: ' + (error.message || '网络错误'), true);
+    });
+}
+
+function goBack() {
+    window.location.href = 'manageUserAdmin.html';
+}
+
+loadUserInfo();
+</script>
+</body>
+</html>
