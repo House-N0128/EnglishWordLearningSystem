@@ -31,6 +31,9 @@ public interface WordMapper {
     @Select("SELECT COUNT(*) FROM t_word")
     int countAll();
 
+    @Select("SELECT MAX(CAST(SUBSTRING(word_id, 3) AS UNSIGNED)) FROM t_word WHERE word_id LIKE 'WD%'")
+    Integer maxWordIdNum();
+
     @Insert("INSERT INTO t_word(word_id, spelling, definition, part_of_speech, example_sentence, phonetic, pronunciation_url, image_url, created_at) " +
             "VALUES(#{wordId}, #{englishSpelling}, #{chineseDefinition}, #{partOfSpeech}, #{exampleSentence}, #{phoneticSymbol}, #{wordPronunciation}, #{wordImage}, NOW())")
     void insert(Word word);

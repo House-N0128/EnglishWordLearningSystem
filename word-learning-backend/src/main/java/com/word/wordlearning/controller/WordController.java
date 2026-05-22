@@ -68,7 +68,7 @@ public class WordController {
             // Word doesn't exist - create it and add ref
             String newId = body.get("wordId");
             if (newId == null || newId.isEmpty()) {
-                newId = "WD" + System.currentTimeMillis();
+                newId = generateWordId();
             }
             Word w = new Word();
             w.setWordId(newId);
@@ -91,7 +91,7 @@ public class WordController {
 
         String wordId = body.get("wordId");
         if (wordId == null || wordId.isEmpty()) {
-            wordId = "WD" + System.currentTimeMillis();
+            wordId = generateWordId();
         }
         String phonetic = body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "";
         String example = body.get("exampleSentence") != null ? body.get("exampleSentence") : "";
@@ -108,6 +108,12 @@ public class WordController {
         w.setWordImage(image);
         wordMapper.insert(w);
         return Result.success("单词添加成功");
+    }
+
+    private String generateWordId() {
+        Integer max = wordMapper.maxWordIdNum();
+        int next = (max == null) ? 1 : max + 1;
+        return "WD" + String.format("%05d", next);
     }
 
     @PutMapping("/{wordId}")
@@ -132,7 +138,8 @@ public class WordController {
         if (words == null || words.isEmpty()) return Result.error(400, "单词列表为空");
 
         int success = 0, fail = 0, skipped = 0;
-        int idSeq = 1;
+        Integer maxNum = wordMapper.maxWordIdNum();
+        int idSeq = (maxNum == null) ? 1 : maxNum + 1;
         for (Map<String, String> w : words) {
             try {
                 String spelling = w.get("englishSpelling");
@@ -146,7 +153,7 @@ public class WordController {
                 // Auto-generate ID
                 String wordId = w.get("wordId");
                 if (wordId == null || wordId.isEmpty()) {
-                    wordId = "WD" + System.currentTimeMillis() + String.format("%03d", idSeq++);
+                    wordId = "WD" + String.format("%05d", idSeq++);
                 }
 
                 Word nw = new Word();
