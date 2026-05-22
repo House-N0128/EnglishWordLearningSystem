@@ -83,8 +83,26 @@ public class WordSearchActivity extends AppCompatActivity {
             });
             topBar.addView(btnLogout);
         } else {
-            topBar.setGravity(Gravity.CENTER);
-            userTopBarTitle(topBar, "单词查询");
+            TextView btnBack = new TextView(this);
+            btnBack.setText("←");
+            btnBack.setTextSize(22);
+            btnBack.setTextColor(0xFFFFFFFF);
+            btnBack.setTypeface(null, Typeface.BOLD);
+            btnBack.setPadding(0, 0, dp(12), 0);
+            btnBack.setOnClickListener(v -> finish());
+            topBar.addView(btnBack);
+
+            TextView userTitle = new TextView(this);
+            userTitle.setText("单词查询");
+            userTitle.setTextSize(18);
+            userTitle.setTextColor(0xFFFFFFFF);
+            userTitle.setTypeface(null, Typeface.BOLD);
+            userTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            topBar.addView(userTitle);
+
+            TextView place = new TextView(this);
+            place.setLayoutParams(new LinearLayout.LayoutParams(dp(48), 1));
+            topBar.addView(place);
         }
         root.addView(topBar);
 
@@ -229,12 +247,16 @@ public class WordSearchActivity extends AppCompatActivity {
 
         // ===== BOTTOM NAVBAR (admin only) =====
         if (isAdmin) {
-            root.addView(makeAdminNavbar());
-        } else {
-            root.addView(makeUserNavbar(2));
+            root.addView(makeNavbar());
         }
 
         setContentView(root);
+        loadData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadData();
     }
 
@@ -247,17 +269,7 @@ public class WordSearchActivity extends AppCompatActivity {
         sp.setBackground(bg);
     }
 
-    private void userTopBarTitle(LinearLayout bar, String title) {
-        TextView tv = new TextView(this);
-        tv.setText(title);
-        tv.setTextSize(18);
-        tv.setTextColor(0xFFFFFFFF);
-        tv.setTypeface(null, Typeface.BOLD);
-        tv.setGravity(Gravity.CENTER);
-        bar.addView(tv);
-    }
-
-    private LinearLayout makeAdminNavbar() {
+    private LinearLayout makeNavbar() {
         LinearLayout navbar = new LinearLayout(this);
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
@@ -265,16 +277,16 @@ public class WordSearchActivity extends AppCompatActivity {
         navbar.setElevation(dp(8));
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
-        navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
-        navItem(navbar, "👥", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
-        navItem(navbar, "📚", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
-        navItem(navbar, "🗃️", "单词管理", true, () -> {});
+        navItem(navbar, "", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
+        navItem(navbar, "", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
+        navItem(navbar, "", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
+        navItem(navbar, "", "单词管理", true, () -> {});
         return navbar;
     }
 
     private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
         TextView item = new TextView(this);
-        item.setText(icon + "\n" + label);
+        item.setText(icon.isEmpty() ? label : icon + "\n" + label);
         item.setTextSize(15);
         item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
@@ -349,78 +361,52 @@ public class WordSearchActivity extends AppCompatActivity {
                 continue; // Words don't have real status yet, skip filter for non-全部
             }
 
-            // Card
-            LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setPadding(dp(12), dp(12), dp(12), dp(12));
-            GradientDrawable cBg = new GradientDrawable();
-            cBg.setColor(0xFFFFFFFF);
-            cBg.setCornerRadius(dp(12));
-            card.setBackground(cBg);
-            card.setElevation(dp(2));
-            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            cp.setMargins(0, 0, 0, dp(12));
-            card.setLayoutParams(cp);
-
-            // Row 1: 单词ID + 词书 + 拼写 + 词性 + 音标
-            StringBuilder row1 = new StringBuilder();
-            row1.append("单词ID: ").append(wordId);
-            if (!wBookName.isEmpty()) row1.append(" | 词书: ").append(wBookName);
-            row1.append(" | 拼写: ").append(spelling);
-            if (!pos.isEmpty()) row1.append(" | 词性: ").append(pos);
-            if (!phonetic.isEmpty()) row1.append(" | 音标: ").append(phonetic);
-            addCardRow(card, row1.toString());
-
-            // Row 2: 释义 + 创建
-            StringBuilder row2 = new StringBuilder();
-            row2.append("释义: ").append(definition);
-            if (!createTime.isEmpty()) row2.append(" | 创建: ").append(createTime);
-            addCardRow(card, row2.toString());
-
-            // Buttons
             if (isAdmin) {
-                LinearLayout btns = new LinearLayout(this);
-                btns.setOrientation(LinearLayout.HORIZONTAL);
-                btns.setPadding(0, dp(6), 0, 0);
+                // Compact single-line: spelling+def | edit | delete | detail
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setBackgroundColor(0xFFFFFFFF);
+                row.setPadding(dp(10), dp(5), dp(10), dp(5));
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                GradientDrawable rBg = new GradientDrawable();
+                rBg.setColor(0xFFFFFFFF);
+                rBg.setCornerRadius(dp(6));
+                row.setBackground(rBg);
+                LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                rp.setMargins(0, 0, 0, dp(2));
+                row.setLayoutParams(rp);
 
-                Button editBtn = cardBtn(btns, "编辑", 0xFF318af8, 0xFFFFFFFF);
-                editBtn.setOnClickListener(v -> {
-                    Intent in = new Intent(this, AddEditWordActivity.class);
-                    in.putExtra("wordId", wordId);
-                    startActivity(in);
-                });
+                TextView spTv = new TextView(this);
+                spTv.setText(spelling + "  " + definition);
+                spTv.setTextSize(13);
+                spTv.setTextColor(0xFF318af8);
+                spTv.setTypeface(null, Typeface.BOLD);
+                spTv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+                row.addView(spTv);
 
-                Button delBtn = cardBtn(btns, "删除", 0xFFe8ecf1, 0xFF5a6b80);
                 String fWordId = wordId, fSpelling = spelling;
-                delBtn.setOnClickListener(v -> new AlertDialog.Builder(this)
+                row.addView(tinyBtn("编辑", 0xFF318af8, 0xFFFFFFFF, v -> {
+                    Intent in = new Intent(this, AddEditWordActivity.class);
+                    in.putExtra("wordId", fWordId);
+                    startActivity(in);
+                }));
+                row.addView(tinyBtn("删除", 0xFFe8ecf1, 0xFF5a6b80, v -> new AlertDialog.Builder(this)
                         .setTitle("确认删除")
                         .setMessage("确定删除\"" + fSpelling + "\"？")
                         .setPositiveButton("确定", (d, w2) -> new Thread(() -> {
-                            try {
-                                JsonObject rr = ApiClient.get().delete("/api/words/" + fWordId, null);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(this, rr.has("message") ? rr.get("message").getAsString() : "已删除", Toast.LENGTH_SHORT).show();
-                                    loadData();
-                                });
-                            } catch (Exception e) {}
+                            try { ApiClient.get().delete("/api/words/" + fWordId, null); runOnUiThread(() -> loadData()); } catch (Exception e) {}
                         }).start())
                         .setNegativeButton("取消", null)
-                        .show());
-
-                Button detailBtn = cardBtn(btns, "详情", 0xFF318af8, 0xFFFFFFFF);
-                detailBtn.setOnClickListener(v -> {
+                        .show()));
+                row.addView(tinyBtn("详情", 0xFF318af8, 0xFFFFFFFF, v -> {
                     Intent in = new Intent(this, WordDetailActivity.class);
-                    in.putExtra("wordId", wordId);
+                    in.putExtra("wordId", fWordId);
                     startActivity(in);
-                });
+                }));
 
-                btns.addView(editBtn);
-                btns.addView(delBtn);
-                btns.addView(detailBtn);
-                card.addView(btns);
+                listArea.addView(row);
             }
 
-            listArea.addView(card);
         }
     }
 
@@ -431,6 +417,25 @@ public class WordSearchActivity extends AppCompatActivity {
         tv.setTextColor(0xFF4a5568);
         tv.setPadding(0, 0, 0, dp(3));
         card.addView(tv);
+    }
+
+    private Button tinyBtn(String text, int bg, int fg, android.view.View.OnClickListener listener) {
+        Button b = new Button(this);
+        b.setText(text);
+        b.setTextColor(fg);
+        b.setTextSize(11);
+        b.setPadding(dp(6), dp(2), dp(6), dp(2));
+        b.setMinWidth(0); b.setMinHeight(0);
+        b.setMinimumWidth(0); b.setMinimumHeight(0);
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(bg);
+        g.setCornerRadius(dp(4));
+        b.setBackground(g);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(dp(4), 0, 0, 0);
+        b.setLayoutParams(bp);
+        b.setOnClickListener(listener);
+        return b;
     }
 
     private Button cardBtn(LinearLayout parent, String text, int bgColor, int textColor) {
@@ -451,39 +456,6 @@ public class WordSearchActivity extends AppCompatActivity {
         bp.setMargins(0, 0, dp(6), 0);
         b.setLayoutParams(bp);
         return b;
-    }
-
-    private LinearLayout makeUserNavbar(int activeIndex) {
-        LinearLayout navbar = new LinearLayout(this);
-        navbar.setOrientation(LinearLayout.HORIZONTAL);
-        navbar.setBackgroundColor(0xFFFFFFFF);
-        navbar.setPadding(0, dp(8), 0, dp(12));
-        navbar.setElevation(dp(8));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
-        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
-        navbar.setGravity(Gravity.CENTER);
-
-        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
-        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
-                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
-
-        for (int i = 0; i < tabs.length; i++) {
-            boolean active = (i == activeIndex);
-            TextView tv = new TextView(this);
-            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
-            tv.setTextSize(15);
-            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
-            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
-            tv.setGravity(Gravity.CENTER);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            int idx = i;
-            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
-            navbar.addView(tv);
-        }
-        return navbar;
     }
 
     private int dp(int val) {

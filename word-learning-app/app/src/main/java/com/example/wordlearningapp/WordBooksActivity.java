@@ -79,8 +79,26 @@ public class WordBooksActivity extends AppCompatActivity {
             });
             topBar.addView(btnLogout);
         } else {
-            topBar.setGravity(Gravity.CENTER);
-            userTopBarTitle(topBar, "词书浏览");
+            TextView btnBack = new TextView(this);
+            btnBack.setText("←");
+            btnBack.setTextSize(22);
+            btnBack.setTextColor(0xFFFFFFFF);
+            btnBack.setTypeface(null, Typeface.BOLD);
+            btnBack.setPadding(0, 0, dp(12), 0);
+            btnBack.setOnClickListener(v -> finish());
+            topBar.addView(btnBack);
+
+            TextView userTitle = new TextView(this);
+            userTitle.setText("词书浏览");
+            userTitle.setTextSize(18);
+            userTitle.setTextColor(0xFFFFFFFF);
+            userTitle.setTypeface(null, Typeface.BOLD);
+            userTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            topBar.addView(userTitle);
+
+            TextView place = new TextView(this);
+            place.setLayoutParams(new LinearLayout.LayoutParams(dp(48), 1));
+            topBar.addView(place);
         }
         root.addView(topBar);
 
@@ -90,13 +108,14 @@ public class WordBooksActivity extends AppCompatActivity {
         main.setOrientation(LinearLayout.VERTICAL);
         main.setPadding(dp(12), dp(8), dp(12), isAdmin ? dp(70) : dp(16));
 
-        // Title
+        // Title (click to refresh)
         TextView title = new TextView(this);
         title.setText(isAdmin ? "词书管理" : "词书浏览");
         title.setTextSize(19);
         title.setTextColor(0xFF318af8);
         title.setTypeface(null, Typeface.BOLD);
         title.setPadding(0, dp(15), 0, dp(15));
+        title.setOnClickListener(v -> loadBooks());
         main.addView(title);
 
         // Search area: two rows
@@ -203,14 +222,18 @@ public class WordBooksActivity extends AppCompatActivity {
         scroll.addView(main);
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
 
-        // ===== BOTTOM NAVBAR =====
+        // ===== BOTTOM NAVBAR (admin only) =====
         if (isAdmin) {
-            root.addView(makeAdminNavbar());
-        } else {
-            root.addView(makeUserNavbar(1));
+            root.addView(makeNavbar());
         }
 
         setContentView(root);
+        loadBooks();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadBooks();
     }
 
@@ -223,17 +246,7 @@ public class WordBooksActivity extends AppCompatActivity {
         sp.setBackground(bg);
     }
 
-    private void userTopBarTitle(LinearLayout bar, String title) {
-        TextView tv = new TextView(this);
-        tv.setText(title);
-        tv.setTextSize(18);
-        tv.setTextColor(0xFFFFFFFF);
-        tv.setTypeface(null, Typeface.BOLD);
-        tv.setGravity(Gravity.CENTER);
-        bar.addView(tv);
-    }
-
-    private LinearLayout makeAdminNavbar() {
+    private LinearLayout makeNavbar() {
         LinearLayout navbar = new LinearLayout(this);
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
@@ -241,16 +254,16 @@ public class WordBooksActivity extends AppCompatActivity {
         navbar.setElevation(dp(8));
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
-        navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
-        navItem(navbar, "👥", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
-        navItem(navbar, "📚", "词书管理", true, () -> {});
-        navItem(navbar, "🗃️", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
+        navItem(navbar, "", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
+        navItem(navbar, "", "用户管理", false, () -> startActivity(new Intent(this, UserManageActivity.class)));
+        navItem(navbar, "", "词书管理", true, () -> {});
+        navItem(navbar, "", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
         return navbar;
     }
 
     private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
         TextView item = new TextView(this);
-        item.setText(icon + "\n" + label);
+        item.setText(icon.isEmpty() ? label : icon + "\n" + label);
         item.setTextSize(15);
         item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
@@ -317,7 +330,13 @@ public class WordBooksActivity extends AppCompatActivity {
 
             addCardRow(card, "ID: " + bid + " | 名称: " + name + " | 难度: " + bookDiff);
             addCardRow(card, "词数: " + wc + " | 创建管理员: " + adminId);
-            addCardRow(card, "创建: " + cTime + " | 更新: " + uTime + " | 状态: " + status);
+            addCardRow(card, "创建: " + cTime + " | 更新: " + uTime);
+            TextView stv = new TextView(this);
+            stv.setText("状态: " + status);
+            stv.setTextSize(12);
+            stv.setTextColor("未上架".equals(status) ? 0xFFe37b4b : 0xFF25cb75);
+            stv.setPadding(0, 0, 0, dp(4));
+            card.addView(stv);
 
             if (isAdmin) {
                 LinearLayout btns = new LinearLayout(this);
@@ -350,13 +369,18 @@ public class WordBooksActivity extends AppCompatActivity {
 
                 Button addWordBtn = cardBtn(btns, "添加单词", 0xFF318af8, 0xFFFFFFFF);
                 addWordBtn.setOnClickListener(v -> {
-                    Intent in = new Intent(this, AddEditBookActivity.class);
+                    Intent in = new Intent(this, AddEditWordActivity.class);
                     in.putExtra("bookId", bid);
                     startActivity(in);
                 });
 
                 Button viewWordBtn = cardBtn(btns, "查看单词", 0xFF318af8, 0xFFFFFFFF);
-                viewWordBtn.setOnClickListener(v -> startActivity(new Intent(this, WordSearchActivity.class)));
+                viewWordBtn.setOnClickListener(v -> {
+                    Intent in = new Intent(this, ViewBookWordsActivity.class);
+                    in.putExtra("bookId", bid);
+                    in.putExtra("bookName", name);
+                    startActivity(in);
+                });
 
                 btns.addView(editBtn);
                 btns.addView(delBtn);
@@ -396,39 +420,6 @@ public class WordBooksActivity extends AppCompatActivity {
         bp.setMargins(0, 0, dp(4), 0);
         b.setLayoutParams(bp);
         return b;
-    }
-
-    private LinearLayout makeUserNavbar(int activeIndex) {
-        LinearLayout navbar = new LinearLayout(this);
-        navbar.setOrientation(LinearLayout.HORIZONTAL);
-        navbar.setBackgroundColor(0xFFFFFFFF);
-        navbar.setPadding(0, dp(8), 0, dp(12));
-        navbar.setElevation(dp(8));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(16), dp(16), dp(16), dp(16), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
-        navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(62)));
-        navbar.setGravity(Gravity.CENTER);
-
-        String[][] tabs = {{"🏠","首页"},{"📚","词书浏览"},{"🔍","单词查询"},{"⭐","我的收藏"},{"📝","学习记录"},{"👤","个人中心"}};
-        Class<?>[] targets = {MainActivity.class, WordBooksActivity.class, WordSearchActivity.class,
-                CollectionsActivity.class, StudyRecordsActivity.class, ProfileActivity.class};
-
-        for (int i = 0; i < tabs.length; i++) {
-            boolean active = (i == activeIndex);
-            TextView tv = new TextView(this);
-            tv.setText(tabs[i][0] + "\n" + tabs[i][1]);
-            tv.setTextSize(15);
-            tv.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
-            tv.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
-            tv.setGravity(Gravity.CENTER);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            int idx = i;
-            tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
-            navbar.addView(tv);
-        }
-        return navbar;
     }
 
     private int dp(int val) {
