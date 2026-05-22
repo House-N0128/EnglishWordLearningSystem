@@ -31,7 +31,4 @@ public interface CollectionMapper {
 
     @Select("SELECT MAX(CAST(collectionId AS UNSIGNED)) FROM t_collection WHERE collectionId REGEXP '^[0-9]+$'")
     Integer maxNumericId();
-
-    @Delete("DELETE FROM t_collection WHERE wordId = #{wordId}")
-    void deleteByWordId(@Param("wordId") String wordId);
 }

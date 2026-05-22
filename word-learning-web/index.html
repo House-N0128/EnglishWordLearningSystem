@@ -140,18 +140,7 @@ async function doLogin() {
     var result = await apiPost(endpoint, { userid: userId, password: password });
 
     if (result.code === 200) {
-        // 调试：打印返回的数据结构
-        console.log('登录成功，返回数据:', result);
-        console.log('用户ID:', result.data.userid);
-        
-        // 设置登录状态
-        var loginUserId = result.data.userid || result.data.userId || userId;
-        setAuth(loginUserId, currentRole);
-        
-        // 调试：验证 localStorage 是否设置成功
-        console.log('localStorage userId:', localStorage.getItem('userId'));
-        console.log('localStorage userRole:', localStorage.getItem('userRole'));
-        
+        setAuth(result.data.userid, currentRole);
         window.location.href = currentRole === 'admin' ? '/admin/indexAdmin.html' : '/user/index.html';
     } else {
         showError(result.message);

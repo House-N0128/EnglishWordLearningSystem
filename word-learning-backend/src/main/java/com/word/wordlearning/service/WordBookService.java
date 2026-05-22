@@ -2,7 +2,6 @@ package com.word.wordlearning.service;
 
 import com.word.wordlearning.entity.WordBook;
 import com.word.wordlearning.mapper.WordBookMapper;
-import com.word.wordlearning.mapper.WordMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,22 +10,12 @@ import java.util.List;
 public class WordBookService {
 
     private final WordBookMapper wordBookMapper;
-    private final WordMapper wordMapper;
 
-    public WordBookService(WordBookMapper wordBookMapper, WordMapper wordMapper) {
+    public WordBookService(WordBookMapper wordBookMapper) {
         this.wordBookMapper = wordBookMapper;
-        this.wordMapper = wordMapper;
     }
 
     public List<WordBook> listAvailable() {
-        List<WordBook> books = wordBookMapper.findAll();
-        for (WordBook book : books) {
-            book.setWordCount(wordBookMapper.countWordsInBook(book.getWordBookId()));
-        }
-        return books;
-    }
-
-    public List<WordBook> listAll() {
         List<WordBook> books = wordBookMapper.findAll();
         for (WordBook book : books) {
             book.setWordCount(wordBookMapper.countWordsInBook(book.getWordBookId()));
@@ -43,7 +32,6 @@ public class WordBookService {
     }
 
     public void delete(String wordBookId) {
-        wordMapper.deleteAllBookRefsByBookId(wordBookId);
-        wordBookMapper.hardDelete(wordBookId);
+        wordBookMapper.delete(wordBookId);
     }
 }

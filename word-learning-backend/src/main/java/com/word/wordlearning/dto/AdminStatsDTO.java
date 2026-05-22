@@ -8,6 +8,4 @@ public class AdminStatsDTO {
     private int wordBookCount;
     private int wordCount;
     private int todayRecordCount;
-    private int todayActiveUserCount;
-    private double avgWordsPerUserToday;
 }

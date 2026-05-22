@@ -53,6 +53,6 @@ public class WordBookController {
     @DeleteMapping("/{wordBookId}")
     public Result<String> delete(@PathVariable String wordBookId) {
         wordBookService.delete(wordBookId);
-        return Result.success("词书已删除");
+        return Result.success("词书已下架");
     }
 }

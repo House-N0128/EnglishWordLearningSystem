@@ -1,128 +1,152 @@
 package com.example.wordlearningapp;
 
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.ViewGroup;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddEditWordActivity extends AppCompatActivity {
 
-    private EditText etSpelling, etPhonetic, etPos, etChinese, etExample;
+    private EditText etBookId, etSpelling, etPhonetic, etChinese, etExample, etAudio, etImage;
+    private Spinner spBook;
     private Button btnSubmit;
     private TextView tvTitle;
-    private String wordId, bookId;
+    private String wordId;
+    private List<String> bookIds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         wordId = getIntent().getStringExtra("wordId");
-        bookId = getIntent().getStringExtra("bookId");
-        boolean isEdit = wordId != null;
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFFf2f8fc);
 
-        // Top bar
-        LinearLayout topBar = new LinearLayout(this);
-        topBar.setOrientation(LinearLayout.HORIZONTAL);
-        topBar.setPadding(dp(6), 0, dp(18), 0);
-        topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
-        topBar.setBackground(tbBg);
-
-        TextView btnBack = new TextView(this);
-        btnBack.setText("←");
-        btnBack.setTextSize(22);
-        btnBack.setTextColor(0xFFFFFFFF);
-        btnBack.setTypeface(null, Typeface.BOLD);
-        btnBack.setPadding(dp(5), 0, dp(11), 0);
-        btnBack.setOnClickListener(v -> finish());
-        topBar.addView(btnBack);
-
+        // Toolbar
+        LinearLayout toolbar = new LinearLayout(this);
+        toolbar.setBackgroundColor(0xFF318af8);
+        toolbar.setPadding(28, 28, 28, 28);
+        TextView back = new TextView(this);
+        back.setText("← 返回"); back.setTextSize(16); back.setTextColor(0xFFFFFFFF);
+        back.setOnClickListener(v -> finish());
+        toolbar.addView(back);
         tvTitle = new TextView(this);
-        tvTitle.setText(isEdit ? "编辑单词" : "新增单词");
-        tvTitle.setTextSize(18);
-        tvTitle.setTextColor(0xFFFFFFFF);
-        tvTitle.setTypeface(null, Typeface.BOLD);
-        topBar.addView(tvTitle);
-        root.addView(topBar);
+        tvTitle.setText(wordId != null ? "编辑单词" : "添加单词");
+        tvTitle.setTextSize(18); tvTitle.setTextColor(0xFFFFFFFF);
+        LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        tvTitle.setGravity(android.view.Gravity.CENTER);
+        tvTitle.setLayoutParams(tp);
+        toolbar.addView(tvTitle);
+        toolbar.addView(new View(this) {{ setLayoutParams(new LinearLayout.LayoutParams(48, 1)); }});
+        root.addView(toolbar);
 
-        // Form
-        ScrollView scroll = new ScrollView(this);
+        // Form in ScrollView
         LinearLayout form = new LinearLayout(this);
         form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(dp(16), dp(16), dp(16), dp(20));
+        form.setPadding(28, 20, 28, 24);
 
-        etSpelling = addField(form, "英文拼写 *");
+        // Book selector
+        TextView bookLabel = new TextView(this);
+        bookLabel.setText("所属词书"); bookLabel.setTextSize(14); bookLabel.setTextColor(0xFF4a5568);
+        bookLabel.setPadding(0, 12, 0, 6);
+        form.addView(bookLabel);
+
+        if (wordId == null) {
+            spBook = new Spinner(this);
+            spBook.setPadding(24, 14, 24, 14);
+            android.graphics.drawable.GradientDrawable sbg = new android.graphics.drawable.GradientDrawable();
+            sbg.setColor(0xFFFFFFFF);
+            sbg.setStroke(2, 0xFFe2e8f0);
+            sbg.setCornerRadius(24);
+            spBook.setBackground(sbg);
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.setMargins(0, 0, 0, 12);
+            spBook.setLayoutParams(sp);
+            form.addView(spBook);
+            loadBookList();
+        } else {
+            etBookId = new EditText(this);
+            etBookId.setPadding(24, 14, 24, 14);
+            etBookId.setTextSize(15);
+            etBookId.setEnabled(false);
+            android.graphics.drawable.GradientDrawable ebg = new android.graphics.drawable.GradientDrawable();
+            ebg.setColor(0xFFF0F4F8);
+            ebg.setStroke(2, 0xFFe2e8f0);
+            ebg.setCornerRadius(24);
+            etBookId.setBackground(ebg);
+            LinearLayout.LayoutParams ep2 = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            ep2.setMargins(0, 0, 0, 12);
+            etBookId.setLayoutParams(ep2);
+            form.addView(etBookId);
+        }
+
+        etSpelling = addField(form, "英文拼写");
         etPhonetic = addField(form, "音标");
-        etPos = addField(form, "词性 (如: n. / v. / adj.)");
-        etChinese = addField(form, "中文释义 *");
+        etChinese = addField(form, "中文释义");
         etExample = addField(form, "例句");
         etExample.setLines(2);
-        etExample.setMinHeight(dp(60));
-        etExample.setGravity(android.view.Gravity.TOP);
+        etAudio = addField(form, "音频URL");
+        etImage = addField(form, "图片URL");
 
         btnSubmit = new Button(this);
-        btnSubmit.setText(isEdit ? "保存修改" : "添加单词");
-        btnSubmit.setTextColor(0xFFFFFFFF);
-        btnSubmit.setTextSize(17);
-        btnSubmit.setPadding(0, dp(12), 0, dp(12));
-        GradientDrawable sbg = new GradientDrawable();
-        sbg.setColors(new int[]{0xFF3577ef, 0xFF6cc3ff});
-        sbg.setOrientation(GradientDrawable.Orientation.LEFT_RIGHT);
-        sbg.setCornerRadius(dp(25));
-        btnSubmit.setBackground(sbg);
-        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        sbp.setMargins(0, dp(16), 0, 0);
-        btnSubmit.setLayoutParams(sbp);
-        btnSubmit.setOnClickListener(v -> submit());
+        btnSubmit.setText(wordId != null ? "保存修改" : "添加单词");
+        btnSubmit.setTextColor(0xFFFFFFFF); btnSubmit.setBackgroundColor(0xFF318af8);
+        btnSubmit.setTextSize(16); btnSubmit.setPadding(14, 14, 14, 14);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(0, 20, 0, 0);
+        btnSubmit.setLayoutParams(bp);
         form.addView(btnSubmit);
 
-        scroll.addView(form);
-        root.addView(scroll);
+        root.addView(form);
         setContentView(root);
 
-        if (isEdit) loadWordData();
+        btnSubmit.setOnClickListener(v -> submit());
+
+        if (wordId != null) loadWordData();
     }
 
     private EditText addField(LinearLayout parent, String label) {
         TextView lbl = new TextView(this);
-        lbl.setText(label);
-        lbl.setTextSize(14);
-        lbl.setTextColor(0xFF318af8);
-        lbl.setTypeface(null, Typeface.BOLD);
-        lbl.setPadding(0, dp(12), 0, dp(4));
+        lbl.setText(label); lbl.setTextSize(14); lbl.setTextColor(0xFF4a5568);
+        lbl.setPadding(0, 12, 0, 6);
         parent.addView(lbl);
-
         EditText et = new EditText(this);
-        et.setPadding(dp(10), dp(10), dp(10), dp(10));
-        et.setTextSize(15);
-        et.setSingleLine(true);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(0xFFf6f8fc);
-        bg.setCornerRadius(dp(8));
-        bg.setStroke(1, 0xFFc7d9ee);
-        et.setBackground(bg);
-        LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ep.setMargins(0, 0, 0, dp(12));
+        et.setPadding(24, 14, 24, 14);
+        et.setBackgroundColor(0xFFFFFFFF);
+        et.setTextSize(15); et.setSingleLine(true);
+        LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ep.setMargins(0, 0, 0, 12);
         et.setLayoutParams(ep);
+
+        // Add visible border via background drawable
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(0xFFFFFFFF);
+        bg.setStroke(2, 0xFFe2e8f0);
+        bg.setCornerRadius(24);
+        et.setBackground(bg);
+        et.setPadding(24, 14, 24, 14);
+
         parent.addView(et);
         return et;
     }
@@ -134,72 +158,89 @@ public class AddEditWordActivity extends AppCompatActivity {
                 if (res.get("code").getAsInt() == 200) {
                     JsonObject w = res.getAsJsonObject("data");
                     runOnUiThread(() -> {
-                        setText(etSpelling, w, "englishSpelling");
-                        setText(etPhonetic, w, "phoneticSymbol");
-                        setText(etPos, w, "partOfSpeech");
-                        setText(etChinese, w, "chineseDefinition");
-                        setText(etExample, w, "exampleSentence");
+                        if (w.has("wordBookId") && !w.get("wordBookId").isJsonNull()) etBookId.setText(w.get("wordBookId").getAsString());
+                        if (w.has("englishSpelling") && !w.get("englishSpelling").isJsonNull()) etSpelling.setText(w.get("englishSpelling").getAsString());
+                        if (w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull()) etPhonetic.setText(w.get("phoneticSymbol").getAsString());
+                        if (w.has("chineseDefinition") && !w.get("chineseDefinition").isJsonNull()) etChinese.setText(w.get("chineseDefinition").getAsString());
+                        if (w.has("exampleSentence") && !w.get("exampleSentence").isJsonNull()) etExample.setText(w.get("exampleSentence").getAsString());
+                        if (w.has("wordPronunciation") && !w.get("wordPronunciation").isJsonNull()) etAudio.setText(w.get("wordPronunciation").getAsString());
+                        if (w.has("wordImage") && !w.get("wordImage").isJsonNull()) etImage.setText(w.get("wordImage").getAsString());
                     });
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) { e.printStackTrace(); }
         }).start();
     }
 
-    private void setText(EditText et, JsonObject w, String key) {
-        if (w.has(key) && !w.get(key).isJsonNull()) et.setText(w.get(key).getAsString());
+    private void loadBookList() {
+        new Thread(() -> {
+            try {
+                JsonObject res = ApiClient.get().get("/api/wordbooks");
+                if (res.get("code").getAsInt() == 200) {
+                    JsonArray books = res.getAsJsonArray("data");
+                    List<String> names = new ArrayList<>();
+                    bookIds.clear();
+                    for (int i = 0; i < books.size(); i++) {
+                        JsonObject b = books.get(i).getAsJsonObject();
+                        String name = (b.has("wordBookName") ? b.get("wordBookName").getAsString() : "")
+                                + " (" + (b.has("wordBookId") ? b.get("wordBookId").getAsString() : "") + ")";
+                        names.add(name);
+                        bookIds.add(b.has("wordBookId") ? b.get("wordBookId").getAsString() : "");
+                    }
+                    runOnUiThread(() -> {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(AddEditWordActivity.this,
+                                android.R.layout.simple_spinner_item, names);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spBook.setAdapter(adapter);
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
     }
 
     private void submit() {
+        String bookId;
+        if (wordId == null && spBook != null) {
+            int pos = spBook.getSelectedItemPosition();
+            if (pos < 0 || pos >= bookIds.size()) {
+                Toast.makeText(this, "请选择词书", Toast.LENGTH_SHORT).show(); return;
+            }
+            bookId = bookIds.get(pos);
+        } else if (etBookId != null) {
+            bookId = etBookId.getText().toString().trim();
+        } else {
+            Toast.makeText(this, "词书信息缺失", Toast.LENGTH_SHORT).show(); return;
+        }
+
         String spelling = etSpelling.getText().toString().trim();
         String chinese = etChinese.getText().toString().trim();
         if (spelling.isEmpty() || chinese.isEmpty()) {
-            Toast.makeText(this, "请填写英文拼写和中文释义", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "请填写拼写和释义", Toast.LENGTH_SHORT).show(); return;
         }
 
         btnSubmit.setEnabled(false);
         btnSubmit.setText("提交中...");
 
-        boolean isEdit = wordId != null;
+        JsonObject body = new JsonObject();
+        if (wordId == null) body.addProperty("wordId", "WD" + System.currentTimeMillis() % 100000);
+        body.addProperty("wordBookId", bookId);
+        body.addProperty("englishSpelling", spelling);
+        body.addProperty("phoneticSymbol", etPhonetic.getText().toString().trim());
+        body.addProperty("chineseDefinition", chinese);
+        body.addProperty("exampleSentence", etExample.getText().toString().trim());
+        body.addProperty("wordPronunciation", etAudio.getText().toString().trim());
+        body.addProperty("wordImage", etImage.getText().toString().trim());
+
         new Thread(() -> {
             try {
-                if (!isEdit && bookId == null) {
-                    // Only check duplicate when not adding to a specific book
-                    JsonObject check = ApiClient.get().get("/api/words/search?keyword=" + spelling);
-                    if (check.get("code").getAsInt() == 200 && check.getAsJsonArray("data").size() > 0) {
-                        var arr = check.getAsJsonArray("data");
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject w = arr.get(i).getAsJsonObject();
-                            if (spelling.equalsIgnoreCase(w.has("englishSpelling") ? w.get("englishSpelling").getAsString() : "")) {
-                                runOnUiThread(() -> {
-                                    btnSubmit.setEnabled(true);
-                                    btnSubmit.setText("添加单词");
-                                    Toast.makeText(this, "单词已存在: " + spelling, Toast.LENGTH_SHORT).show();
-                                });
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                JsonObject body = new JsonObject();
-                body.addProperty("englishSpelling", spelling);
-                body.addProperty("phoneticSymbol", etPhonetic.getText().toString().trim());
-                body.addProperty("partOfSpeech", etPos.getText().toString().trim());
-                body.addProperty("chineseDefinition", chinese);
-                body.addProperty("exampleSentence", etExample.getText().toString().trim());
-                if (bookId != null) body.addProperty("wordBookId", bookId);
-
                 JsonObject res;
-                if (isEdit) {
+                if (wordId != null) {
                     res = ApiClient.get().put("/api/words/" + wordId, body);
                 } else {
                     res = ApiClient.get().post("/api/words", body);
                 }
-
                 runOnUiThread(() -> {
                     btnSubmit.setEnabled(true);
-                    btnSubmit.setText(isEdit ? "保存修改" : "添加单词");
+                    btnSubmit.setText(wordId != null ? "保存修改" : "添加单词");
                     if (res.get("code").getAsInt() == 200) {
                         Toast.makeText(this, res.get("message").getAsString(), Toast.LENGTH_SHORT).show();
                         finish();
@@ -208,12 +249,8 @@ public class AddEditWordActivity extends AppCompatActivity {
                     }
                 });
             } catch (Exception e) {
-                runOnUiThread(() -> { btnSubmit.setEnabled(true); btnSubmit.setText(isEdit ? "保存修改" : "添加单词"); Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show(); });
+                runOnUiThread(() -> { btnSubmit.setEnabled(true); Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show(); });
             }
         }).start();
-    }
-
-    private int dp(int val) {
-        return (int) (val * getResources().getDisplayMetrics().density + 0.5f);
     }
 }

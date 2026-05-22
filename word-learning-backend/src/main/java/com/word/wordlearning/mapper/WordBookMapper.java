@@ -13,20 +13,17 @@ public interface WordBookMapper {
     @Select("SELECT * FROM t_word_book")
     List<WordBook> findAll();
 
-    @Select("SELECT * FROM t_word_book WHERE wordBookStatus = '已上架'")
-    List<WordBook> findAllOnline();
-
     @Select("SELECT COUNT(*) FROM t_word_book")
     int countAll();
 
     @Insert("INSERT INTO t_word_book(wordBookId, wordBookName, difficultyLevel, wordBookDescription, wordCount, createTime, updateTime, wordBookStatus) " +
-            "VALUES(#{wordBookId}, #{wordBookName}, #{difficultyLevel}, #{wordBookDescription}, 0, NOW(), NOW(), #{wordBookStatus})")
+            "VALUES(#{wordBookId}, #{wordBookName}, #{difficultyLevel}, #{wordBookDescription}, 0, NOW(), NOW(), '已上线')")
     void insert(WordBook book);
 
-    @Update("UPDATE t_word_book SET wordBookName=#{wordBookName}, difficultyLevel=#{difficultyLevel}, wordBookDescription=#{wordBookDescription}, wordBookStatus=#{wordBookStatus}, updateTime=NOW() WHERE wordBookId=#{wordBookId}")
+    @Update("UPDATE t_word_book SET wordBookName=#{wordBookName}, difficultyLevel=#{difficultyLevel}, wordBookDescription=#{wordBookDescription}, updateTime=NOW() WHERE wordBookId=#{wordBookId}")
     void update(WordBook book);
 
-    @Update("UPDATE t_word_book SET wordBookStatus='未上架', updateTime=NOW() WHERE wordBookId=#{wordBookId}")
+    @Update("UPDATE t_word_book SET wordBookStatus='已下线', updateTime=NOW() WHERE wordBookId=#{wordBookId}")
     void delete(String wordBookId);
 
     @Select("SELECT wordBookId FROM t_word_book WHERE wordBookId LIKE 'WB%' ORDER BY wordBookId DESC LIMIT 1")
@@ -40,7 +37,4 @@ public interface WordBookMapper {
 
     @Update("UPDATE t_word_book SET wordCount = (SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = #{wordBookId}) WHERE wordBookId = #{wordBookId}")
     void syncWordCount(String wordBookId);
-
-    @Delete("DELETE FROM t_word_book WHERE wordBookId = #{wordBookId}")
-    int hardDelete(String wordBookId);
 }

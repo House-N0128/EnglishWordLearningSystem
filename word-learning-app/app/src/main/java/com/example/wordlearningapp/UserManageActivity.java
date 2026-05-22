@@ -34,7 +34,6 @@ public class UserManageActivity extends AppCompatActivity {
     private EditText etSearch;
     private Spinner spStatus;
     private List<JsonObject> allUsersData = new ArrayList<>();
-    private List<JsonObject> filteredData = new ArrayList<>();
     private int pageSize = 8, currentPage = 0;
 
     @Override
@@ -178,7 +177,7 @@ public class UserManageActivity extends AppCompatActivity {
         nextBg.setColor(0xFF318af8);
         nextBg.setCornerRadius(dp(14));
         btnNext.setBackground(nextBg);
-        btnNext.setOnClickListener(v -> { int total = (filteredData.size() + pageSize - 1) / pageSize; if (currentPage < total - 1) { currentPage++; renderPage(); } });
+        btnNext.setOnClickListener(v -> { int total = (allUsersData.size() + pageSize - 1) / pageSize; if (currentPage < total - 1) { currentPage++; renderPage(); } });
         pager.addView(btnNext);
 
         main.addView(pager);
@@ -210,16 +209,16 @@ public class UserManageActivity extends AppCompatActivity {
         navbar.setElevation(dp(8));
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
-        navItem(navbar, "", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
-        navItem(navbar, "", "用户管理", true, () -> {});
-        navItem(navbar, "", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
-        navItem(navbar, "", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
+        navItem(navbar, "🏠", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
+        navItem(navbar, "👥", "用户管理", true, () -> {});
+        navItem(navbar, "📚", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
+        navItem(navbar, "🗃️", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
         return navbar;
     }
 
     private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
         TextView item = new TextView(this);
-        item.setText(icon.isEmpty() ? label : icon + "\n" + label);
+        item.setText(icon + "\n" + label);
         item.setTextSize(15);
         item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
@@ -273,7 +272,7 @@ public class UserManageActivity extends AppCompatActivity {
             filtered.add(u);
         }
 
-        filteredData = filtered;
+        allUsersData = filtered;
         currentPage = 0;
         renderPage();
     }
@@ -281,13 +280,13 @@ public class UserManageActivity extends AppCompatActivity {
     private void renderPage() {
         listArea.removeAllViews();
         int start = currentPage * pageSize;
-        int end = Math.min(start + pageSize, filteredData.size());
-        int total = (filteredData.size() + pageSize - 1) / pageSize;
+        int end = Math.min(start + pageSize, allUsersData.size());
+        int total = (allUsersData.size() + pageSize - 1) / pageSize;
         if (total == 0) total = 1;
         tvPager.setText("第" + (currentPage + 1) + "页 / 共" + total + "页");
 
         for (int i = start; i < end; i++) {
-            JsonObject u = filteredData.get(i);
+            JsonObject u = allUsersData.get(i);
             String uid = u.has("userId") ? u.get("userId").getAsString() : "";
             String name = u.has("userName") && !u.get("userName").isJsonNull() ? u.get("userName").getAsString() : "";
             String phone = u.has("phoneNumber") && !u.get("phoneNumber").isJsonNull() ? u.get("phoneNumber").getAsString() : "";

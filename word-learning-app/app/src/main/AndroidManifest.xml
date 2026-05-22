@@ -39,8 +39,6 @@
         <activity android:name=".WordStudyActivity" />
         <activity android:name=".AddEditWordActivity" />
         <activity android:name=".BatchAddWordActivity" />
-        <activity android:name=".AddWordToBookActivity" />
-        <activity android:name=".ViewBookWordsActivity" />
         <activity android:name=".CollectionsActivity" />
         <activity android:name=".StudyRecordsActivity" />
         <activity android:name=".AdminMainActivity" />
