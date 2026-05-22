@@ -38,6 +38,9 @@ public interface WordMapper {
     @Insert("INSERT IGNORE INTO t_word_book_ref(word_book_id, word_id) VALUES(#{wordBookId}, #{wordId})")
     void insertBookRef(@Param("wordBookId") String wordBookId, @Param("wordId") String wordId);
 
+    @Select("SELECT COUNT(*) FROM t_word_book_ref WHERE word_book_id = #{bookId} AND word_id = #{wordId}")
+    int existsBookRef(@Param("bookId") String bookId, @Param("wordId") String wordId);
+
     @Update("UPDATE t_word SET spelling=#{englishSpelling}, definition=#{chineseDefinition}, part_of_speech=#{partOfSpeech}, " +
             "example_sentence=#{exampleSentence}, phonetic=#{phoneticSymbol}, " +
             "pronunciation_url=#{wordPronunciation}, image_url=#{wordImage} WHERE word_id=#{wordId}")

@@ -85,7 +85,7 @@ public class BatchAddWordActivity extends AppCompatActivity {
 
         // Instructions
         TextView hint = new TextView(this);
-        hint.setText("每行一个单词，格式：单词ID,英文拼写,中文释义,音标(可选),例句(可选)");
+        hint.setText("每行一个单词，格式：英文拼写,中文释义,音标(可选),例句(可选)\n单词ID由系统自动生成，已存在的单词自动跳过");
         hint.setTextSize(13);
         hint.setTextColor(0xFF8899aa);
         hint.setPadding(0, 16, 0, 8);
@@ -93,7 +93,7 @@ public class BatchAddWordActivity extends AppCompatActivity {
 
         // Batch input area
         etBatchInput = new EditText(this);
-        etBatchInput.setHint("W001,hello,你好,/həˈloʊ/,Hello World!\nW002,world,世界,/wɜːld/,Hello World!");
+        etBatchInput.setHint("hello,你好,/həˈloʊ/,Hello World!\nworld,世界,/wɜːld/,Hello World!");
         etBatchInput.setTextSize(14);
         etBatchInput.setPadding(16, 12, 16, 12);
         etBatchInput.setBackgroundColor(0xFFf6f8fc);
@@ -157,13 +157,12 @@ public class BatchAddWordActivity extends AppCompatActivity {
             line = line.trim();
             if (line.isEmpty()) continue;
             String[] parts = line.split(",");
-            if (parts.length < 3) continue;
+            if (parts.length < 2) continue;
             JsonObject word = new JsonObject();
-            word.addProperty("wordId", parts[0].trim());
-            word.addProperty("englishSpelling", parts[1].trim());
-            word.addProperty("chineseDefinition", parts[2].trim());
-            if (parts.length > 3) word.addProperty("phoneticSymbol", parts[3].trim());
-            if (parts.length > 4) word.addProperty("exampleSentence", parts[4].trim());
+            word.addProperty("englishSpelling", parts[0].trim());
+            word.addProperty("chineseDefinition", parts[1].trim());
+            if (parts.length > 2) word.addProperty("phoneticSymbol", parts[2].trim());
+            if (parts.length > 3) word.addProperty("exampleSentence", parts[3].trim());
             wordsArr.add(word);
         }
 

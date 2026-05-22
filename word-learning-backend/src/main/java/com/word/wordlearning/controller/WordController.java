@@ -45,12 +45,46 @@ public class WordController {
     public Result<String> add(@RequestBody Map<String, String> body) {
         String spelling = body.get("englishSpelling");
         String definition = body.get("chineseDefinition");
+        String bookId = body.get("wordBookId");
         if (spelling == null || definition == null) {
             return Result.error(400, "缺少必填字段");
         }
 
-        // Check duplicate by spelling
+        // Find existing word by spelling
         Word existBySpelling = wordMapper.findBySpelling(spelling);
+
+        // If adding to a specific book
+        if (bookId != null && !bookId.isEmpty()) {
+            if (existBySpelling != null) {
+                // Word exists - check if already in this book
+                if (wordMapper.existsBookRef(bookId, existBySpelling.getWordId()) > 0) {
+                    return Result.error(400, "该单词已在此词书中");
+                }
+                // Word exists but not in this book - add ref
+                wordMapper.insertBookRef(bookId, existBySpelling.getWordId());
+                wordBookMapper.syncWordCount(bookId);
+                return Result.success("已将单词添加到词书");
+            }
+            // Word doesn't exist - create it and add ref
+            String newId = body.get("wordId");
+            if (newId == null || newId.isEmpty()) {
+                newId = "WD" + System.currentTimeMillis();
+            }
+            Word w = new Word();
+            w.setWordId(newId);
+            w.setEnglishSpelling(spelling);
+            w.setChineseDefinition(definition);
+            w.setPhoneticSymbol(body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "");
+            w.setExampleSentence(body.get("exampleSentence") != null ? body.get("exampleSentence") : "");
+            w.setWordPronunciation(body.get("wordPronunciation") != null ? body.get("wordPronunciation") : "");
+            w.setWordImage(body.get("wordImage") != null ? body.get("wordImage") : "");
+            wordMapper.insert(w);
+            wordMapper.insertBookRef(bookId, newId);
+            wordBookMapper.syncWordCount(bookId);
+            return Result.success("单词已创建并添加到词书");
+        }
+
+        // No book specified - just create word (prevent duplicate)
         if (existBySpelling != null) {
             return Result.error(400, "单词已存在: " + spelling);
         }
@@ -59,28 +93,20 @@ public class WordController {
         if (wordId == null || wordId.isEmpty()) {
             wordId = "WD" + System.currentTimeMillis();
         }
-        String bookId = body.get("wordBookId");
         String phonetic = body.get("phoneticSymbol") != null ? body.get("phoneticSymbol") : "";
         String example = body.get("exampleSentence") != null ? body.get("exampleSentence") : "";
         String audio = body.get("wordPronunciation") != null ? body.get("wordPronunciation") : "";
         String image = body.get("wordImage") != null ? body.get("wordImage") : "";
 
-        Word exist = wordMapper.findById(wordId);
-        if (exist == null) {
-            Word w = new Word();
-            w.setWordId(wordId);
-            w.setEnglishSpelling(spelling);
-            w.setChineseDefinition(definition);
-            w.setPhoneticSymbol(phonetic);
-            w.setExampleSentence(example);
-            w.setWordPronunciation(audio);
-            w.setWordImage(image);
-            wordMapper.insert(w);
-        }
-        if (bookId != null && !bookId.isEmpty()) {
-            wordMapper.insertBookRef(bookId, wordId);
-            wordBookMapper.syncWordCount(bookId);
-        }
+        Word w = new Word();
+        w.setWordId(wordId);
+        w.setEnglishSpelling(spelling);
+        w.setChineseDefinition(definition);
+        w.setPhoneticSymbol(phonetic);
+        w.setExampleSentence(example);
+        w.setWordPronunciation(audio);
+        w.setWordImage(image);
+        wordMapper.insert(w);
         return Result.success("单词添加成功");
     }
 
