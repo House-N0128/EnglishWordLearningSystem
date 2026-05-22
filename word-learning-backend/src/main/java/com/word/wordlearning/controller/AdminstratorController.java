@@ -94,6 +94,8 @@ public class AdminstratorController {
         user.setEmail(body.get("email"));
         userMapper.updateProfile(user);
         return Result.success("用户信息已更新");
+    }
+
     public Result<String> updateUser(@PathVariable String userId, @RequestBody Map<String, String> body) {
         OrdinaryUser user = userMapper.findByUserId(userId);
         if (user == null) return Result.error(404, "用户不存在");

@@ -88,9 +88,12 @@ public class WordController {
         // 如果提供了词书ID，则建立关联
         if (bookId != null && !bookId.trim().isEmpty()) {
             wordMapper.insertBookRef(bookId, wordId);
+            wordBookMapper.syncWordCount(bookId);
         }
-        
-    public Result<String> add(@RequestBody Map<String, String> body) {
+        return Result.success("单词添加成功");
+    }
+
+    public Result<String> addLegacy(@RequestBody Map<String, String> body) {
         String spelling = body.get("englishSpelling");
         String definition = body.get("chineseDefinition");
         String bookId = body.get("wordBookId");
