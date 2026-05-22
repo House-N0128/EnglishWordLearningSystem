@@ -202,6 +202,11 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
         }
 
         .btn-submit {
@@ -213,15 +218,71 @@
             background-color: #6c757d;
             color: white;
         }
+
+        /* 提示消息 */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* 错误提示样式 */
+        .form-input.error, .form-textarea.error, .form-select.error {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">提交中...</div>
+</div>
+
 <!-- 顶部导航栏 -->
 <div class="top-nav">
     <div class="nav-title">单词学习平台 - 管理员系统</div>
     <div class="user-area">
         <span class="user-name">管理员账号：admin</span>
-        <button class="btn-logout">退出登录</button>
+        <button class="btn-logout" id="logoutBtn">退出登录</button>
     </div>
 </div>
 
@@ -230,17 +291,15 @@
     <!-- 左侧侧边栏 -->
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li>管理员首页</li>
+            <li id="menuAdminHome">管理员首页</li>
+            <li id="menuPersonal">个人中心</li>
             <li>用户管理</li>
-            <li class="sub-item">用户管理</li>
-            <li>词书管理</li>
-            <li class="sub-item active">添加词书</li>
-            <li class="sub-item">管理词书</li>
+            <li class="sub-item" id="menuUserManage">用户管理</li>
+            <li class="active">词书管理</li>
+            <li class="sub-item" id="menuManageWordBook">管理词书</li>
             <li>单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
-            <li class="sub-item">管理单词</li>
-            <li>学习记录查询</li>
+            <li class="sub-item" id="menuManageWord">管理单词</li>
+            <li id="menuStudyRecord">学习记录查询</li>
         </ul>
     </div>
 
@@ -248,43 +307,335 @@
     <div class="content-area">
         <div class="page-title">添加词书</div>
         <div class="form-card">
-            <div class="form-group">
-                <label class="form-label">词书名称</label>
-                <input type="text" class="form-input" placeholder="请输入词书名称">
-                <div class="input-tip">词书名称应简洁明了，便于用户识别</div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">难度等级</label>
-                <select class="form-select">
-                    <option>初级</option>
-                    <option>中级</option>
-                    <option>高级</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">词书描述</label>
-                <textarea class="form-textarea" placeholder="请输入词书描述信息"></textarea>
-                <div class="input-tip">描述词书的特点、适用人群和学习目标</div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">单词数量</label>
-                <input type="number" class="form-input" value="100">
-                <div class="input-tip">词书包含的单词总数</div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">词书状态</label>
-                <select class="form-select">
-                    <option>已上架</option>
-                    <option>未上架</option>
-                </select>
-                <div class="input-tip">未上架的词书用户无法看到</div>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-submit">添加词书</button>
-                <button class="btn btn-cancel">取消</button>
-            </div>
+            <form id="addWordBookForm">
+                <div class="form-group">
+                    <label class="form-label">词书名称 <span style="color:#dc3545;">*</span></label>
+                    <input type="text" class="form-input" id="bookName" placeholder="请输入词书名称" autocomplete="off">
+                    <div class="input-tip">词书名称应简洁明了，便于用户识别</div>
+                    <div class="error-message" id="nameError" style="display:none;"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">难度等级 <span style="color:#dc3545;">*</span></label>
+                    <select class="form-select" id="difficultyLevel">
+                        <option value="初级">初级</option>
+                        <option value="中级">中级</option>
+                        <option value="高级">高级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">词书描述</label>
+                    <textarea class="form-textarea" id="bookDesc" placeholder="请输入词书描述信息"></textarea>
+                    <div class="input-tip">描述词书的特点、适用人群和学习目标</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">单词数量 <span style="color:#dc3545;">*</span></label>
+                    <input type="number" class="form-input" id="wordCount" value="100" min="1" max="99999">
+                    <div class="input-tip">词书包含的单词总数</div>
+                    <div class="error-message" id="countError" style="display:none;"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">词书状态 <span style="color:#dc3545;">*</span></label>
+                    <select class="form-select" id="bookStatus">
+                        <option value="已上线">已上线</option>
+                        <option value="未上线">未上线</option>
+                    </select>
+                    <div class="input-tip">未上线的词书用户无法看到</div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-submit" id="submitBtn">添加词书</button>
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">取消</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    // API 基础地址配置（请根据实际后端地址修改）
+    const API_BASE_URL = 'http://localhost:8080/api';
+    
+    // DOM 元素
+    const bookNameInput = document.getElementById('bookName');
+    const difficultyLevelSelect = document.getElementById('difficultyLevel');
+    const bookDescTextarea = document.getElementById('bookDesc');
+    const wordCountInput = document.getElementById('wordCount');
+    const bookStatusSelect = document.getElementById('bookStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const toastMsg = document.getElementById('toastMsg');
+    
+    // 显示提示消息
+    function showMessage(msg, isError = false) {
+        toastMsg.textContent = msg;
+        toastMsg.style.backgroundColor = isError ? "#dc3545" : "#28a745";
+        toastMsg.style.opacity = "1";
+        setTimeout(() => {
+            toastMsg.style.opacity = "0";
+        }, 2500);
+    }
+    
+    // 显示/隐藏加载状态
+    function showLoading() {
+        loadingOverlay.style.display = "flex";
+    }
+    
+    function hideLoading() {
+        loadingOverlay.style.display = "none";
+    }
+    
+    // 清除表单错误样式
+    function clearErrors() {
+        document.getElementById('nameError').style.display = 'none';
+        document.getElementById('countError').style.display = 'none';
+        bookNameInput.classList.remove('error');
+        wordCountInput.classList.remove('error');
+    }
+    
+    // 表单验证
+    function validateForm() {
+        clearErrors();
+        let isValid = true;
+        
+        const bookName = bookNameInput.value.trim();
+        if (!bookName) {
+            document.getElementById('nameError').textContent = '请输入词书名称';
+            document.getElementById('nameError').style.display = 'block';
+            bookNameInput.classList.add('error');
+            isValid = false;
+        } else if (bookName.length > 50) {
+            document.getElementById('nameError').textContent = '词书名称不能超过50个字符';
+            document.getElementById('nameError').style.display = 'block';
+            bookNameInput.classList.add('error');
+            isValid = false;
+        }
+        
+        const wordCount = parseInt(wordCountInput.value);
+        if (isNaN(wordCount) || wordCount < 1) {
+            document.getElementById('countError').textContent = '单词数量必须是大于0的整数';
+            document.getElementById('countError').style.display = 'block';
+            wordCountInput.classList.add('error');
+            isValid = false;
+        } else if (wordCount > 99999) {
+            document.getElementById('countError').textContent = '单词数量不能超过99999';
+            document.getElementById('countError').style.display = 'block';
+            wordCountInput.classList.add('error');
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    // 生成唯一ID (前端临时生成，实际应由后端生成)
+    function generateBookId() {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        return `WB${timestamp}${random}`;
+    }
+    
+    // 获取当前时间字符串
+    function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+    
+    // 提交词书数据到后端
+    async function submitWordBookToBackend(bookData) {
+        try {
+            // 调用后端API创建词书
+            // 根据实际后端接口调整URL和请求格式
+            const response = await fetch(`${API_BASE_URL}/wordbooks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 如果需要认证token
+                    // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(bookData)
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+            }
+            
+            const result = await response.json();
+            // 处理不同的返回格式
+            if (result.code === 200 || result.success === true || result.data) {
+                return { success: true, data: result.data || result };
+            } else {
+                throw new Error(result.message || '添加失败');
+            }
+        } catch (error) {
+            console.error('添加词书失败:', error);
+            throw error;
+        }
+    }
+    
+    // 添加词书主函数
+    async function addWordBook() {
+        if (!validateForm()) {
+            return;
+        }
+        
+        const bookName = bookNameInput.value.trim();
+        const difficultyLevel = difficultyLevelSelect.value;
+        const description = bookDescTextarea.value.trim();
+        const wordCount = parseInt(wordCountInput.value);
+        const status = bookStatusSelect.value;
+        const currentTime = getCurrentDateTime();
+        const adminId = 'admin'; // 当前登录管理员ID，实际应从登录状态获取
+        
+        const newBookData = {
+            wordBookId: generateBookId(),
+            wordBookName: bookName,
+            difficultyLevel: difficultyLevel,
+            wordBookDescription: description,
+            wordCount: wordCount,
+            adminId: adminId,
+            wordBookStatus: status
+        };
+        
+        showLoading();
+        try {
+            const result = await submitWordBookToBackend(newBookData);
+            showMessage(`词书 "${bookName}" 添加成功！`);
+            
+            // 添加成功后跳转到词书管理页面
+            setTimeout(() => {
+                window.location.href = "manageWordBookAdmin.html";
+            }, 1000);
+        } catch (error) {
+            console.error('添加失败:', error);
+            showMessage(`添加失败: ${error.message}`, true);
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    // 取消操作 - 返回词书管理页面
+    function cancelAndGoBack() {
+        if (confirm('确定取消添加吗？未保存的内容将丢失。')) {
+            window.location.href = "manageWordBookAdmin.html";
+        }
+    }
+    
+    // 退出登录
+    function handleLogout() {
+        if (confirm("确定要退出登录吗？")) {
+            // 清除本地存储的登录信息
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            showMessage("已退出登录，跳转至登录页");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 500);
+        }
+    }
+    
+    // 侧边栏导航跳转
+    function setupSidebarNavigation() {
+        const menuItems = {
+            'menuAdminHome': '../admin/indexAdmin.html',
+            'menuPersonal': '../admin/adminPersonal.html',
+            'menuUserManage': '../admin/manageUserAdmin.html',
+            'menuManageWordBook': 'manageWordBookAdmin.html',
+            'menuManageWord': '../word/manageWordAdmin.html',
+            'menuStudyRecord': '../wordlearningrecord/viewUserLearningRecords.html'
+        };
+        
+        for (const [id, url] of Object.entries(menuItems)) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.location.href = url;
+                });
+            }
+        }
+        
+        // 处理其他没有ID的菜单项
+        const otherItems = document.querySelectorAll('.sidebar-menu li:not([id])');
+        otherItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = item.innerText.trim();
+                if (text === '管理员首页') {
+                    window.location.href = '../admin/indexAdmin.html';
+                } else if (text === '个人中心') {
+                    window.location.href = '../admin/adminPersonal.html';
+                } else if (text === '用户管理') {
+                    window.location.href = '../admin/manageUserAdmin.html';
+                } else if (text === '词书管理') {
+                    window.location.href = 'manageWordBookAdmin.html';
+                } else if (text === '单词管理') {
+                    window.location.href = '../word/manageWordAdmin.html';
+                } else if (text === '学习记录查询') {
+                    window.location.href = '../wordlearningrecord/viewUserLearningRecords.html';
+                } else {
+                    showMessage(`导航到 ${text} 页面`);
+                }
+            });
+        });
+    }
+    
+    // 初始化页面 - 设置默认值，绑定事件
+    function init() {
+        // 绑定按钮事件
+        submitBtn.addEventListener('click', addWordBook);
+        cancelBtn.addEventListener('click', cancelAndGoBack);
+        logoutBtn.addEventListener('click', handleLogout);
+        
+        // 设置侧边栏导航
+        setupSidebarNavigation();
+        
+        // 设置输入框实时清除错误样式
+        bookNameInput.addEventListener('input', () => {
+            if (bookNameInput.value.trim()) {
+                bookNameInput.classList.remove('error');
+                document.getElementById('nameError').style.display = 'none';
+            }
+        });
+        
+        wordCountInput.addEventListener('input', () => {
+            const val = parseInt(wordCountInput.value);
+            if (!isNaN(val) && val >= 1) {
+                wordCountInput.classList.remove('error');
+                document.getElementById('countError').style.display = 'none';
+            }
+        });
+        
+        // 检查是否有从其他页面传递过来的预填数据（例如从词书管理页编辑跳转）
+        const urlParams = new URLSearchParams(window.location.search);
+        const editBookId = urlParams.get('editId');
+        if (editBookId) {
+            // 如果是编辑模式，可以加载现有词书数据
+            // 这里暂不实现编辑，仅作为扩展点
+            console.log('编辑模式，词书ID:', editBookId);
+        }
+        
+        // 从本地存储获取管理员信息（可选）
+        const userInfo = localStorage.getItem('userInfo');
+        if (userInfo) {
+            try {
+                const user = JSON.parse(userInfo);
+                const userNameSpan = document.querySelector('.user-name');
+                if (userNameSpan && user.username) {
+                    userNameSpan.textContent = `管理员账号：${user.username}`;
+                }
+            } catch (e) {}
+        }
+    }
+    
+    // 启动应用
+    init();
+</script>
 </body>
 </html>

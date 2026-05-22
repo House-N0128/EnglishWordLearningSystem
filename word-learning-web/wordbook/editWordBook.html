@@ -212,7 +212,13 @@
             background-color: #6c757d;
             color: white;
         }
+        .btn-save:hover { background-color: #0069d9; }
+        .btn-cancel:hover { background-color: #5a6268; }
+        .toast-msg { position:fixed; bottom:20px; right:20px; background:#333; color:white; padding:10px 18px; border-radius:6px; font-size:14px; z-index:1000; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+        .loading-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:2000; display:none; }
+        .loading-spinner { background:white; padding:20px 30px; border-radius:8px; font-size:16px; }
     </style>
+    <script src="../api.js"></script>
 </head>
 <body>
 <!-- 顶部导航栏 -->
@@ -230,14 +236,12 @@
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li>管理员首页</li>
+            <li>个人中心</li>
             <li>用户管理</li>
             <li class="sub-item">用户管理</li>
-            <li>词书管理</li>
-            <li class="sub-item">添加词书</li>
+            <li class="active">词书管理</li>
             <li class="sub-item">管理词书</li>
             <li>单词管理</li>
-            <li class="sub-item">添加单词</li>
-            <li class="sub-item">批量添加单词</li>
             <li class="sub-item">管理单词</li>
             <li>学习记录查询</li>
         </ul>
@@ -248,42 +252,152 @@
         <div class="page-title">编辑词书</div>
         <div class="form-card">
             <div class="form-group">
+                <label class="form-label">词书ID</label>
+                <input type="text" class="form-input" id="bookId" disabled>
+            </div>
+            <div class="form-group">
                 <label class="form-label">词书名称</label>
-                <input type="text" class="form-input" value="四级核心词汇">
+                <input type="text" class="form-input" id="bookName" placeholder="请输入词书名称">
                 <div class="input-tip">词书名称应简洁明了，便于用户识别</div>
             </div>
             <div class="form-group">
                 <label class="form-label">难度等级</label>
-                <select class="form-select">
+                <select class="form-select" id="difficultyLevel">
                     <option>初级</option>
-                    <option selected>中级</option>
+                    <option>中级</option>
                     <option>高级</option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label">词书描述</label>
-                <textarea class="form-textarea">包含英语四级考试最核心的3000个词汇，系统化分类，科学记忆，帮助考生高效备考。涵盖听力、阅读、写作等各个方面的必备词汇。</textarea>
+                <textarea class="form-textarea" id="bookDesc" placeholder="请输入词书描述"></textarea>
                 <div class="input-tip">描述词书的特点、适用人群和学习目标</div>
             </div>
             <div class="form-group">
                 <label class="form-label">单词数量</label>
-                <input type="number" class="form-input" value="3000">
+                <input type="number" class="form-input" id="wordCount" placeholder="请输入单词数量">
                 <div class="input-tip">词书包含的单词总数</div>
             </div>
             <div class="form-group">
                 <label class="form-label">词书状态</label>
-                <select class="form-select">
-                    <option selected>已上架</option>
-                    <option>未上架</option>
+                <select class="form-select" id="bookStatus">
+                    <option>已上线</option>
+                    <option>未上线</option>
                 </select>
-                <div class="input-tip">未上架的词书用户无法看到</div>
+                <div class="input-tip">未上线的词书用户无法看到</div>
             </div>
             <div class="btn-group">
-                <button class="btn btn-save">保存修改</button>
-                <button class="btn btn-cancel">取消</button>
+                <button class="btn btn-save" onclick="saveWordBook()">保存修改</button>
+                <button class="btn btn-cancel" onclick="goBack()">取消</button>
             </div>
         </div>
     </div>
 </div>
+<div class="toast-msg" id="toastMsg">提示信息</div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">保存中...</div>
+</div>
+<script>
+var currentBookId = '';
+
+function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+function showMessage(msg, isError) {
+    var toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+    toast.style.opacity = '1';
+    setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+}
+
+function loadBookInfo() {
+    var params = new URLSearchParams(window.location.search);
+    currentBookId = params.get('bookId');
+    if (!currentBookId) {
+        showMessage('缺少词书ID', true);
+        return;
+    }
+    
+    showLoading();
+    apiGet('/api/wordbooks').then(function(r) {
+        hideLoading();
+        if (r.code === 200 && r.data && r.data.length > 0) {
+            var book = r.data.find(function(b) { return b.wordBookId === currentBookId; });
+            if (book) {
+                document.getElementById('bookId').value = book.wordBookId || '';
+                document.getElementById('bookName').value = book.wordBookName || '';
+                document.getElementById('difficultyLevel').value = book.difficultyLevel || '中级';
+                document.getElementById('bookDesc').value = book.wordBookDescription || '';
+                document.getElementById('wordCount').value = book.wordCount || 0;
+                document.getElementById('bookStatus').value = book.wordBookStatus || '已上线';
+            } else {
+                showMessage('未找到词书信息', true);
+            }
+        } else {
+            showMessage(r.message || '获取词书信息失败', true);
+        }
+    }).catch(function(error) {
+        hideLoading();
+        showMessage('获取词书信息失败: ' + error.message, true);
+    });
+}
+
+function saveWordBook() {
+    var data = {
+        wordBookName: document.getElementById('bookName').value.trim(),
+        difficultyLevel: document.getElementById('difficultyLevel').value,
+        wordBookDescription: document.getElementById('bookDesc').value.trim(),
+        wordCount: parseInt(document.getElementById('wordCount').value) || 0,
+        wordBookStatus: document.getElementById('bookStatus').value
+    };
+    
+    if (!data.wordBookName) {
+        showMessage('请输入词书名称', true);
+        return;
+    }
+    
+    showLoading();
+    apiPut('/api/wordbooks/' + currentBookId, data).then(function(r) {
+        hideLoading();
+        if (r.code === 200) {
+            showMessage('词书信息修改成功');
+            setTimeout(function() { window.location.href = 'manageWordBookAdmin.html'; }, 1500);
+        } else {
+            showMessage(r.message || '修改失败', true);
+        }
+    }).catch(function(error) {
+        hideLoading();
+        showMessage('修改失败: ' + error.message, true);
+    });
+}
+
+function goBack() {
+    window.location.href = 'manageWordBookAdmin.html';
+}
+
+// 侧边栏菜单交互
+document.querySelectorAll('.sidebar-menu li').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var text = item.innerText.trim();
+        if (text === '词书管理' || text === '管理词书') {
+            window.location.href = 'manageWordBookAdmin.html';
+        } else if (text === '管理员首页') {
+            window.location.href = '../admin/indexAdmin.html';
+        } else if (text === '个人中心') {
+            window.location.href = '../admin/adminPersonal.html';
+        } else if (text === '用户管理') {
+            window.location.href = '../admin/manageUserAdmin.html';
+        } else if (text === '单词管理' || text === '管理单词') {
+            window.location.href = '../word/manageWordAdmin.html';
+        } else if (text === '学习记录查询') {
+            window.location.href = '../wordlearningrecord/viewUserLearningRecords.html';
+        }
+    });
+});
+
+loadBookInfo();
+</script>
 </body>
 </html>
