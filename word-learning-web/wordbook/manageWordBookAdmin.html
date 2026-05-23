@@ -744,6 +744,10 @@
                     <th>📖 词书名称</th>
                     <th>🎯 难度等级</th>
                     <th>🔤 单词数量</th>
+<<<<<<< HEAD
+=======
+                    <th>👤 创建管理员</th>
+>>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
                     <th>🕐 创建时间</th>
                     <th>🔄 更新时间</th>
                     <th>📊 状态</th>
@@ -870,6 +874,10 @@
                     name: item.wordBookName || '',
                     level: item.difficultyLevel || '中级',
                     wordCount: item.wordCount || 0,
+<<<<<<< HEAD
+=======
+                    adminId: item.adminId || item.creatorId || 'admin',
+>>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
                     createTime: formatDateTime(item.createTime),
                     updateTime: formatDateTime(item.updateTime),
                     status: item.wordBookStatus === '已上线' || item.wordBookStatus === '已上架' || item.wordBookStatus === 'online' ? '已上线' : '未上线'
