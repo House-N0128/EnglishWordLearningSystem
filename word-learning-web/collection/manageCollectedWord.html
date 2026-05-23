@@ -5,34 +5,271 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 我的收藏</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .page-title { font-size:22px; color:#333; font-weight:600; }
-        .btn-back { background-color:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .word-item { display:flex; align-items:center; padding:15px; background:white; border-radius:6px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.05); gap:15px; }
-        .word-spelling { font-size:16px; font-weight:500; color:#333; flex:2; }
-        .word-phonetic { font-size:14px; color:#666; flex:2; }
-        .word-meaning { font-size:14px; color:#555; flex:3; }
-        .word-time { font-size:13px; color:#999; flex:1; }
-        .btn-detail { background-color:#007bff; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
-        .empty-hint { text-align:center; color:#999; padding:40px; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '⭐';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 0;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .word-item {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .word-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .word-spelling {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            flex: 2;
+        }
+
+        .word-phonetic {
+            font-size: 14px;
+            color: #888;
+            font-family: monospace;
+            flex: 2;
+        }
+
+        .word-meaning {
+            font-size: 14px;
+            color: #555;
+            flex: 3;
+            line-height: 1.5;
+        }
+
+        .word-time {
+            font-size: 12px;
+            color: #bbb;
+            flex: 1;
+        }
+
+        .btn-detail {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-detail:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        }
+
+        .empty-hint {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            padding: 60px;
+            font-size: 16px;
+        }
+
+        footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .word-item {
+                flex-wrap: wrap;
+            }
+            .word-spelling, .word-phonetic, .word-meaning, .word-time {
+                flex: auto;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -47,60 +284,113 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li onclick="window.location.href='../user/index.html'">首页</li>
-            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
-            <li onclick="window.location.href='../word/searchWord.html'">单词查询</li>
-            <li style="background:#f0f7ff;color:#007bff;">我的收藏</li>
-            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
-            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+            <li onclick="window.location.href='../user/index.html'">🏠 首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">📚 词书浏览</li>
+            <li onclick="window.location.href='../word/searchWord.html'">🔍 单词查询</li>
+            <li style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">⭐ 我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">📊 学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="page-header">
-            <h1 class="page-title">我的收藏</h1>
-            <button class="btn-back" onclick="window.location.href='../user/index.html'">返回首页</button>
+            <h1 class="page-title">⭐ 我的收藏</h1>
+            <button class="btn-back" onclick="window.location.href='../user/index.html'">← 返回首页</button>
         </div>
         <div id="list"></div>
     </div>
 </div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
-<script src="../api.js"></script>
+
 <script>
-if (!requireAuth('user')) { /* redirect */ }
-document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
-
-function loadCollections() {
-  apiGet('/api/collections').then(function(r) {
-    var el = document.getElementById('list');
-    if (r.code === 200 && r.data.length > 0) {
-      var html = '';
-      r.data.forEach(function(c) {
-        html += '<div class="word-item">' +
-          '<span class="word-spelling">' + (c.englishSpelling || '-') + '</span>' +
-          '<span class="word-phonetic">' + (c.phoneticSymbol || '') + '</span>' +
-          '<span class="word-meaning">' + (c.chineseDefinition || '') + '</span>' +
-          '<span class="word-time">' + (c.collectionTime ? c.collectionTime.substring(0,10) : '') + '</span>' +
-          '<button class="btn-detail" style="margin-right:6px" onclick="window.location.href=\'../word/viewWordDetail.html?id=' + c.wordId + '\'">详情</button>' +
-          '<button class="btn-detail" style="background-color:#dc3545" onclick="cancelCollect(\'' + c.wordId + '\')">取消收藏</button>' +
-          '</div>';
-      });
-      el.innerHTML = html;
-    } else { el.innerHTML = '<div class="empty-hint">暂无收藏</div>'; }
-  });
+function getUserId() {
+    return localStorage.getItem('userId') || '10006';
 }
 
-function cancelCollect(wordId) {
-  if (!confirm('确定取消收藏吗？')) return;
-  apiDelete('/api/collections/remove', { wordId: wordId }).then(function(r) {
-    alert(r.message || '操作失败');
-    loadCollections();
-  });
+function clearAuth() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+    window.location.href = '/index.html';
 }
+
+document.getElementById('display-name').textContent = '👤 ' + getUserId();
+
+async function loadCollections() {
+    const userId = getUserId();
+    const listDiv = document.getElementById('list');
+    
+    try {
+        const res = await fetch('http://localhost:8080/api/collections', {
+            headers: { 'X-User-Id': userId }
+        });
+        const data = await res.json();
+        
+        if (data.code === 200 && data.data && data.data.length > 0) {
+            let html = '';
+            for (const item of data.data) {
+                try {
+                    const wordRes = await fetch('http://localhost:8080/api/words/' + item.wordId, {
+                        headers: { 'X-User-Id': userId }
+                    });
+                    const wordData = await wordRes.json();
+                    const word = wordData.code === 200 ? wordData.data : {};
+                    
+                    html += '<div class="word-item">' +
+                        '<span class="word-spelling">📖 ' + (word.spelling || word.englishSpelling || item.wordId || '-') + '</span>' +
+                        '<span class="word-phonetic">/' + (word.phonetic || word.phoneticSymbol || '') + '/</span>' +
+                        '<span class="word-meaning">' + (word.definition || word.chineseDefinition || '') + '</span>' +
+                        '<span class="word-time">📅 ' + (item.collectionTime ? item.collectionTime.substring(0,10) : '') + '</span>' +
+                        '<button class="btn-detail" onclick="window.location.href=\'../word/viewWordDetail.html?id=' + item.wordId + '\'">详情</button>' +
+                        '<button class="btn-detail" style="background: linear-gradient(135deg, #dc3545 0%, #b91c1c 100%);" onclick="cancelCollect(\'' + item.wordId + '\')">取消收藏</button>' +
+                        '</div>';
+                } catch(e) {
+                    console.log('获取单词详情失败:', item.wordId);
+                }
+            }
+            listDiv.innerHTML = html;
+        } else {
+            listDiv.innerHTML = '<div class="empty-hint">📭 暂无收藏</div>';
+        }
+    } catch(e) {
+        console.error('加载失败:', e);
+        listDiv.innerHTML = '<div class="empty-hint">⚠️ 加载失败，请稍后重试</div>';
+    }
+}
+
+window.cancelCollect = async function(wordId) {
+    if (!confirm('确定取消收藏吗？')) return;
+    
+    const userId = getUserId();
+    try {
+        const res = await fetch('http://localhost:8080/api/collections/remove', {
+            method: 'DELETE',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-User-Id': userId
+            },
+            body: JSON.stringify({ wordId: wordId })
+        });
+        const data = await res.json();
+        
+        if (data.code === 200) {
+            alert('✅ 取消收藏成功');
+            loadCollections();
+        } else {
+            alert(data.message || '取消收藏失败');
+        }
+    } catch(e) {
+        alert('操作失败：' + e.message);
+    }
+};
 
 loadCollections();
 </script>

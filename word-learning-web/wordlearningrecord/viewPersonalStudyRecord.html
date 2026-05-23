@@ -5,40 +5,497 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 学习记录</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        html, body {
-            height: 100%;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .page-title { font-size:22px; color:#333; font-weight:600; }
-        .btn-back { background-color:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .stats-card { background:white; padding:20px; border-radius:6px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); display:flex; gap:30px; }
-        .stat-item { text-align:center; flex:1; }
-        .stat-item .num { font-size:28px; color:#007bff; font-weight:600; }
-        .stat-item .label { font-size:13px; color:#999; }
-        .list-area { background:white; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .list-title { font-size:16px; padding:15px; border-bottom:1px solid #eee; }
-        table { width:100%; border-collapse:collapse; }
-        th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:14px; }
-        th { background:#f8f9fa; }
-        .empty-hint { text-align:center; color:#999; padding:40px; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '📊';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 0;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 统计卡片 */
+        .stats-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item .num {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-item .label {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* 筛选区域 */
+        .date-filter {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .date-filter > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-filter span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .date-filter input, .date-filter select {
+            padding: 10px 14px;
+            border: 2px solid #eef2ff;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .date-filter input:focus, .date-filter select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .date-filter button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .date-filter button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        /* 图表和汇总区域 */
+        .stats-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .chart-area {
+            flex: 2;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            min-width: 0;
+        }
+
+        .chart-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .chart-header::before {
+            content: '📈';
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+
+        .summary-card {
+            flex: 1;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .summary-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e7ff;
+        }
+
+        .summary-header::before {
+            content: '📋';
+        }
+
+        .summary-content {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e7ff;
+        }
+
+        .summary-item .label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .summary-item .value {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary-item .unit {
+            font-size: 13px;
+            color: #888;
+            margin-left: 4px;
+        }
+
+        /* 列表区域 */
+        .list-area {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .list-title {
+            font-size: 18px;
+            font-weight: 700;
+            padding: 20px 25px;
+            background: #f8f9ff;
+            border-bottom: 2px solid #eef2ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-title::before {
+            content: '📋';
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8f9ff;
+            color: #555;
+            font-weight: 600;
+            border-bottom: 2px solid #eef2ff;
+        }
+
+        td {
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+
+        tr:hover td {
+            background: #f8f9ff;
+        }
+
+        .empty-hint {
+            text-align: center;
+            color: #aaa;
+            padding: 50px;
+            font-size: 15px;
+        }
+
+        /* 柱状图样式 */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            height: 100%;
+            padding: 10px 0;
+        }
+
+        .bar-item {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 60%;
+            min-width: 30px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 4px 4px;
+            transition: height 0.5s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar:hover {
+            opacity: 0.85;
+            transform: scaleX(1.05);
+        }
+
+        .bar-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .bar-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #aaa;
+            padding: 60px;
+            font-size: 14px;
+        }
+
+        footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .stats-row {
+                flex-direction: column;
+            }
+            .date-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .date-filter > div {
+                justify-content: space-between;
+            }
+            th, td {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -53,73 +510,92 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li onclick="window.location.href='../user/index.html'">首页</li>
-            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
-            <li onclick="window.location.href='../word/searchWord.html'">单词查询</li>
-            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
-            <li style="background:#f0f7ff;color:#007bff;">学习记录</li>
-            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+            <li onclick="window.location.href='../user/index.html'">🏠 首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">📚 词书浏览</li>
+            <li onclick="window.location.href='../word/searchWord.html'">🔍 单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">⭐ 我的收藏</li>
+            <li style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📊 学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="page-header">
-            <h1 class="page-title">我的学习记录</h1>
-            <button class="btn-back" onclick="window.location.href='../user/index.html'">返回首页</button>
+            <h1 class="page-title">📊 我的学习记录</h1>
+            <button class="btn-back" onclick="window.location.href='../user/index.html'">← 返回首页</button>
         </div>
         <div class="stats-card" id="stats"></div>
-        <div class="date-filter" style="background:white; padding:15px 20px; border-radius:6px; margin-bottom:20px; display:flex; gap:20px; align-items:center;">
-    <div style="display:flex; align-items:center; gap:8px;">
-        <span>开始日期：</span>
-        <input type="date" id="startDate" style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-        <span>结束日期：</span>
-        <input type="date" id="endDate" style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-        <span>学习词书：</span>
-        <select id="bookFilter" style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
-            <option value="all">全部词书</option>
-        </select>
-    </div>
-    <button id="queryBtn" style="background:#007bff; color:white; border:none; padding:6px 20px; border-radius:4px; cursor:pointer;">查询</button>
-</div>
-        <div class="list-area">
-        <div class="list-title">学习记录列表</div>
-        <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
-            <div class="chart-area" style="flex: 2; background:white; padding:20px; border-radius:6px; overflow-x: auto; min-width: 0;">
-                <div style="font-size:14px; color:#666; margin-bottom:15px;">学习单词量统计</div>
-                <div id="chartContainer" style="height:200px; width:100%; min-width: 100%;"></div>
+        
+        <div class="date-filter">
+            <div>
+                <span>📅 开始日期：</span>
+                <input type="date" id="startDate">
             </div>
-            <div class="summary-card" style="flex: 1; background:#f8f9fa; padding:20px; border-radius:6px;">
-                <div style="font-size:14px; color:#666; margin-bottom:15px;">学习汇总</div>
-                <div style="display:flex; flex-direction:column; gap:15px;">
-                    <div><span style="color:#666;">总学习单词数：</span><strong id="totalWords" style="color:#007bff; font-size:20px;">0</strong></div>
-                    <div><span style="color:#666;">平均每日学习数：</span><strong id="avgDaily" style="color:#007bff; font-size:20px;">0</strong></div>
-                    <div><span style="color:#666;">学习天数：</span><strong id="studyDays" style="color:#007bff; font-size:20px;">0</strong></div>
-                    <div><span style="color:#666;">总学习时长：</span><strong id="totalMinutes" style="color:#007bff; font-size:20px;">0</strong><span style="color:#666;"> 分钟</span></div>
+            <div>
+                <span>📅 结束日期：</span>
+                <input type="date" id="endDate">
+            </div>
+            <div>
+                <span>📚 学习词书：</span>
+                <select id="bookFilter">
+                    <option value="all">全部词书</option>
+                </select>
+            </div>
+            <button id="queryBtn">🔍 查询</button>
+        </div>
+
+        <div class="stats-row">
+            <div class="chart-area">
+                <div class="chart-header">学习单词量统计</div>
+                <div id="chartContainer" class="chart-container"></div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-header">学习汇总</div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <span class="label">总学习单词数</span>
+                        <span><span class="value" id="totalWords">0</span><span class="unit">个</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">平均每日学习数</span>
+                        <span><span class="value" id="avgDaily">0</span><span class="unit">个/天</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">学习天数</span>
+                        <span><span class="value" id="studyDays">0</span><span class="unit">天</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">总学习时长</span>
+                        <span><span class="value" id="totalMinutes">0</span><span class="unit">分钟</span></span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div style="margin-top: 20px;">
-            <table style="width:100%; border-collapse:collapse;">
-                <thead><tr><th>日期</th><th>学习词书</th><th>学习单词数</th><th>学习时长</th></tr></thead>
+
+        <div class="list-area">
+            <div class="list-title">学习记录明细</div>
+            <table>
+                <thead>
+                    <tr><th>日期</th><th>学习词书</th><th>学习单词数</th><th>学习时长</th></tr>
+                </thead>
                 <tbody id="tbody"></tbody>
             </table>
         </div>
     </div>
-
-
+</div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="../api.js"></script>
 
 <script>
-document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
+document.getElementById('display-name').textContent = '👤 ' + (localStorage.getItem('userId') || '');
 
 let allRecords = [];
 
@@ -137,35 +613,27 @@ async function loadBookFilter() {
 }
 
 function renderChart(data) {
-    console.log('renderChart 收到数据:', data);
     const container = document.getElementById('chartContainer');
     if (!container) return;
     
-    // 清空容器
-    container.innerHTML = '';
-    
     if (!data || data.length === 0) {
-        container.innerHTML = '<div style="width:100%; text-align:center; color:#999; line-height:200px;">暂无数据</div>';
+        container.innerHTML = '<div class="no-data">📭 暂无数据</div>';
         return;
     }
     
-    // 计算最大值用于高度比例
     let maxCount = Math.max(...data.map(d => d.count), 1);
     
-    // 创建柱状图容器，设置明确的高度
-    let html = '<div style="display:flex; align-items:flex-end; justify-content:flex-start; gap:12px; height:180px; min-width: max-content;">';
-    
+    let html = '<div class="bar-chart">';
     data.forEach(item => {
-        // 确保高度至少 5px，避免看不见
-        let height = Math.max((item.count / maxCount) * 150, 5);
+        let height = Math.max((item.count / maxCount) * 160, 30);
         let dateDisplay = item.date;
         if (dateDisplay && dateDisplay.includes('-')) {
-            dateDisplay = dateDisplay.slice(5); // 显示月-日
+            dateDisplay = dateDisplay.slice(5);
         }
-        html += `<div style="flex:1; text-align:center; display:flex; flex-direction:column; align-items:center;">
-            <div style="height:${height}px; width:60%; background:#007bff; border-radius:4px 4px 0 0; transition:height 0.3s;"></div>
-            <div style="font-size:12px; color:#666; margin-top:8px;">${dateDisplay}</div>
-            <div style="font-size:12px; color:#007bff; font-weight:500;">${item.count}</div>
+        html += `<div class="bar-item">
+            <div class="bar" style="height:${height}px;"></div>
+            <div class="bar-value">${item.count}</div>
+            <div class="bar-label">${dateDisplay}</div>
         </div>`;
     });
     html += '</div>';
@@ -173,20 +641,16 @@ function renderChart(data) {
 }
 
 function renderSummary(data) {
-    const totalWordsEl = document.getElementById('totalWords');
-    const avgDailyEl = document.getElementById('avgDaily');
-    const studyDaysEl = document.getElementById('studyDays');
-    const totalMinutesEl = document.getElementById('totalMinutes');
-    if (totalWordsEl) totalWordsEl.textContent = data.totalWords || 0;
-    if (avgDailyEl) avgDailyEl.textContent = data.avgDaily || 0;
-    if (studyDaysEl) studyDaysEl.textContent = data.studyDays || 0;
-    if (totalMinutesEl) totalMinutesEl.textContent = data.totalMinutes || 0;
+    document.getElementById('totalWords').textContent = data.totalWords || 0;
+    document.getElementById('avgDaily').textContent = data.avgDaily || 0;
+    document.getElementById('studyDays').textContent = data.studyDays || 0;
+    document.getElementById('totalMinutes').textContent = data.totalMinutes || 0;
 }
 
 function renderTable(records) {
     const tbody = document.getElementById('tbody');
     if (!records || records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4"><div class="empty-hint">暂无记录</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4"><div class="empty-hint">📭 暂无记录</div></td></tr>';
         return;
     }
     let html = '';
@@ -202,23 +666,19 @@ function renderTable(records) {
 }
 
 async function loadAndRender() {
-     // 每次查询前清空图表和表格
     const chartContainer = document.getElementById('chartContainer');
-    if (chartContainer) chartContainer.innerHTML = '<div style="width:100%; text-align:center; color:#999;">加载中...</div>';
+    if (chartContainer) chartContainer.innerHTML = '<div class="no-data">⏳ 加载中...</div>';
     
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     const bookId = document.getElementById('bookFilter').value;
     
     const res = await apiGet('/api/records/list');
-    console.log('后端返回的第一条数据:', res.data && res.data[0]);
     if (res.code === 200 && res.data) {
         allRecords = res.data;
         
-        let dateMap = new Map();
         let filtered = allRecords;
         
-        // 日期筛选：需要统一日期格式
         if (startDate) {
             filtered = filtered.filter(r => {
                 let d = r.learningDate;
@@ -236,29 +696,21 @@ async function loadAndRender() {
         if (bookId !== 'all') {
             filtered = filtered.filter(r => r.learnedWordBookId === bookId);
         }
-
-        console.log('筛选条件:', { startDate, endDate, bookId });
-        console.log('筛选后记录数:', filtered.length);
         
+        let dateMap = new Map();
         filtered.forEach(rec => {
             let date = rec.learningDate;
             if (!date) return;
-            // 如果日期格式是 2025-11-20T00:00:00，只取前面部分
             if (date.includes('T')) date = date.split('T')[0];
-            if (dateMap.has(date)) {
-                dateMap.set(date, dateMap.get(date) + 1);
-            } else {
-                dateMap.set(date, 1);
-            }
+            dateMap.set(date, (dateMap.get(date) || 0) + 1);
         });
         
-        const chartData = Array.from(dateMap.entries()).map(([date, count]) => ({ date, count })).sort((a,b) => a.date.localeCompare(b.date));
-        console.log('传给 renderChart 的数据:', chartData);
+        const chartData = Array.from(dateMap.entries())
+            .map(([date, count]) => ({ date, count }))
+            .sort((a,b) => a.date.localeCompare(b.date));
         renderChart(chartData);
         
         const totalWords = filtered.length;
-        //const uniqueDays = new Set(filtered.map(r => r.learningDate)).size;
-        // 修复 uniqueDays 计算，需要处理日期格式
         const uniqueDays = new Set(filtered.map(r => {
             let d = r.learningDate;
             if (d && d.includes('T')) d = d.split('T')[0];
@@ -267,21 +719,15 @@ async function loadAndRender() {
         const avgDaily = uniqueDays > 0 ? Math.round(totalWords / uniqueDays) : 0;
         renderSummary({ totalWords, avgDaily, studyDays: uniqueDays, totalMinutes: totalWords * 2 });
         
-        // 构建表格数据，按天+词书分组显示详细数据
         let tableData = [];
         if (bookId === 'all') {
-            // 全部词书：按天和词书分组
             let bookDayMap = new Map();
             filtered.forEach(rec => {
                 let date = rec.learningDate;
                 if (date && date.includes('T')) date = date.split('T')[0];
                 const bookName = rec.wordBookName || rec.learnedWordBookId || '未知词书';
                 const key = `${date}|${bookName}`;
-                if (bookDayMap.has(key)) {
-                    bookDayMap.set(key, bookDayMap.get(key) + 1);
-                } else {
-                    bookDayMap.set(key, 1);
-                }
+                bookDayMap.set(key, (bookDayMap.get(key) || 0) + 1);
             });
             bookDayMap.forEach((count, key) => {
                 const [date, bookName] = key.split('|');
@@ -293,7 +739,6 @@ async function loadAndRender() {
                 });
             });
         } else {
-            // 单本词书：按天分组
             dateMap.forEach((count, date) => {
                 tableData.push({
                     learningDate: date,
@@ -315,24 +760,21 @@ async function loadAndRender() {
 apiGet('/api/records/stats').then(function(r) {
     if (r.code === 200) {
         document.getElementById('stats').innerHTML = 
-            '<div class="stat-item"><div class="num">' + (r.data.todayCount || 0) + '</div><div class="label">今日学习</div></div>' +
-            '<div class="stat-item"><div class="num">' + (r.data.totalCount || 0) + '</div><div class="label">累计学习</div></div>' +
-            '<div class="stat-item"><div class="num">' + (r.data.currentBookName || '-') + '</div><div class="label">当前词书</div></div>';
+            '<div class="stat-item"><div class="num">' + (r.data.todayCount || 0) + '</div><div class="label">📖 今日学习</div></div>' +
+            '<div class="stat-item"><div class="num">' + (r.data.totalCount || 0) + '</div><div class="label">📚 累计学习</div></div>' +
+            '<div class="stat-item"><div class="num">' + (r.data.currentBookName || '-') + '</div><div class="label">📘 当前词书</div></div>';
     }
 });
 
 loadBookFilter();
 const queryBtn = document.getElementById('queryBtn');
 if (queryBtn) {
-    // 移除旧监听器，避免重复绑定
     const newBtn = queryBtn.cloneNode(true);
     queryBtn.parentNode.replaceChild(newBtn, queryBtn);
     newBtn.addEventListener('click', function() {
-        console.log('查询按钮被点击');
         loadAndRender();
     });
 }
-// 初始加载
 loadAndRender();
 </script>
 </body>

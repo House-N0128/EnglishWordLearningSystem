@@ -5,46 +5,398 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 词书浏览</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .page-title { font-size:22px; color:#333; font-weight:600; }
-        .btn-back { background-color:#6c757d; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:15px; }
-        .search-area { background-color:white; padding:20px; border-radius:6px; margin-bottom:25px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; align-items:center; gap:15px; flex-wrap:wrap; }
-        .filter-select { padding:8px 12px; border:1px solid #eee; border-radius:6px; font-size:14px; min-width:120px; }
-        .search-input { flex:1; min-width:200px; padding:8px 12px; border:1px solid #eee; border-radius:6px; font-size:15px; }
-        .btn-search { background-color:#007bff; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; }
-        .book-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:25px; margin-bottom:30px; }
-        .book-card { background-color:white; border-radius:8px; padding:25px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-        .book-title-row { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; }
-        .book-name { font-size:18px; font-weight:600; color:#333; }
-        .level-tag { padding:3px 8px; border-radius:10px; font-size:12px; font-weight:500; }
-        .level-beginner { background-color:#c3e6cb; color:#155724; }
-        .level-intermediate { background-color:#ffeeba; color:#856404; }
-        .level-advanced { background-color:#f5c6cb; color:#721c24; }
-        .word-count { font-size:14px; color:#666; margin-bottom:15px; }
-        .book-desc { font-size:13px; color:#666; line-height:1.6; margin-bottom:20px; }
-        .book-footer { display:flex; justify-content:space-between; align-items:center; }
-        .create-time { font-size:12px; color:#999; }
-        .card-buttons { display:flex; gap:10px; }
-        .btn-start { background-color:#007bff; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
-        .empty-hint { text-align:center; color:#999; padding:40px; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '📚';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 侧边栏 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 0;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        /* 内容区域 */
+        .content-area {
+            flex: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 搜索区域 */
+        .search-area {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-area label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #eef2ff;
+            border-radius: 12px;
+            font-size: 14px;
+            min-width: 120px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 2px solid #eef2ff;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        /* 词书网格 */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .book-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .book-name {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .level-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .level-beginner {
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d4ab 100%);
+            color: #1e6f3f;
+        }
+
+        .level-intermediate {
+            background: linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%);
+            color: #8a6d0c;
+        }
+
+        .level-advanced {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .word-count {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .word-count::before {
+            content: '📖';
+        }
+
+        .book-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .create-time {
+            font-size: 11px;
+            color: #bbb;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .empty-hint {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            padding: 60px;
+            font-size: 16px;
+        }
+
+        /* 页脚 */
+        footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-select, .search-input {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -59,42 +411,56 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li onclick="window.location.href='../user/index.html'">首页</li>
-            <li style="background:#f0f7ff;color:#007bff;">词书浏览</li>
-            <li onclick="window.location.href='../word/searchWord.html'">单词查询</li>
-            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
-            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
-            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+            <li onclick="window.location.href='../user/index.html'">🏠 首页</li>
+            <li style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📚 词书浏览</li>
+            <li onclick="window.location.href='../word/searchWord.html'">🔍 单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">⭐ 我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">📊 学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="page-header">
-            <h1 class="page-title">词书浏览</h1>
-            <button class="btn-back" onclick="window.location.href='../user/index.html'">返回首页</button>
+            <h1 class="page-title">📚 词书浏览</h1>
+            <button class="btn-back" onclick="window.location.href='../user/index.html'">← 返回首页</button>
         </div>
         <div class="search-area">
-            <label style="font-size:14px;color:#333;">难度等级:</label>
+            <label>🎯 难度等级:</label>
             <select class="filter-select" id="level-filter" onchange="renderBooks()">
-                <option value="">全部</option><option value="初级">初级</option><option value="中级">中级</option><option value="高级">高级</option>
+                <option value="">全部</option>
+                <option value="初级">🌱 初级</option>
+                <option value="中级">📘 中级</option>
+                <option value="高级">🔥 高级</option>
             </select>
-            <input type="text" class="search-input" id="name-search" placeholder="输入词书名称搜索" oninput="renderBooks()">
+            <input type="text" class="search-input" id="name-search" placeholder="🔍 搜索词书名称..." oninput="renderBooks()">
         </div>
-        <div class="book-grid" id="book-grid"></div>
+        <div class="book-grid" id="book-grid">
+            <div class="empty-hint">⏳ 加载中...</div>
+        </div>
     </div>
 </div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="../api.js"></script>
 <script>
 if (!requireAuth('user')) { /* redirect */ }
-document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
+document.getElementById('display-name').textContent = '👤 ' + (localStorage.getItem('userId') || '');
 
 var allBooks = [];
-apiGet('/api/wordbooks').then(function(r) { if (r.code === 200) { allBooks = r.data; renderBooks(); } });
+apiGet('/api/wordbooks').then(function(r) { 
+    if (r.code === 200) { 
+        allBooks = r.data; 
+        renderBooks(); 
+    } 
+});
 
 function renderBooks() {
     var level = document.getElementById('level-filter').value;
@@ -102,18 +468,32 @@ function renderBooks() {
     var filtered = allBooks.filter(function(b) {
         return (!level || b.difficultyLevel === level) && (!name || b.wordBookName.toLowerCase().indexOf(name) >= 0);
     });
+    
+    if (filtered.length === 0) {
+        document.getElementById('book-grid').innerHTML = '<div class="empty-hint">📭 暂无匹配词书</div>';
+        return;
+    }
+    
     var html = '';
     filtered.forEach(function(b) {
-        var cls = b.difficultyLevel === '初级' ? 'level-beginner' : (b.difficultyLevel === '高级' ? 'level-advanced' : 'level-intermediate');
+        var levelClass = b.difficultyLevel === '初级' ? 'level-beginner' : (b.difficultyLevel === '高级' ? 'level-advanced' : 'level-intermediate');
+        var levelIcon = b.difficultyLevel === '初级' ? '🌱' : (b.difficultyLevel === '中级' ? '📘' : '🔥');
         html += '<div class="book-card">' +
-            '<div class="book-title-row"><div class="book-name">' + b.wordBookName + '</div><div class="level-tag ' + cls + '">' + b.difficultyLevel + '</div></div>' +
+            '<div class="book-title-row">' +
+                '<div class="book-name">' + b.wordBookName + '</div>' +
+                '<div class="level-tag ' + levelClass + '">' + levelIcon + ' ' + b.difficultyLevel + '</div>' +
+            '</div>' +
             '<div class="word-count">' + b.wordCount + ' 个单词</div>' +
             '<div class="book-desc">' + (b.wordBookDescription || '暂无简介') + '</div>' +
-            '<div class="book-footer"><div class="create-time">' + (b.createTime || '') + '</div>' +
-            '<div class="card-buttons"><button class="btn-start" onclick="window.location.href=\'../wordlearningrecord/recordWordStudy.html?bookId=' + b.wordBookId + '\'">开始学习</button></div></div>' +
-            '</div>';
+            '<div class="book-footer">' +
+                '<div class="create-time">📅 ' + (b.createTime ? b.createTime.substring(0,10) : '') + '</div>' +
+                '<div class="card-buttons">' +
+                    '<button class="btn-start" onclick="window.location.href=\'../wordlearningrecord/recordWordStudy.html?bookId=' + b.wordBookId + '\'">开始学习 →</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
     });
-    document.getElementById('book-grid').innerHTML = filtered.length ? html : '<div class="empty-hint">暂无匹配词书</div>';
+    document.getElementById('book-grid').innerHTML = html;
 }
 </script>
 </body>

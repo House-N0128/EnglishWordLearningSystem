@@ -5,38 +5,318 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 单词查询</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .query-section { background-color:white; padding:25px; border-radius:6px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-        .section-title { font-size:18px; color:#333; font-weight:500; margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid #eee; }
-        .query-input-wrap { display:flex; align-items:center; gap:10px; }
-        .query-label { font-size:14px; color:#333; margin-bottom:8px; display:block; }
-        .query-input { flex:1; padding:12px 15px; border:1px solid #ddd; border-radius:6px; font-size:14px; outline:none; }
-        .query-input:focus { border-color:#007bff; }
-        .btn-query { background-color:#007bff; color:white; border:none; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:14px; }
-        .result-section { background-color:white; padding:25px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.05); min-height:200px; }
-        .empty-tip { font-size:16px; color:#999; text-align:center; padding:40px; }
-        .word-result { border:1px solid #eee; border-radius:6px; padding:15px; margin-bottom:10px; }
-        .word-result .w-name { font-size:18px; font-weight:600; color:#007bff; margin-bottom:6px; }
-        .word-result .w-phonetic { font-size:14px; color:#666; margin-bottom:4px; }
-        .word-result .w-meaning { font-size:14px; color:#333; margin-bottom:6px; }
-        .btn-fav { background-color:#ffc107; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; margin-top:6px; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '🔍';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 0;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .query-section {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .query-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .query-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .query-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #eef2ff;
+            border-radius: 16px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .query-input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+
+        .btn-query {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-query:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .result-section {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            min-height: 300px;
+        }
+
+        .empty-tip {
+            text-align: center;
+            color: #aaa;
+            padding: 50px;
+            font-size: 15px;
+        }
+
+        .word-result {
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid #eef2ff;
+        }
+
+        .word-result:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .w-name {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .w-phonetic {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .w-meaning {
+            font-size: 15px;
+            color: #444;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-fav {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-fav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245,158,11,0.4);
+        }
+
+        footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .query-input-wrap {
+                flex-direction: column;
+            }
+            .btn-query {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -51,39 +331,43 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li onclick="window.location.href='../user/index.html'">首页</li>
-            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
-            <li style="background:#f0f7ff;color:#007bff;">单词查询</li>
-            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
-            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
-            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+            <li onclick="window.location.href='../user/index.html'">🏠 首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">📚 词书浏览</li>
+            <li style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">🔍 单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">⭐ 我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">📊 学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="query-section">
             <div class="section-title">单词查询</div>
-            <label class="query-label">输入英文单词或中文释义</label>
+            <label class="query-label">🔤 输入英文单词或中文释义</label>
             <div class="query-input-wrap">
-                <input type="text" class="query-input" id="keyword" placeholder="请输入要查询的单词" onkeydown="if(event.key==='Enter')doSearch()">
-                <button class="btn-query" onclick="doSearch()">查询</button>
+                <input type="text" class="query-input" id="keyword" placeholder="例如: abandon 或 放弃" onkeydown="if(event.key==='Enter')doSearch()">
+                <button class="btn-query" onclick="doSearch()">🔍 查询</button>
             </div>
         </div>
         <div class="result-section" id="result-section">
             <div class="section-title">查询结果</div>
-            <div class="empty-tip">请输入单词进行查询</div>
+            <div class="empty-tip">✨ 请输入单词进行查询</div>
         </div>
     </div>
 </div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="../api.js"></script>
 <script>
 if (!requireAuth('user')) { /* redirect */ }
-document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
+document.getElementById('display-name').textContent = '👤 ' + (localStorage.getItem('userId') || '');
 
 function doSearch() {
     var kw = document.getElementById('keyword').value.trim();
@@ -94,23 +378,23 @@ function doSearch() {
             var html = '<div class="section-title">查询结果（' + r.data.length + '条）</div>';
             r.data.forEach(function(w) {
                 html += '<div class="word-result">' +
-                    '<div class="w-name">' + w.englishSpelling + '</div>' +
-                    '<div class="w-phonetic">' + (w.phoneticSymbol || '') + '</div>' +
-                    '<div class="w-meaning">' + w.chineseDefinition + '</div>' +
-                    '<div class="w-meaning" style="color:#888;font-size:13px;">' + (w.exampleSentence || '') + '</div>' +
-                    '<button class="btn-fav" onclick="collectWord(\'' + w.wordId + '\')">收藏单词</button>' +
+                    '<div class="w-name">📖 ' + w.englishSpelling + '</div>' +
+                    '<div class="w-phonetic">/' + (w.phoneticSymbol || '') + '/</div>' +
+                    '<div class="w-meaning">释义：' + (w.chineseDefinition || '暂无') + '</div>' +
+                    (w.exampleSentence ? '<div class="w-meaning" style="color:#888;font-size:13px;">例句：' + w.exampleSentence + '</div>' : '') +
+                    '<button class="btn-fav" onclick="collectWord(\'' + w.wordId + '\')">⭐ 收藏单词</button>' +
                     '</div>';
             });
             container.innerHTML = html;
         } else {
-            container.innerHTML = '<div class="section-title">查询结果</div><div class="empty-tip">未找到匹配单词</div>';
+            container.innerHTML = '<div class="section-title">查询结果</div><div class="empty-tip">😢 未找到匹配单词</div>';
         }
     });
 }
 
 function collectWord(wordId) {
     apiPost('/api/collections/add', { wordId: wordId }).then(function(r) {
-        alert(r.code === 200 ? '收藏成功' : r.message);
+        alert(r.code === 200 ? '⭐ 收藏成功！' : (r.message || '收藏失败'));
     });
 }
 </script>
