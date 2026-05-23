@@ -44,6 +44,16 @@ public class WordBooksActivity extends AppCompatActivity {
             bookListContainer = findViewById(R.id.book_list_container);
             etSearchBook = findViewById(R.id.et_search_book);
             spinnerDifficulty = findViewById(R.id.spinner_difficulty);
+
+            // 设置难度筛选下拉框的适配器
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    new String[]{"难度等级", "全部", "初级", "中级", "高级"}
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerDifficulty.setAdapter(adapter);
+
             findViewById(R.id.btn_search_book).setOnClickListener(v -> filterBooks());
             spinnerDifficulty.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                 @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) { filterBooks(); }
@@ -54,6 +64,7 @@ public class WordBooksActivity extends AppCompatActivity {
             loadBooks();
         }
     }
+
 
     private void buildAdminUI() {
         LinearLayout root = new LinearLayout(this);

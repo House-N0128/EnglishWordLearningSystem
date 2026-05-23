@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
+import com.example.wordlearningapp.util.WordImageLoader;
 import com.google.gson.JsonObject;
 
 public class WordDetailActivity extends AppCompatActivity {
@@ -39,6 +40,9 @@ public class WordDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        // 清除 Glide 缓存（调试用，解决图片不更新问题）
+        WordImageLoader.clearCache(this);
 
         wordId = getIntent().getStringExtra("wordId");
         isFromCollection = getIntent().getBooleanExtra("fromCollection", false);
@@ -120,7 +124,7 @@ public class WordDetailActivity extends AppCompatActivity {
             btnAudio.setVisibility(Button.GONE);
         }
 
-        loadWordImage(spelling);
+        loadWordImage(w);
 
         if (isFromCollection) {
             btnCollect.setText("🗑️ 取消收藏");
@@ -133,41 +137,16 @@ public class WordDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void loadWordImage(String spelling) {
-        if (spelling == null || spelling.isEmpty()) {
-            ivWordImage.setVisibility(ImageView.GONE);
-            tvNoImage.setVisibility(TextView.VISIBLE);
-            return;
+    private void loadWordImage(JsonObject w) {
+        // 从数据库获取服务器相对路径
+        String wordImageUrl = null;
+        if (w.has("wordImage") && !w.get("wordImage").isJsonNull()) {
+            wordImageUrl = w.get("wordImage").getAsString();
+            Log.d(TAG, "从数据库获取图片路径: " + wordImageUrl);
         }
 
-        try {
-            String imageName = spelling.toLowerCase().trim();
-
-            // 从mipmap目录查找图片
-            // Android会根据设备密度自动选择合适的分辨率图片
-            // 例如：mipmap/abandon/abandon.png (xhdpi)
-            int imageResId = getResources().getIdentifier(imageName, "mipmap", getPackageName());
-
-            Log.d(TAG, "查找图片: " + imageName + ", 资源ID: " + imageResId);
-
-            if (imageResId != 0) {
-                // 找到图片，显示图片，隐藏"暂无示意图"文字
-                ivWordImage.setVisibility(ImageView.VISIBLE);
-                tvNoImage.setVisibility(TextView.GONE);
-                ivWordImage.setImageResource(imageResId);
-                ivWordImage.setContentDescription(spelling + " - 示意图");
-                Log.d(TAG, "成功加载图片: " + spelling);
-            } else {
-                // 未找到图片，隐藏图片，显示"暂无示意图"文字
-                ivWordImage.setVisibility(ImageView.GONE);
-                tvNoImage.setVisibility(TextView.VISIBLE);
-                Log.d(TAG, "未找到图片: " + spelling + "，显示暂无示意图");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "加载图片失败: " + e.getMessage());
-            ivWordImage.setVisibility(ImageView.GONE);
-            tvNoImage.setVisibility(TextView.VISIBLE);
-        }
+        // 使用新的加载方法，传入tvNoImage用于显示/隐藏"暂无示意图"
+        WordImageLoader.loadWordImage(ivWordImage, wordImageUrl, tvNoImage);
     }
 
     private void playAudio(String url) {

@@ -10,20 +10,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#1E90FF"
-        android:padding="16dp"
-        android:elevation="4dp">
+        android:background="#318af8"
+        android:paddingTop="50dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/toolbar_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="←"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textColor="#fff"
+            android:paddingLeft="8dp"
+            android:paddingRight="16dp"
             android:clickable="true"
-            android:focusable="true"
-            android:padding="4dp" />
+            android:focusable="true" />
 
         <TextView
             android:layout_width="0dp"
@@ -37,7 +41,7 @@
 
         <View
             android:layout_width="48dp"
-            android:layout_height="1dp" />
+            android:layout_height="0dp" />
     </LinearLayout>
 
     <!-- 滚动内容区域 -->
@@ -61,7 +65,8 @@
                 android:textSize="24sp"
                 android:textColor="#1E90FF"
                 android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"
+                android:gravity="center" />
 
             <!-- 难度和词数 -->
             <TextView
@@ -71,7 +76,8 @@
                 android:text="难度: 中级 | 共 1200 词"
                 android:textSize="16sp"
                 android:textColor="#666"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:gravity="center"/>
 
             <!-- 创建时间 -->
             <TextView
@@ -81,7 +87,8 @@
                 android:text="创建时间: 2025-01-01"
                 android:textSize="15sp"
                 android:textColor="#888"
-                android:layout_marginBottom="20dp" />
+                android:layout_marginBottom="20dp"
+                android:gravity="center"/>
 
             <!-- 词书简介标题 -->
             <TextView

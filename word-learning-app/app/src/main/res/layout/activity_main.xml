@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#f2f8fc">
+    android:background="@drawable/bg_picture2">
 
     <!-- Top Bar -->
     <LinearLayout
