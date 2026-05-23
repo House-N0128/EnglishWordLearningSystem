@@ -400,6 +400,7 @@
                 <tr>
                     <th>单词ID</th>
                     <th>英文拼写</th>
+                    <th>词性</th>
                     <th>音标</th>
                     <th>中文释义</th>
                     <th>例句</th>
@@ -487,6 +488,7 @@ async function fetchWordsFromBackend() {
                 id: item.wordId || '',
                 bookId: item.wordBookId || '',
                 spelling: item.englishSpelling || '',
+                partOfSpeech: item.partOfSpeech || '',
                 phonetic: item.phoneticSymbol || '',
                 definition: item.chineseDefinition || '',
                 example: item.exampleSentence || '',
@@ -561,17 +563,18 @@ function renderTable() {
     const pageData = filteredData.slice(startIndex, endIndex);
 
     if (pageData.length === 0) {
-        wordTbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;">暂无数据</td></tr>';
+        wordTbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px;">暂无数据</td></tr>';
     } else {
         wordTbody.innerHTML = pageData.map(word => {
             return `
                 <tr>
                     <td>${word.id}</td>
                     <td>${word.spelling}</td>
+                    <td>${word.partOfSpeech || '-'}</td>
                     <td>${word.phonetic || '-'}</td>
                     <td>${word.definition || '-'}</td>
                     <td>${word.example || '-'}</td>
-                    <td>${word.audio ? '<audio controls src="' + word.audio + '" style="width:100px;"></audio>' : '-'}</td>
+                    <td>${word.audio ? '<audio controls src="' + word.audio + '" style="width:100px;">\u5426\u5219' : '-'}</td>
                     <td>${word.image ? '<img src="' + word.image + '" style="width:60px;height:60px;object-fit:cover;" />' : '-'}</td>
                     <td>${word.createTime}</td>
                     <td class="action-buttons">
