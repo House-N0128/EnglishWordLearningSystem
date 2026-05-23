@@ -447,6 +447,21 @@
                         <input type="text" class="form-control" id="phoneticSymbol" placeholder="请输入音标">
                     </div>
                     <div class="form-group">
+                        <label>词性</label>
+                        <select class="form-control" id="partOfSpeech">
+                            <option value="">请选择词性</option>
+                            <option value="n.">名词 (n.)</option>
+                            <option value="v.">动词 (v.)</option>
+                            <option value="adj.">形容词 (adj.)</option>
+                            <option value="adv.">副词 (adv.)</option>
+                            <option value="prep.">介词 (prep.)</option>
+                            <option value="conj.">连词 (conj.)</option>
+                            <option value="pron.">代词 (pron.)</option>
+                            <option value="num.">数词 (num.)</option>
+                            <option value="interj.">感叹词 (interj.)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>例句</label>
                         <textarea class="form-control" id="exampleSentence" rows="3" placeholder="请输入例句"></textarea>
                     </div>
@@ -598,28 +613,32 @@
         });
 
         function displaySearchResults(words) {
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = words.map(word => `
-                <div class="search-result-item" onclick="selectExistingWord('${word.wordId}', '${word.englishSpelling}', '${word.chineseDefinition}', '${word.phoneticSymbol || ''}', '${word.exampleSentence || ''}', '${word.wordPronunciation || ''}', '${word.wordImage || ''}')">
-                    <div class="result-word">${word.englishSpelling}${word.wordId === document.getElementById('selectedWordId').value ? '<span class="selected-badge">已选择</span>' : ''}</div>
-                    <div class="result-definition">${word.chineseDefinition}</div>
-                </div>
-            `).join('');
-            resultsDiv.style.display = 'block';
-        }
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = words.map(word => `
+        <div class="search-result-item" onclick="selectExistingWord('${word.wordId}', '${word.englishSpelling}', '${word.chineseDefinition}', '${word.phoneticSymbol || ''}', '${word.partOfSpeech || ''}', '${word.exampleSentence || ''}', '${word.wordPronunciation || ''}', '${word.wordImage || ''}')">
+            <div class="result-word">${word.englishSpelling}${word.wordId === document.getElementById('selectedWordId').value ? '<span class="selected-badge">已选择</span>' : ''}</div>
+            <div class="result-definition">${word.chineseDefinition}</div>
+        </div>
+    `).join('');
+    resultsDiv.style.display = 'block';
+}
 
-        function selectExistingWord(wordId, spelling, definition, phonetic, example, pronunciation, image) {
-            document.getElementById('selectedWordId').value = wordId;
-            document.getElementById('englishSpelling').value = spelling;
-            document.getElementById('chineseDefinition').value = definition;
-            document.getElementById('phoneticSymbol').value = phonetic;
-            document.getElementById('exampleSentence').value = example;
-            document.getElementById('wordPronunciation').value = pronunciation;
-            document.getElementById('wordImage').value = image;
-            document.getElementById('existingRadio').checked = true;
-            
-            displaySearchResults([{wordId, englishSpelling: spelling, chineseDefinition: definition}]);
-        }
+
+        
+        function selectExistingWord(wordId, spelling, definition, phonetic, partOfSpeech, example, pronunciation, image) {
+    document.getElementById('selectedWordId').value = wordId;
+    document.getElementById('englishSpelling').value = spelling;
+    document.getElementById('chineseDefinition').value = definition;
+    document.getElementById('phoneticSymbol').value = phonetic;
+    document.getElementById('partOfSpeech').value = partOfSpeech;
+    document.getElementById('exampleSentence').value = example;
+    document.getElementById('wordPronunciation').value = pronunciation;
+    document.getElementById('wordImage').value = image;
+    document.getElementById('existingRadio').checked = true;
+    
+    displaySearchResults([{wordId, englishSpelling: spelling, chineseDefinition: definition}]);
+}
+
 
         document.getElementById('singleAddForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -643,6 +662,7 @@
                 const englishSpelling = document.getElementById('englishSpelling').value.trim();
                 const chineseDefinition = document.getElementById('chineseDefinition').value.trim();
                 const phoneticSymbol = document.getElementById('phoneticSymbol').value.trim();
+                const partOfSpeech = document.getElementById('partOfSpeech').value.trim();
                 const exampleSentence = document.getElementById('exampleSentence').value.trim();
                 const wordPronunciation = document.getElementById('wordPronunciation').value.trim();
                 const wordImage = document.getElementById('wordImage').value.trim();
@@ -669,15 +689,16 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        wordId: 'WD' + Date.now(),
-                        wordBookId: bookId,
-                        englishSpelling: englishSpelling,
-                        chineseDefinition: chineseDefinition,
-                        phoneticSymbol: phoneticSymbol,
-                        exampleSentence: exampleSentence,
-                        wordPronunciation: pronunciation,
-                        wordImage: image
-                    })
+                            wordId: 'WD' + Date.now(),
+                            wordBookId: bookId,
+                            englishSpelling: englishSpelling,
+                            chineseDefinition: chineseDefinition,
+                            phoneticSymbol: phoneticSymbol,
+                            partOfSpeech: partOfSpeech,
+                            exampleSentence: exampleSentence,
+                            wordPronunciation: pronunciation,
+                            wordImage: image
+                        })
                 });
                 const result = await response.json();
 
@@ -726,6 +747,7 @@
             document.getElementById('englishSpelling').value = '';
             document.getElementById('chineseDefinition').value = '';
             document.getElementById('phoneticSymbol').value = '';
+            document.getElementById('partOfSpeech').value = '';
             document.getElementById('exampleSentence').value = '';
             document.getElementById('wordPronunciation').value = '';
             document.getElementById('wordImage').value = '';
@@ -809,9 +831,9 @@
         }
 
         document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
-            const templateContent = `spelling,definition,example_sentence,phonetic,pronunciation_url,image_url
-abandon,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,,
-ability,能力，才能,She has the ability to learn languages quickly.,/əˈbɪləti/,,`;
+            const templateContent = `spelling,part_of_speech,definition,example_sentence,phonetic,pronunciation_url,image_url
+abandon,v.,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,,
+ability,n.,能力，才能,She has the ability to learn languages quickly.,/əˈbɪləti/,,`;
             
             const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');

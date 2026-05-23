@@ -266,28 +266,32 @@ public class WordController {
                     }
                     word.setEnglishSpelling(spelling.trim());
 
-                    // definition (B列)
-                    String definition = getCellValueAsString(row.getCell(1));
+                    // part_of_speech (B列)
+                    String partOfSpeech = getCellValueAsString(row.getCell(1));
+                    word.setPartOfSpeech(partOfSpeech != null ? partOfSpeech.trim() : "");
+
+                    // definition (C列)
+                    String definition = getCellValueAsString(row.getCell(2));
                     if (definition == null || definition.trim().isEmpty()) {
                         failCount++;
                         continue;
                     }
                     word.setChineseDefinition(definition.trim());
 
-                    // example_sentence (C列)
-                    String exampleSentence = getCellValueAsString(row.getCell(2));
+                    // example_sentence (D列)
+                    String exampleSentence = getCellValueAsString(row.getCell(3));
                     word.setExampleSentence(exampleSentence != null ? exampleSentence.trim() : "");
 
-                    // phonetic (D列)
-                    String phonetic = getCellValueAsString(row.getCell(3));
+                    // phonetic (E列)
+                    String phonetic = getCellValueAsString(row.getCell(4));
                     word.setPhoneticSymbol(phonetic != null ? phonetic.trim() : "");
 
-                    // pronunciation_url (E列)
-                    String pronunciationUrl = getCellValueAsString(row.getCell(4));
+                    // pronunciation_url (F列)
+                    String pronunciationUrl = getCellValueAsString(row.getCell(5));
                     word.setWordPronunciation(pronunciationUrl != null ? pronunciationUrl.trim() : "");
 
-                    // image_url (F列)
-                    String imageUrl = getCellValueAsString(row.getCell(5));
+                    // image_url (G列)
+                    String imageUrl = getCellValueAsString(row.getCell(6));
                     word.setWordImage(imageUrl != null ? imageUrl.trim() : "");
 
                     // 自动生成word_id（格式：WD+6位数字）

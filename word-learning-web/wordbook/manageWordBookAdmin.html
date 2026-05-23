@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -21,55 +21,61 @@
 
         /* 顶部导航栏 */
         .top-nav {
-            background-color: #dc3545;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 15px 25px;
+            box-shadow: 0 2px 15px rgba(220,53,69,0.3);
         }
 
         .nav-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
+            letter-spacing: 1px;
         }
 
         .user-area {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .user-name {
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .btn-logout {
             background-color: rgba(255,255,255,0.2);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
+            transition: all 0.3s;
         }
 
         .btn-logout:hover {
             background-color: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
         }
 
         /* 主体布局 */
         .main-container {
             display: flex;
             flex: 1;
+            min-height: calc(100vh - 60px);
         }
 
         /* 左侧侧边栏 */
         .sidebar {
-            width: 180px;
-            background-color: white;
-            border-right: 1px solid #eee;
-            padding: 20px 0;
+            width: 200px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 25px 0;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
         }
 
         .sidebar-menu {
@@ -77,17 +83,19 @@
         }
 
         .sidebar-menu li {
-            padding: 12px 25px;
+            padding: 14px 25px;
             cursor: pointer;
-            color: #333;
+            color: #444;
             font-size: 15px;
-            transition: background-color 0.2s;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
         }
 
         .sidebar-menu li:hover,
         .sidebar-menu li.active {
-            background-color: #f8d7da;
+            background-color: #fff5f5;
             color: #dc3545;
+            border-left-color: #dc3545;
         }
 
         .sidebar-menu .sub-item {
@@ -104,96 +112,287 @@
         /* 右侧主内容区 */
         .content-area {
             flex: 1;
-            padding: 25px;
+            padding: 35px;
         }
 
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .page-title {
-            font-size: 22px;
+            font-size: 26px;
             color: #333;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-icon {
+            font-size: 28px;
         }
 
         .header-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-green {
-            background-color: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
             color: white;
         }
 
+        .btn-green:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.4);
+        }
+
         .btn-secondary {
-            background-color: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,117,141,0.4);
+        }
+
+        /* 轮播区域 */
+        .carousel-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .slide-icon {
+            font-size: 48px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+        }
+
+        .slide-content {
+            flex: 1;
+        }
+
+        .slide-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .slide-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: #dc3545;
+            transform: scale(1.2);
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
         }
 
         /* 搜索区域 */
         .search-area {
-            background-color: white;
-            padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
 
         .search-input-wrap {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .search-input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         }
 
         .btn-search {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
             border: none;
-            padding: 0 20px;
-            border-radius: 6px;
+            padding: 0 25px;
+            border-radius: 10px;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
         }
 
         .filter-row {
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
 
         .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            font-size: 14px;
-            min-width: 120px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         }
 
         /* 表格区域 */
         .table-area {
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            overflow-x: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
 
         table {
@@ -203,96 +402,132 @@
         }
 
         th, td {
-            padding: 15px;
+            padding: 18px 20px;
             text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
         }
 
         th {
-            background-color: #f8f9fa;
+            background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
             font-weight: 600;
-            color: #333;
+            color: #444;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        tr {
+            transition: all 0.3s;
         }
 
         tr:hover {
-            background-color: #f8f9fa;
+            background-color: #fff8f0;
+            transform: scale(1.002);
         }
 
         .level-beginner {
             color: #28a745;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .level-intermediate {
             color: #ffc107;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .level-advanced {
             color: #dc3545;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .status-online {
             color: #28a745;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .status-offline {
             color: #dc3545;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .action-row {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
         .btn-edit {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0069d9 100%);
             color: white;
             border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0,123,255,0.4);
         }
 
         .btn-delete {
-            background-color: #dc3545;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
             border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(220,53,69,0.4);
         }
 
         .btn-add {
-            background-color: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
             color: white;
             border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(40,167,69,0.4);
         }
 
         .btn-view {
-            background-color: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             color: white;
             border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(108,117,141,0.4);
         }
 
         /* 分页 */
@@ -300,16 +535,24 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
-            padding: 20px;
+            gap: 20px;
+            padding: 25px;
         }
 
         .page-btn {
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             background-color: white;
             cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #dc3545;
+            background-color: #fff5f5;
         }
 
         .page-btn:disabled {
@@ -320,17 +563,18 @@
         /* 弹窗提示 */
         .toast-msg {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #333;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
             color: white;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-size: 15px;
             z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.3s;
             pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         /* 加载状态 */
@@ -350,10 +594,11 @@
 
         .loading-spinner {
             background: white;
-            padding: 20px 30px;
-            border-radius: 8px;
+            padding: 30px 45px;
+            border-radius: 15px;
             font-size: 16px;
             color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
     </style>
     <script src="/api.js"></script>
@@ -391,10 +636,75 @@
     <!-- 右侧主内容区 -->
     <div class="content-area">
         <div class="page-header">
-            <h1 class="page-title">词书管理</h1>
+            <h1 class="page-title"><span class="page-icon">📚</span>词书管理</h1>
             <div class="header-buttons">
-                <button class="btn btn-green" id="addWordBookBtn">新增词书</button>
-                <button class="btn btn-secondary" id="backHomeBtn">返回首页</button>
+                <button class="btn btn-green" id="addWordBookBtn">➕ 新增词书</button>
+                <button class="btn btn-secondary" id="backHomeBtn">🏠 返回首页</button>
+            </div>
+        </div>
+
+        <!-- 轮播区域 -->
+        <div class="carousel-container">
+            <div class="carousel-header">📢 系统公告</div>
+            <div class="carousel-slides" id="carouselSlides">
+                <div class="carousel-slide">
+                    <div class="slide-icon">🎯</div>
+                    <div class="slide-content">
+                        <div class="slide-title">欢迎使用词书管理系统</div>
+                        <div class="slide-desc">在这里您可以管理所有词书，包括添加、编辑、删除词书，以及查看词书中的单词。</div>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="slide-icon">📊</div>
+                    <div class="slide-content">
+                        <div class="slide-title">数据统计</div>
+                        <div class="slide-desc">系统实时统计词书数量、单词总数等关键指标，帮助您更好地管理词书资源。</div>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="slide-icon">💡</div>
+                    <div class="slide-content">
+                        <div class="slide-title">操作提示</div>
+                        <div class="slide-desc">点击词书操作栏的"添加"按钮，可以快速为词书添加单词。</div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-indicators" id="carouselIndicators">
+                <span class="indicator active" data-index="0"></span>
+                <span class="indicator" data-index="1"></span>
+                <span class="indicator" data-index="2"></span>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue">📚</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">词书总数</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">✅</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statOnline">0</div>
+                    <div class="stat-label">已上线</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">⏳</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statOffline">0</div>
+                    <div class="stat-label">未上线</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">🔤</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statWords">0</div>
+                    <div class="stat-label">单词总数</div>
+                </div>
             </div>
         </div>
 
@@ -406,20 +716,20 @@
             </div>
             <div class="filter-row">
                 <div>
-                    <label style="font-size:14px; color:#333; margin-right:8px;">难度等级:</label>
+                    <label style="font-size:15px; color:#444; margin-right:12px;font-weight:500;">🎯 难度等级:</label>
                     <select class="filter-select" id="levelFilter">
                         <option value="all">全部</option>
-                        <option value="初级">初级</option>
-                        <option value="中级">中级</option>
-                        <option value="高级">高级</option>
+                        <option value="初级">🌱 初级</option>
+                        <option value="中级">🌿 中级</option>
+                        <option value="高级">🌳 高级</option>
                     </select>
                 </div>
                 <div>
-                    <label style="font-size:14px; color:#333; margin-right:8px;">词书状态:</label>
+                    <label style="font-size:15px; color:#444; margin-right:12px;font-weight:500;">📊 词书状态:</label>
                     <select class="filter-select" id="statusFilter">
                         <option value="all">全部</option>
-                        <option value="已上线">已上线</option>
-                        <option value="未上线">未上线</option>
+                        <option value="已上线">✅ 已上线</option>
+                        <option value="未上线">⏳ 未上线</option>
                     </select>
                 </div>
             </div>
@@ -430,19 +740,18 @@
             <table id="wordbookTable">
                 <thead>
                 <tr>
-                    <th>词书ID</th>
-                    <th>词书名称</th>
-                    <th>难度等级</th>
-                    <th>单词数量</th>
-                    <th>创建管理员ID</th>
-                    <th>创建时间</th>
-                    <th>更新时间</th>
-                    <th>状态</th>
-                    <th>操作</th>
+                    <th>📋 词书ID</th>
+                    <th>📖 词书名称</th>
+                    <th>🎯 难度等级</th>
+                    <th>🔤 单词数量</th>
+                    <th>🕐 创建时间</th>
+                    <th>🔄 更新时间</th>
+                    <th>📊 状态</th>
+                    <th>⚙️ 操作</th>
                 </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="9" style="text-align:center;">加载中...</td></tr>
+                    <tr><td colspan="8" style="text-align:center;">加载中...</td></tr>
                 </tbody>
             </table>
             <div class="pagination" id="paginationArea">
@@ -498,62 +807,104 @@
         }, 2000);
     }
     
-    // 从后端获取词书列表
-    async function fetchWordBooksFromBackend() {
-        showLoading();
-        try {
-            // 使用 api.js 中定义的 apiGet 方法调用后端接口
-            // 后端 WordBookController 的 @RequestMapping("/api/wordbooks")
-            const result = await apiGet('/api/wordbooks');
+    // 更新统计数据
+        function updateStats() {
+            const total = bookData.length;
+            const online = bookData.filter(b => b.status === '已上线').length;
+            const offline = total - online;
+            const totalWords = bookData.reduce((sum, b) => sum + (b.wordCount || 0), 0);
             
-            // 根据实际后端返回的数据结构进行适配
-            // 假设返回格式为: { code: 200, data: [...], message: "success" }
-            let data = [];
-            if (result.code === 200 && result.data && Array.isArray(result.data)) {
-                data = result.data;
-            } else {
-                throw new Error(result.message || '数据格式异常');
-            }
-            
-            // 转换后端字段名为前端使用的字段名（根据 WordBook 实体类字段映射）
-            bookData = data.map(item => ({
-                id: item.wordBookId || '',
-                name: item.wordBookName || '',
-                level: item.difficultyLevel || '中级',
-                wordCount: item.wordCount || 0,
-                adminId: item.adminId || item.creatorId || 'admin',
-                createTime: formatDateTime(item.createTime),
-                updateTime: formatDateTime(item.updateTime),
-                status: item.wordBookStatus === '已上线' || item.wordBookStatus === '已上架' || item.wordBookStatus === 'online' ? '已上线' : '未上线'
-            }));
-            
-            // 格式化日期时间
-            function formatDateTime(dateTime) {
-                if (!dateTime) return '-';
-                // 处理 Java LocalDateTime 格式（如：2024-01-15T14:30:25）
-                return String(dateTime).replace('T', ' ');
-            }
-            
-            if (bookData.length === 0) {
-                showMessage('暂无词书数据');
-            } else {
-                showMessage(`成功加载 ${bookData.length} 条词书数据`);
-            }
-            
-            // 应用过滤和渲染
-            applyFilters();
-            
-        } catch (error) {
-            console.error('获取词书列表失败:', error);
-            showMessage(`获取数据失败: ${error.message}`, true);
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#dc3545;">数据加载失败，请检查网络或后端服务</td></tr>`;
-            bookData = [];
-            filteredData = [];
-            renderTable();
-        } finally {
-            hideLoading();
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statOnline').textContent = online;
+            document.getElementById('statOffline').textContent = offline;
+            document.getElementById('statWords').textContent = totalWords.toLocaleString();
         }
-    }
+
+        // 轮播功能
+        let currentSlide = 0;
+        let carouselTimer;
+        
+        function startCarousel() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            carouselTimer = setInterval(() => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                updateCarousel(slides, indicators);
+            }, 4000);
+        }
+        
+        function updateCarousel(slides, indicators) {
+            const container = document.getElementById('carouselSlides');
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            indicators.forEach((ind, idx) => {
+                ind.classList.toggle('active', idx === currentSlide);
+            });
+        }
+        
+        function pauseCarousel() {
+            clearInterval(carouselTimer);
+        }
+
+        // 从后端获取词书列表
+        async function fetchWordBooksFromBackend() {
+            showLoading();
+            try {
+                // 使用 api.js 中定义的 apiGet 方法调用后端接口
+                // 后端 WordBookController 的 @RequestMapping("/api/wordbooks")
+                const result = await apiGet('/api/wordbooks');
+                
+                // 根据实际后端返回的数据结构进行适配
+                // 假设返回格式为: { code: 200, data: [...], message: "success" }
+                let data = [];
+                if (result.code === 200 && result.data && Array.isArray(result.data)) {
+                    data = result.data;
+                } else {
+                    throw new Error(result.message || '数据格式异常');
+                }
+                
+                // 转换后端字段名为前端使用的字段名（根据 WordBook 实体类字段映射）
+                bookData = data.map(item => ({
+                    id: item.wordBookId || '',
+                    name: item.wordBookName || '',
+                    level: item.difficultyLevel || '中级',
+                    wordCount: item.wordCount || 0,
+                    createTime: formatDateTime(item.createTime),
+                    updateTime: formatDateTime(item.updateTime),
+                    status: item.wordBookStatus === '已上线' || item.wordBookStatus === '已上架' || item.wordBookStatus === 'online' ? '已上线' : '未上线'
+                }));
+                
+                // 格式化日期时间
+                function formatDateTime(dateTime) {
+                    if (!dateTime) return '-';
+                    // 处理 Java LocalDateTime 格式（如：2024-01-15T14:30:25）
+                    return String(dateTime).replace('T', ' ');
+                }
+                
+                // 更新统计数据
+                updateStats();
+                
+                if (bookData.length === 0) {
+                    showMessage('暂无词书数据');
+                } else {
+                    showMessage(`成功加载 ${bookData.length} 条词书数据`);
+                }
+                
+                // 应用过滤和渲染
+                applyFilters();
+                
+            } catch (error) {
+                console.error('获取词书列表失败:', error);
+                showMessage(`获取数据失败: ${error.message}`, true);
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#dc3545;">数据加载失败，请检查网络或后端服务</td></tr>`;
+                bookData = [];
+                filteredData = [];
+                renderTable();
+            } finally {
+                hideLoading();
+            }
+        }
     
     // 删除词书（调用后端API）
     async function deleteWordBookFromBackend(bookId) {
@@ -646,7 +997,6 @@
                         <td>${escapeHtml(book.name)}</td>
                         <td class="${levelClass}">${escapeHtml(book.level)}</td>
                         <td>${book.wordCount}</td>
-                        <td>${escapeHtml(book.adminId)}</td>
                         <td>${escapeHtml(book.createTime || '-')}</td>
                         <td>${escapeHtml(book.updateTime || '-')}</td>
                         <td class="${statusClass}">${escapeHtml(book.status)}</td>
@@ -836,6 +1186,20 @@
                 }
             });
         });
+
+        // 轮播事件绑定
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseenter', pauseCarousel);
+        carouselContainer.addEventListener('mouseleave', startCarousel);
+        
+        const indicators = document.querySelectorAll('.indicator');
+        indicators.forEach((ind, idx) => {
+            ind.addEventListener('click', () => {
+                currentSlide = idx;
+                updateCarousel(document.querySelectorAll('.carousel-slide'), indicators);
+            });
+        });
+        startCarousel();
     }
     
     // 启动应用
