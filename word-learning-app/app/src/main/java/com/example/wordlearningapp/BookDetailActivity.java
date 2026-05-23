@@ -24,6 +24,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private LinearLayout wordsContainer;
     private Button btnStartStudy;
     private String bookId;
+    private String studyMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class BookDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_book_detail);
 
         bookId = getIntent().getStringExtra("bookId");
+        studyMode = getIntent().getStringExtra("studyMode");
 
         findViewById(R.id.toolbar_back).setOnClickListener(v -> finish());
 
@@ -53,6 +55,9 @@ public class BookDetailActivity extends AppCompatActivity {
         btnStartStudy.setOnClickListener(v -> {
             Intent intent = new Intent(this, WordStudyActivity.class);
             intent.putExtra("bookId", bookId);
+            if (studyMode != null) {
+                intent.putExtra("studyMode", studyMode);
+            }
             startActivity(intent);
         });
 

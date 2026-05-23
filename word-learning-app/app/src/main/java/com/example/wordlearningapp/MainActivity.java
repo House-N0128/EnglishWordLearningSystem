@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupNavBar();
-        setupClickListeners();
         loadData();
     }
 
@@ -76,30 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProfileActivity.class)));
     }
 
-    private void setupClickListeners() {
-        findViewById(R.id.card_today).setOnClickListener(v -> {
-            Intent intent = new Intent(this, TodayWordsActivity.class);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.card_total).setOnClickListener(v -> {
-            startActivity(new Intent(this, StudyRecordsActivity.class));
-        });
-
-        // 当前词书卡片点击跳转至词书详情页
-        cardCurrentBook.setOnClickListener(v -> {
-            if (currentBookId != null && !currentBookId.isEmpty()) {
-                Log.d(TAG, "跳转到词书详情页，bookId: " + currentBookId);
-                Intent intent = new Intent(this, BookDetailActivity.class);
-                intent.putExtra("bookId", currentBookId);
-                startActivity(intent);
-            } else {
-                Log.d(TAG, "当前没有选择词书");
-                Toast.makeText(this, "当前没有选择词书，请先选择词书开始学习", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void loadData() {
         new Thread(() -> {
             try {
@@ -119,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                     String bookName = s.has("currentBookName") && !s.get("currentBookName").isJsonNull()
                             ? s.get("currentBookName").getAsString() : "无";
 
-                    // 获取当前词书ID
                     String bookId = "";
                     if (s.has("currentBookId") && !s.get("currentBookId").isJsonNull()) {
                         bookId = s.get("currentBookId").getAsString();
@@ -133,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                         tvBook.setText(bookName);
                         currentBookId = finalBookId;
 
-                        // 更新卡片视觉效果
                         if (!currentBookId.isEmpty()) {
                             tvBook.setTextColor(0xFF318af8);
                             tvBook.setPaintFlags(tvBook.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
@@ -144,17 +117,66 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
 
-                JsonObject recentRes = ApiClient.get().get("/api/records/recent");
-                Log.d(TAG, "=== 最近学习API响应 ===");
-                Log.d(TAG, recentRes.toString());
-                if (recentRes.get("code").getAsInt() == 200) {
-                    JsonArray recentArr = recentRes.getAsJsonArray("data");
-                    Log.d(TAG, "=== 最近学习数据 ===");
-                    Log.d(TAG, "数据数量: " + recentArr.size());
-                    for (int i = 0; i < recentArr.size(); i++) {
-                        Log.d(TAG, "数据项[" + i + "]: " + recentArr.get(i).toString());
+                JsonObject recordsRes = ApiClient.get().get("/api/records/list");
+                Log.d(TAG, "=== 学习记录API响应 ===");
+                Log.d(TAG, recordsRes.toString());
+
+                if (recordsRes.get("code").getAsInt() == 200) {
+                    JsonArray recordsArr = recordsRes.getAsJsonArray("data");
+                    Log.d(TAG, "=== 学习记录数据 ===");
+                    Log.d(TAG, "记录数量: " + recordsArr.size());
+
+                    if (recordsArr.size() > 0) {
+                        java.util.LinkedHashSet<String> uniqueWordIds = new java.util.LinkedHashSet<>();
+                        for (int i = 0; i < recordsArr.size() && uniqueWordIds.size() < 3; i++) {
+                            JsonObject record = recordsArr.get(i).getAsJsonObject();
+                            if (record.has("wordId") && !record.get("wordId").isJsonNull()) {
+                                uniqueWordIds.add(record.get("wordId").getAsString());
+                            }
+                        }
+
+                        Log.d(TAG, "去重后的单词数量: " + uniqueWordIds.size());
+
+                        JsonArray enrichedArr = new JsonArray();
+                        for (String wordId : uniqueWordIds) {
+                            try {
+                                JsonObject wordRes = ApiClient.get().get("/api/words/" + wordId);
+                                Log.d(TAG, "单词详情响应[" + wordId + "]: " + wordRes.toString());
+
+                                if (wordRes.get("code").getAsInt() == 200) {
+                                    JsonObject wordData = wordRes.getAsJsonObject("data");
+                                    JsonObject enriched = new JsonObject();
+                                    enriched.addProperty("wordId", wordId);
+
+                                    if (wordData.has("englishSpelling") && !wordData.get("englishSpelling").isJsonNull()) {
+                                        enriched.addProperty("englishSpelling", wordData.get("englishSpelling").getAsString());
+                                    }
+
+                                    if (wordData.has("chineseDefinition") && !wordData.get("chineseDefinition").isJsonNull()) {
+                                        enriched.addProperty("chineseDefinition", wordData.get("chineseDefinition").getAsString());
+                                    }
+
+                                    enrichedArr.add(enriched);
+                                    Log.d(TAG, "成功获取单词: " +
+                                            (enriched.has("englishSpelling") ? enriched.get("englishSpelling").getAsString() : ""));
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "获取单词详情异常[" + wordId + "]: " + e.getMessage(), e);
+                            }
+                        }
+
+                        Log.d(TAG, "=== 最终显示数据 ===");
+                        Log.d(TAG, "有效单词数量: " + enrichedArr.size());
+                        runOnUiThread(() -> buildRecentWords(enrichedArr));
+                    } else {
+                        runOnUiThread(() -> buildRecentWords(new JsonArray()));
                     }
-                    runOnUiThread(() -> buildRecentWords(recentArr));
+                } else {
+                    Log.e(TAG, "获取学习记录失败，code: " + recordsRes.get("code"));
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, "加载学习记录失败", Toast.LENGTH_SHORT).show();
+                        buildRecentWords(new JsonArray());
+                    });
                 }
 
                 JsonObject booksRes = ApiClient.get().get("/api/wordbooks");
@@ -164,7 +186,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "加载数据异常: " + e.getMessage(), e);
-                runOnUiThread(() -> tvUsername.setText("加载失败"));
+                runOnUiThread(() -> {
+                    tvUsername.setText("加载失败");
+                    Toast.makeText(MainActivity.this, "加载数据失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
             }
         }).start();
     }
@@ -311,13 +336,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // 只展示前三个词书
         int displayCount = Math.min(arr.size(), 3);
 
         for (int i = 0; i < displayCount; i++) {
             JsonObject b = arr.get(i).getAsJsonObject();
 
-            // 创建词书卡片（水平布局，与词书浏览界面一致）
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.HORIZONTAL);
             card.setPadding(dp(16), dp(16), dp(16), dp(16));
@@ -329,14 +352,12 @@ public class MainActivity extends AppCompatActivity {
             cardParams.setMargins(0, 0, 0, dp(12));
             card.setLayoutParams(cardParams);
 
-            // 左侧信息区域
             LinearLayout leftInfo = new LinearLayout(this);
             leftInfo.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(
                     0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
             leftInfo.setLayoutParams(leftParams);
 
-            // 词书名称
             TextView bookName = new TextView(this);
             String name = b.has("wordBookName") ? b.get("wordBookName").getAsString() : "";
             bookName.setText(name);
@@ -346,7 +367,6 @@ public class MainActivity extends AppCompatActivity {
             bookName.setPadding(0, 0, 0, dp(8));
             leftInfo.addView(bookName);
 
-            // 难度和词数
             TextView bookInfo = new TextView(this);
             String info = (b.has("difficultyLevel") ? b.get("difficultyLevel").getAsString() : "")
                     + " | " + (b.has("wordCount") ? b.get("wordCount").getAsInt() : 0) + "词";
@@ -356,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
             bookInfo.setPadding(0, 0, 0, dp(8));
             leftInfo.addView(bookInfo);
 
-            // 词书描述
             if (b.has("wordBookDescription") && !b.get("wordBookDescription").isJsonNull()) {
                 TextView descTv = new TextView(this);
                 descTv.setText(b.get("wordBookDescription").getAsString());
@@ -368,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
 
             card.addView(leftInfo);
 
-            // 右侧开始学习按钮（使用渐变背景）
             Button studyBtn = new Button(this);
             studyBtn.setText("开始学习");
             studyBtn.setTextSize(14);

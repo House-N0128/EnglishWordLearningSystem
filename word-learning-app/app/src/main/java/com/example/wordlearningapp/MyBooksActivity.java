@@ -309,6 +309,7 @@ public class MyBooksActivity extends AppCompatActivity {
             studyBtn.setOnClickListener(v -> {
                 Intent intent = new Intent(this, BookDetailActivity.class);
                 intent.putExtra("bookId", bookId);
+                intent.putExtra("studyMode", "continue");
                 startActivity(intent);
             });
             card.addView(studyBtn);
