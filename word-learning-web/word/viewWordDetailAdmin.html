@@ -335,6 +335,11 @@ D:\Projects\EnglishWordLearningSystem\word-learning-web\word\viewWordDetailAdmin
                 </div>
 
                 <div class="detail-section">
+                    <div class="section-label">词性</div>
+                    <div class="section-content" id="wordClass"></div>
+                </div>
+
+                <div class="detail-section">
                     <div class="section-label">中文释义</div>
                     <div class="section-content definition" id="wordDefinition"></div>
                 </div>
@@ -426,6 +431,7 @@ D:\Projects\EnglishWordLearningSystem\word-learning-web\word\viewWordDetailAdmin
             document.getElementById('wordId').textContent = word.wordId || '-';
             document.getElementById('wordSpelling').textContent = word.englishSpelling || '-';
             document.getElementById('wordPhonetic').textContent = word.phoneticSymbol || '-';
+            document.getElementById('wordClass').textContent = word.partOfSpeech || '-';
             document.getElementById('wordDefinition').textContent = word.chineseDefinition || '-';
             document.getElementById('wordExample').textContent = word.exampleSentence || '-';
 
