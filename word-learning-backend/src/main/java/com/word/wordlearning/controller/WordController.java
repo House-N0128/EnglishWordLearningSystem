@@ -57,6 +57,7 @@ public class WordController {
         String spelling = (String) body.get("englishSpelling");
         String definition = (String) body.get("chineseDefinition");
         String phonetic = body.get("phoneticSymbol") != null ? (String) body.get("phoneticSymbol") : "";
+        String partOfSpeech = body.get("partOfSpeech") != null ? (String) body.get("partOfSpeech") : "";
         String example = body.get("exampleSentence") != null ? (String) body.get("exampleSentence") : "";
         String audio = body.get("wordPronunciation") != null ? (String) body.get("wordPronunciation") : "";
         String image = body.get("wordImage") != null ? (String) body.get("wordImage") : "";
@@ -79,6 +80,7 @@ public class WordController {
             w.setEnglishSpelling(spelling);
             w.setChineseDefinition(definition);
             w.setPhoneticSymbol(phonetic);
+            w.setPartOfSpeech(partOfSpeech);
             w.setExampleSentence(example);
             w.setWordPronunciation(audio);
             w.setWordImage(image);

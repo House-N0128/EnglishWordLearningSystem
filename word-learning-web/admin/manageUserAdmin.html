@@ -298,6 +298,7 @@ function renderUsers() {
                 '<td>'+(u.phoneNumber||'-')+'</td>'+
                 '<td>'+(u.email||'-')+'</td>'+
                 '<td>'+formatTime(u.registerTime)+'</td>'+
+                '<td><span class="'+statusClass+'">'+statusText+'</span></td>'+
                 '<td><button class="btn-edit" onclick="editUser(\''+u.userId+'\')">编辑</button>'+
                 '<button class="btn-toggle" onclick="toggleStatus(\''+u.userId+'\', \''+u.accountStatus+'\')">'+toggleText+'</button></td></tr>';
     });
