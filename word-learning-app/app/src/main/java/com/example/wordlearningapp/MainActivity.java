@@ -19,6 +19,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -156,11 +160,73 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "记录数量: " + recordsArr.size());
 
                     if (recordsArr.size() > 0) {
-                        java.util.LinkedHashSet<String> uniqueWordIds = new java.util.LinkedHashSet<>();
-                        for (int i = 0; i < recordsArr.size() && uniqueWordIds.size() < 3; i++) {
-                            JsonObject record = recordsArr.get(i).getAsJsonObject();
+                        LinkedHashSet<String> uniqueWordIds = new LinkedHashSet<>();
+
+                        List<JsonObject> recordList = new ArrayList<>();
+                        for (int i = 0; i < recordsArr.size(); i++) {
+                            recordList.add(recordsArr.get(i).getAsJsonObject());
+                        }
+
+                        recordList.sort((r1, r2) -> {
+                            String date1 = "";
+                            String date2 = "";
+
+                            if (r1.has("recordCreateTime") && !r1.get("recordCreateTime").isJsonNull()) {
+                                date1 = r1.get("recordCreateTime").getAsString();
+                            } else if (r1.has("learningDate") && !r1.get("learningDate").isJsonNull()) {
+                                date1 = r1.get("learningDate").getAsString();
+                            }
+
+                            if (r2.has("recordCreateTime") && !r2.get("recordCreateTime").isJsonNull()) {
+                                date2 = r2.get("recordCreateTime").getAsString();
+                            } else if (r2.has("learningDate") && !r2.get("learningDate").isJsonNull()) {
+                                date2 = r2.get("learningDate").getAsString();
+                            }
+
+                            return date2.compareTo(date1);
+                        });
+
+                        Log.d(TAG, "=== 排序后的记录 ===");
+                        for (int i = 0; i < recordList.size(); i++) {
+                            JsonObject record = recordList.get(i);
+                            String wordId = "";
                             if (record.has("wordId") && !record.get("wordId").isJsonNull()) {
-                                uniqueWordIds.add(record.get("wordId").getAsString());
+                                wordId = record.get("wordId").getAsString();
+                            } else if (record.has("learnedWordId") && !record.get("learnedWordId").isJsonNull()) {
+                                wordId = record.get("learnedWordId").getAsString();
+                            } else if (record.has("id") && !record.get("id").isJsonNull()) {
+                                wordId = record.get("id").getAsString();
+                            }
+
+                            String date = "";
+                            if (record.has("recordCreateTime") && !record.get("recordCreateTime").isJsonNull()) {
+                                date = record.get("recordCreateTime").getAsString();
+                            } else if (record.has("learningDate") && !record.get("learningDate").isJsonNull()) {
+                                date = record.get("learningDate").getAsString();
+                            }
+
+                            Log.d(TAG, "记录[" + i + "]: wordId=" + (wordId.isEmpty() ? "空" : wordId) + ", date=" + (date.isEmpty() ? "空" : date));
+                        }
+
+                        for (JsonObject record : recordList) {
+                            if (uniqueWordIds.size() >= 3) {
+                                break;
+                            }
+
+                            String wordId = "";
+                            if (record.has("wordId") && !record.get("wordId").isJsonNull()) {
+                                wordId = record.get("wordId").getAsString();
+                            } else if (record.has("learnedWordId") && !record.get("learnedWordId").isJsonNull()) {
+                                wordId = record.get("learnedWordId").getAsString();
+                            } else if (record.has("id") && !record.get("id").isJsonNull()) {
+                                wordId = record.get("id").getAsString();
+                            }
+
+                            if (!wordId.isEmpty()) {
+                                uniqueWordIds.add(wordId);
+                                Log.d(TAG, "提取到单词ID[" + (uniqueWordIds.size()) + "/3]: " + wordId);
+                            } else {
+                                Log.w(TAG, "记录中没有找到有效的单词ID字段，记录内容: " + record.toString());
                             }
                         }
 
