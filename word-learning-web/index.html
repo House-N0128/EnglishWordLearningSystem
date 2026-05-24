@@ -1,3 +1,4 @@
+<!-- index.html - 登录页面（自动填充注册账号） -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -22,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* 装饰性背景圆点 */
         body::before {
             content: '';
             position: absolute;
@@ -38,7 +38,6 @@
             100% { transform: translate(40px, 40px); }
         }
 
-        /* 毛玻璃卡片 */
         .login-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -56,7 +55,6 @@
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
         }
 
-        /* 头部区域 */
         .card-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -95,7 +93,6 @@
             font-weight: 300;
         }
 
-        /* Tab 切换 */
         .tab-bar {
             display: flex;
             padding: 0 20px;
@@ -142,7 +139,6 @@
             color: #764ba2;
         }
 
-        /* 表单内容 */
         .form-content {
             padding: 30px 30px 35px;
             background: white;
@@ -183,7 +179,6 @@
             font-weight: 400;
         }
 
-        /* 按钮样式 */
         .btn {
             width: 100%;
             padding: 14px;
@@ -238,7 +233,6 @@
             box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
         }
 
-        /* 忘记密码链接 */
         .forgot-link {
             text-align: center;
             margin-top: 15px;
@@ -271,7 +265,6 @@
             width: 100%;
         }
 
-        /* 错误提示 */
         .error-msg {
             display: none;
             text-align: center;
@@ -285,12 +278,17 @@
             border-left: 3px solid #e74c3c;
         }
 
-        /* 弹窗美化 */
-        #forgotPasswordModal > div {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: modalFadeIn 0.3s ease;
+        .success-tip {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #e0f2e9 0%, #d1fae5 100%);
+            color: #0b5e42;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 3px solid #10b981;
         }
 
         @keyframes modalFadeIn {
@@ -304,17 +302,14 @@
             }
         }
 
-        /* 响应式 */
         @media (max-width: 480px) {
             .login-card {
                 width: 90%;
                 margin: 20px;
             }
-            
             .form-content {
                 padding: 25px 20px;
             }
-            
             .card-header h1 {
                 font-size: 26px;
             }
@@ -346,6 +341,7 @@
             <a href="#" onclick="showForgotPassword()">❓ 忘记密码？</a>
         </div>
         <div class="error-msg" id="error-msg"></div>
+        <div class="success-tip" id="success-tip"></div>
     </div>
 </div>
 
@@ -382,12 +378,50 @@
 <script>
 var currentRole = 'user';
 
+// 页面加载时自动填充注册的账号
+window.addEventListener('DOMContentLoaded', function() {
+    // 方式1：从 URL 参数获取
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoFillAccount = urlParams.get('autoFill');
+    
+    if (autoFillAccount) {
+        document.getElementById('userId').value = autoFillAccount;
+        showSuccessTip('✅ 注册成功！请使用您的账号登录');
+        // 清除 URL 参数（刷新页面后不再显示）
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } 
+    // 方式2：从 localStorage 获取
+    else {
+        const lastAccount = localStorage.getItem('lastRegisteredAccount');
+        const lastTime = localStorage.getItem('lastRegisteredTime');
+        
+        if (lastAccount && lastTime) {
+            const timeSince = (Date.now() - new Date(lastTime).getTime()) / 1000 / 60;
+            // 如果是在最近5分钟内注册的，则自动填充
+            if (timeSince < 5) {
+                document.getElementById('userId').value = lastAccount;
+                showSuccessTip('✅ 账号已自动填充，请输入密码登录');
+            }
+        }
+    }
+});
+
+function showSuccessTip(msg) {
+    var el = document.getElementById('success-tip');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(function() {
+        el.style.display = 'none';
+    }, 5000);
+}
+
 function switchTab(role) {
     currentRole = role;
     document.getElementById('tab-user').classList.toggle('active', role === 'user');
     document.getElementById('tab-admin').classList.toggle('active', role === 'admin');
     document.getElementById('btn-register').style.display = role === 'user' ? 'block' : 'none';
     document.getElementById('error-msg').style.display = 'none';
+    document.getElementById('success-tip').style.display = 'none';
 }
 
 function showError(msg) {
@@ -398,6 +432,7 @@ function showError(msg) {
 
 async function doLogin() {
     document.getElementById('error-msg').style.display = 'none';
+    document.getElementById('success-tip').style.display = 'none';
 
     var userId = document.getElementById('userId').value.trim();
     var password = document.getElementById('password').value.trim();
@@ -409,6 +444,9 @@ async function doLogin() {
     if (result.code === 200) {
         var loginUserId = result.data.userid || result.data.userId || userId;
         setAuth(loginUserId, currentRole);
+        // 登录成功后清除 localStorage 中的注册缓存
+        localStorage.removeItem('lastRegisteredAccount');
+        localStorage.removeItem('lastRegisteredTime');
         window.location.href = currentRole === 'admin' ? '/admin/indexAdmin.html' : '/user/index.html';
     } else {
         showError(result.message);
@@ -416,7 +454,8 @@ async function doLogin() {
 }
 
 function goRegister() {
-    window.location.href = '/user/signupOrdinaryUser.html';
+    // 修正：使用正确的相对路径（当前文件在根目录，注册页面也在根目录的 user 文件夹下）
+    window.location.href = 'user/signupOrdinaryUser.html';
 }
 
 // 找回密码相关函数
