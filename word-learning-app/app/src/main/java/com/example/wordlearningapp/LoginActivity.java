@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String TAG = "LoginActivity";
 
     private TextView tabUser, tabAdmin, loginTitle, tvError, tvForgotPassword, tvHelpLinks;
     private EditText etAccount, etPassword;
@@ -38,6 +41,19 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         initListeners();
+
+        checkAutoFillAccount();
+    }
+
+    private void checkAutoFillAccount() {
+        String autoAccount = getIntent().getStringExtra("auto_account");
+        if (autoAccount != null && !autoAccount.isEmpty()) {
+            etAccount.setText(autoAccount);
+            etAccount.setSelection(autoAccount.length());
+            etPassword.requestFocus();
+
+            Toast.makeText(this, "已自动填入账号：" + autoAccount, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void initViews() {
@@ -114,6 +130,9 @@ public class LoginActivity extends AppCompatActivity {
                 int code = result.has("code") ? result.get("code").getAsInt() : -1;
                 String message = result.has("message") ? result.get("message").getAsString() : "网络错误";
 
+                Log.d(TAG, "登录响应 - code: " + code + ", message: " + message);
+                Log.d(TAG, "完整响应: " + result.toString());
+
                 runOnUiThread(() -> {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("登录");
@@ -124,7 +143,8 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show();
                         navigateToHome();
                     } else {
-                        showError(message);
+                        String enhancedMessage = enhanceErrorMessage(code, message);
+                        showError(enhancedMessage);
                     }
                 });
             } catch (Exception e) {
@@ -140,6 +160,24 @@ public class LoginActivity extends AppCompatActivity {
     private void showError(String msg) {
         tvError.setText(msg);
         tvError.setVisibility(View.VISIBLE);
+    }
+
+    private String enhanceErrorMessage(int code, String originalMessage) {
+        Log.d(TAG, "错误码: " + code + ", 原始消息: " + originalMessage);
+
+        if (code == 404) {
+            return "此账号暂不存在，请先注册";
+        }
+
+        if (code == 401) {
+            return "账号或密码错误\n如未注册请先注册";
+        }
+
+        if (code == 403) {
+            return "账号已被禁用，请联系客服";
+        }
+
+        return originalMessage;
     }
 
     private void navigateToHome() {

@@ -32,15 +32,17 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="24dp" />
 
-            <EditText
-                android:id="@+id/et_account"
+            <TextView
+                android:id="@+id/tv_auto_account"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:hint="登录账号"
+                android:text="请输入手机号后自动生成账号"
                 android:textSize="16sp"
+                android:textColor="#8eaac4"
                 android:padding="16dp"
                 android:background="@drawable/bg_input"
                 android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
                 android:singleLine="true" />
 
             <EditText
@@ -101,7 +103,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="手机号：11位数字"
+                android:text="手机号：11位数字，用于生成账号"
                 android:textSize="13sp"
                 android:textColor="#8eaac4"
                 android:layout_marginBottom="16dp" />
@@ -118,12 +120,39 @@
                 android:layout_marginBottom="8dp"
                 android:singleLine="true" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="邮箱：如 xxx@xxx.com"
-                android:textSize="13sp"
-                android:textColor="#8eaac4"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="邮箱：如 xxx@xxx.com"
+                    android:textSize="13sp"
+                    android:textColor="#8eaac4" />
+
+                <Button
+                    android:id="@+id/btn_verify_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="验证邮箱"
+                    android:textSize="12sp"
+
+                    android:background="@drawable/bg_btn_blue_round"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_email_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:padding="8dp"
+                android:gravity="center"
+                android:visibility="gone"
                 android:layout_marginBottom="16dp" />
 
             <LinearLayout
