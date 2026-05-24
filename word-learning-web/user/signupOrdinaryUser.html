@@ -1,3 +1,4 @@
+<!-- signupOrdinaryUser.html - 注册页面（无需邮箱验证） -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -40,7 +41,7 @@
 
         .register-card {
             background: rgba(255, 255, 255, 0.98);
-            width: 620px;
+            width: 550px;
             max-width: 100%;
             border-radius: 44px;
             overflow: hidden;
@@ -207,111 +208,6 @@
             margin-top: 6px;
         }
 
-        .email-verify-group {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        .email-verify-group .input-wrapper {
-            flex: 2;
-        }
-
-        .verify-btn {
-            flex-shrink: 0;
-            background: white;
-            border: 2px solid #cbd5e1;
-            padding: 0 18px;
-            height: 48px;
-            border-radius: 36px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .verify-btn:hover {
-            border-color: #10b981;
-            color: #0f3b2c;
-        }
-
-        .verify-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        .verify-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            margin-top: 8px;
-            font-weight: 500;
-            padding: 4px 14px;
-            border-radius: 60px;
-        }
-
-        .verify-badge.success {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .verify-badge.error {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .verify-badge.info {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .code-group {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .code-group input {
-            flex: 2;
-        }
-
-        .code-group button {
-            flex-shrink: 0;
-            width: auto;
-            min-width: 100px;
-        }
-
-        .resend-link {
-            font-size: 12px;
-            text-align: right;
-            margin-top: 6px;
-        }
-
-        .resend-link button {
-            background: none;
-            border: none;
-            color: #10b981;
-            cursor: pointer;
-            font-size: 12px;
-            text-decoration: underline;
-        }
-
-        .resend-link button:disabled {
-            color: #9ca3af;
-            cursor: not-allowed;
-            text-decoration: none;
-        }
-
-        .row {
-            display: flex;
-            gap: 20px;
-        }
-
-        .row .form-group {
-            flex: 1;
-        }
-
         .agreement {
             display: flex;
             align-items: center;
@@ -369,24 +265,6 @@
             .card-body {
                 padding: 28px 18px;
             }
-            .row {
-                flex-direction: column;
-                gap: 0;
-            }
-            .email-verify-group {
-                flex-direction: column;
-            }
-            .code-group {
-                flex-direction: column;
-            }
-            .code-group button {
-                width: 100%;
-                height: 44px;
-            }
-            .verify-btn {
-                width: 100%;
-                height: 44px;
-            }
         }
     </style>
 </head>
@@ -394,6 +272,7 @@
 <div class="register-card">
     <div class="card-header">
         <h1>📖 单词学习平台</h1>
+        <p>手机号自动生成账号 · 快速注册</p>
     </div>
     <div class="card-body">
         <div class="error-msg" id="error-msg"></div>
@@ -437,30 +316,11 @@
             <div class="hint">不填则默认使用手机号后四位</div>
         </div>
 
-        <!-- 邮箱 + 验证按钮 -->
+        <!-- 邮箱（选填） -->
         <div class="form-group">
-            <label>📧 电子邮箱 <span class="required">*</span></label>
-            <div class="email-verify-group">
-                <div class="input-wrapper">
-                    <input type="email" id="email" placeholder="your@example.com" autocomplete="off">
-                </div>
-                <button type="button" class="verify-btn" id="sendCodeBtn">📨 发送验证码</button>
-            </div>
-            <div id="emailVerifyStatus" class="verify-badge" style="display: none;"></div>
-        </div>
-
-        <!-- 验证码输入区域（初始隐藏） -->
-        <div class="form-group" id="codeGroup" style="display: none;">
-            <label>🔢 验证码 <span class="required">*</span></label>
-            <div class="code-group">
-                <input type="text" id="verificationCode" placeholder="请输入6位验证码" maxlength="6" autocomplete="off">
-                <button type="button" class="verify-btn" id="verifyCodeBtn">✓ 校验验证码</button>
-            </div>
-            <div class="resend-link" id="resendLink" style="display: none;">
-                <button id="resendCodeBtn">🔄 重新发送验证码</button>
-                <span id="countdownText" style="color: #9ca3af; margin-left: 10px;"></span>
-            </div>
-            <div class="hint">验证码已发送至邮箱，5分钟内有效</div>
+            <label>📧 电子邮箱 <span style="color:#9ca3af; font-weight:normal;">（选填）</span></label>
+            <input type="email" id="email" placeholder="your@example.com（用于找回密码）" autocomplete="off">
+            <div class="hint">邮箱为选填项，不填也可注册</div>
         </div>
 
         <!-- 协议 -->
@@ -471,7 +331,7 @@
 
         <!-- 按钮 -->
         <button class="btn btn-register" id="registerBtn">✨ 注册新账号</button>
-        <button class="btn btn-back" onclick="window.location.href='../index.html'">← 返回登录</button>
+        <button class="btn btn-back" id="backBtn">← 返回登录</button>
     </div>
 </div>
 
@@ -487,25 +347,13 @@
     const confirmInput = document.getElementById('confirmPassword');
     const userNameInput = document.getElementById('userName');
     const emailInput = document.getElementById('email');
-    const sendCodeBtn = document.getElementById('sendCodeBtn');
-    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
-    const resendCodeBtn = document.getElementById('resendCodeBtn');
-    const verificationCodeInput = document.getElementById('verificationCode');
-    const emailStatusDiv = document.getElementById('emailVerifyStatus');
-    const codeGroup = document.getElementById('codeGroup');
-    const resendLink = document.getElementById('resendLink');
-    const countdownSpan = document.getElementById('countdownText');
     const agreementCheck = document.getElementById('agreement');
     const registerBtn = document.getElementById('registerBtn');
+    const backBtn = document.getElementById('backBtn');
     const errorMsgDiv = document.getElementById('error-msg');
 
     // ==================== 状态变量 ====================
-    let isEmailVerified = false;
-    let currentVerifiedEmail = "";
     let currentGeneratedUserId = "";
-    let countdownInterval = null;
-    let canResend = true;
-    let pendingEmail = "";
 
     // ==================== 辅助函数 ====================
     function showError(msg, isSuccess = false) {
@@ -525,18 +373,21 @@
         errorMsgDiv.style.display = 'none';
     }
 
+    // 生成4位时间戳（基于当前时间的分钟+秒）
     function get4DigitTimestamp() {
         const now = new Date();
         const value = (now.getMinutes() * 100 + now.getSeconds()) % 10000;
         return value.toString().padStart(4, '0');
     }
 
+    // 生成账号：手机号 + 时间戳
     function generateUserId(phone) {
         const cleanPhone = phone.replace(/\D/g, '');
         if (cleanPhone.length < 7) return "";
         return cleanPhone + get4DigitTimestamp();
     }
 
+    // 刷新显示的账号
     function refreshDisplayUserId() {
         const phone = phoneBaseInput.value.trim();
         if (!phone) {
@@ -554,6 +405,7 @@
         }
     }
 
+    // 强制刷新账号（换一换）
     function forceRefreshUserId() {
         const phone = phoneBaseInput.value.trim();
         if (!phone) {
@@ -570,215 +422,17 @@
         }
     }
 
-    function updateEmailUI(valid, message, emailValue) {
-        emailStatusDiv.style.display = 'flex';
-        if (valid) {
-            emailStatusDiv.className = 'verify-badge success';
-            emailStatusDiv.innerHTML = `<i>✅</i> ${message}`;
-            isEmailVerified = true;
-            currentVerifiedEmail = emailValue;
-            codeGroup.style.display = 'none';
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-        } else {
-            emailStatusDiv.className = 'verify-badge error';
-            emailStatusDiv.innerHTML = `<i>❌</i> ${message}`;
-            isEmailVerified = false;
-            currentVerifiedEmail = "";
-        }
+    // 保存注册信息到 localStorage（供登录页使用）
+    function saveToLocalStorage(loginAccount) {
+        localStorage.setItem('lastRegisteredAccount', loginAccount);
+        localStorage.setItem('lastRegisteredTime', new Date().toISOString());
     }
 
-    function resetEmailVerify() {
-        const currentEmail = emailInput.value.trim();
-        if (currentEmail !== currentVerifiedEmail) {
-            if (isEmailVerified) {
-                isEmailVerified = false;
-                currentVerifiedEmail = "";
-                emailStatusDiv.style.display = 'flex';
-                emailStatusDiv.className = 'verify-badge error';
-                emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱已修改，请重新验证`;
-            }
-            codeGroup.style.display = 'none';
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-            verificationCodeInput.value = '';
-        }
-    }
-
-    function startCountdown(seconds = 60) {
-        let remaining = seconds;
-        canResend = false;
-        resendCodeBtn.disabled = true;
-        countdownSpan.textContent = `${remaining}秒后重发`;
-        
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-        }
-        
-        countdownInterval = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-                canResend = true;
-                resendCodeBtn.disabled = false;
-                countdownSpan.textContent = '';
-            } else {
-                countdownSpan.textContent = `${remaining}秒后重发`;
-            }
-        }, 1000);
-    }
-
-    // ==================== 原生 fetch 请求（不带认证头，和找回密码页面一样） ====================
-    async function sendVerificationCode() {
-        hideError();
-        const email = emailInput.value.trim();
-        
-        if (!email) {
-            showError("请填写邮箱地址");
-            return false;
-        }
-        
-        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showError("邮箱格式不正确，例如: name@example.com");
-            return false;
-        }
-
-        const originalText = sendCodeBtn.innerText;
-        sendCodeBtn.disabled = true;
-        sendCodeBtn.innerText = "⏳ 发送中...";
-
-        try {
-            // 直接使用原生 fetch，不携带认证头（和 forgetPassword 页面一样）
-            const response = await fetch(BASE_URL + '/api/user/send-verification-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ contact: email })
-            });
-            
-            const result = await response.json();
-            console.log("发送验证码响应:", result);
-            
-            if (result && result.code === 200) {
-                pendingEmail = email;
-                codeGroup.style.display = 'block';
-                resendLink.style.display = 'block';
-                verificationCodeInput.value = '';
-                
-                emailStatusDiv.style.display = 'flex';
-                emailStatusDiv.className = 'verify-badge info';
-                emailStatusDiv.innerHTML = `<i>📧</i> 验证码已发送至 ${email}，请查收`;
-                
-                showError("✅ 验证码已发送，请查看邮箱", true);
-                startCountdown(60);
-                return true;
-            } else {
-                const errMsg = result?.message || "发送验证码失败";
-                updateEmailUI(false, errMsg, "");
-                showError(errMsg);
-                return false;
-            }
-        } catch (error) {
-            console.error("发送验证码失败:", error);
-            let errMsg = "发送失败，请检查网络连接";
-            updateEmailUI(false, errMsg, "");
-            showError(errMsg);
-            return false;
-        } finally {
-            sendCodeBtn.disabled = false;
-            sendCodeBtn.innerText = originalText;
-        }
-    }
-
-    async function verifyCode() {
-        hideError();
-        
-        const email = emailInput.value.trim();
-        const code = verificationCodeInput.value.trim();
-        
-        if (!email) {
-            showError("请填写邮箱地址");
-            return false;
-        }
-        
-        if (!code) {
-            showError("请输入验证码");
-            return false;
-        }
-        
-        if (code.length !== 6) {
-            showError("验证码为6位数字");
-            return false;
-        }
-        
-        verifyCodeBtn.disabled = true;
-        const originalText = verifyCodeBtn.innerText;
-        verifyCodeBtn.innerText = "⏳ 校验中...";
-        
-        try {
-            // 直接使用原生 fetch，不携带认证头
-            const response = await fetch(BASE_URL + '/api/user/verify-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ contact: email, code: code })
-            });
-            
-            const result = await response.json();
-            console.log("校验验证码响应:", result);
-            
-            if (result && result.code === 200) {
-                updateEmailUI(true, "✓ 邮箱验证通过，可以使用", email);
-                showError("✅ 邮箱验证成功！可以继续注册", true);
-                return true;
-            } else {
-                const errMsg = result?.message || "验证码错误";
-                updateEmailUI(false, errMsg, "");
-                showError(errMsg);
-                return false;
-            }
-        } catch (error) {
-            console.error("校验验证码失败:", error);
-            let errMsg = "校验失败，请重试";
-            updateEmailUI(false, errMsg, "");
-            showError(errMsg);
-            return false;
-        } finally {
-            verifyCodeBtn.disabled = false;
-            verifyCodeBtn.innerText = originalText;
-        }
-    }
-
-    async function resendCode() {
-        if (!canResend) {
-            showError("请等待倒计时结束");
-            return;
-        }
-        
-        const email = emailInput.value.trim();
-        if (!email) {
-            showError("请填写邮箱地址");
-            return;
-        }
-        
-        if (email !== pendingEmail) {
-            resetEmailVerify();
-        }
-        
-        await sendVerificationCode();
-    }
-
+    // ==================== 注册逻辑 ====================
     async function doRegister() {
         hideError();
 
+        // 1. 获取手机号
         const phone = phoneBaseInput.value.trim();
         const cleanPhone = phone.replace(/\D/g, '');
         
@@ -791,6 +445,7 @@
             return;
         }
 
+        // 2. 刷新并获取生成的账号
         refreshDisplayUserId();
         const loginAccount = currentGeneratedUserId;
         if (!loginAccount || loginAccount.includes("请填写") || loginAccount.includes("无效")) {
@@ -798,6 +453,7 @@
             return;
         }
 
+        // 3. 密码校验
         const password = passwordInput.value.trim();
         const confirmPwd = confirmInput.value.trim();
         
@@ -814,6 +470,7 @@
             return;
         }
 
+        // 4. 昵称（选填，默认手机号后四位）
         let nickname = userNameInput.value.trim();
         if (!nickname) {
             nickname = "用户" + cleanPhone.slice(-4);
@@ -823,45 +480,33 @@
             return;
         }
 
+        // 5. 邮箱（选填）
         const email = emailInput.value.trim();
-        if (!email) {
-            showError("请填写电子邮箱");
-            return;
-        }
-        
-        if (!isEmailVerified) {
-            showError("❌ 请先完成邮箱验证：发送验证码 → 输入验证码 → 校验通过");
-            return;
-        }
-        
-        if (currentVerifiedEmail !== email) {
-            showError("邮箱内容已更改，请重新验证邮箱");
-            isEmailVerified = false;
-            emailStatusDiv.style.display = 'flex';
-            emailStatusDiv.className = 'verify-badge error';
-            emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱已修改，请重新验证`;
-            return;
-        }
 
+        // 6. 协议勾选
         if (!agreementCheck.checked) {
             showError("请阅读并同意《用户服务协议》和《隐私政策》");
             return;
         }
 
+        // 7. 提交注册
         const registerData = {
             userId: loginAccount,
             loginPassword: password,
             userName: nickname,
-            phoneNumber: cleanPhone,
-            email: email
+            phoneNumber: cleanPhone
         };
+        
+        // 如果填写了邮箱，则添加到请求中
+        if (email) {
+            registerData.email = email;
+        }
 
         registerBtn.disabled = true;
         const originalBtnText = registerBtn.innerText;
         registerBtn.innerText = "⏳ 注册中...";
 
         try {
-            // 直接使用原生 fetch，不携带认证头
             const response = await fetch(BASE_URL + '/api/user/register', {
                 method: 'POST',
                 headers: {
@@ -873,18 +518,15 @@
             const result = await response.json();
             
             if (result && result.code === 200) {
+                // 保存账号到 localStorage，供登录页使用
+                localStorage.setItem('userNickname', nickname);
+                saveToLocalStorage(loginAccount);
+                
                 alert(`🎉 注册成功！\n\n您的登录账号是：${loginAccount}\n请牢记此账号用于登录平台。`);
-                window.location.href = "../index.html";
+                window.location.href = "../index.html?autoFill=" + encodeURIComponent(loginAccount);
             } else {
                 const errMsg = result?.message || "注册失败，请稍后重试";
                 showError(errMsg);
-                
-                if (errMsg.includes("邮箱") || errMsg.includes("已存在")) {
-                    isEmailVerified = false;
-                    emailStatusDiv.style.display = 'flex';
-                    emailStatusDiv.className = 'verify-badge error';
-                    emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱验证失效，请重新验证`;
-                }
             }
         } catch (error) {
             console.error("注册请求失败:", error);
@@ -895,33 +537,29 @@
         }
     }
 
+    // ==================== 返回登录 ====================
+    function goBack() {
+        window.location.href = "../index.html";
+    }
+
     // ==================== 事件绑定 ====================
     phoneBaseInput.addEventListener('input', function() {
         refreshDisplayUserId();
     });
     
     refreshIdBtn.addEventListener('click', forceRefreshUserId);
-    
-    emailInput.addEventListener('input', function() {
-        resetEmailVerify();
-        codeGroup.style.display = 'none';
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-    });
-    
-    sendCodeBtn.addEventListener('click', sendVerificationCode);
-    verifyCodeBtn.addEventListener('click', verifyCode);
-    resendCodeBtn.addEventListener('click', resendCode);
     registerBtn.addEventListener('click', doRegister);
+    backBtn.addEventListener('click', goBack);
 
-    verificationCodeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            verifyCode();
-        }
+    // 回车键提交
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') doRegister();
+    });
+    confirmInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') doRegister();
     });
 
+    // 初始化
     refreshDisplayUserId();
 </script>
 </body>
