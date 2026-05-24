@@ -6,30 +6,96 @@
     <title>单词学习平台 - 管理员首页</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#dc3545; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:14px; }
-        .btn-logout { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
-        .btn-logout:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
+        body { background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height:100vh; }
+        .top-nav { background:linear-gradient(135deg, #dc3545 0%, #c82333 100%); color:white; display:flex; justify-content:space-between; align-items:center; padding:15px 25px; box-shadow:0 2px 15px rgba(220,53,69,0.3); }
+        .nav-title { font-size:20px; font-weight:600; letter-spacing:1px; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-name { font-size:15px; }
+        .btn-logout { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:14px; transition:all 0.3s; }
+        .btn-logout:hover { background-color:rgba(255,255,255,0.3); transform:translateY(-1px); }
+        .main-container { display:flex; min-height:calc(100vh - 60px); }
+        .sidebar { width:200px; background:white; border-right:1px solid #e0e0e0; padding:25px 0; box-shadow:2px 0 15px rgba(0,0,0,0.05); }
         .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f8d7da; color:#dc3545; }
-        .content-area { flex:1; padding:25px; }
-        .welcome-banner { background-color:#dc3545; color:white; padding:30px; border-radius:8px; margin-bottom:25px; }
-        .welcome-banner h1 { font-size:28px; margin-bottom:10px; }
-        .welcome-banner p { font-size:16px; opacity:0.9; }
-        .stats-row { display:flex; gap:20px; margin-bottom:25px; }
-        .stat-card { background-color:white; flex:1; padding:25px; text-align:center; border-radius:8px; border-top:3px solid #dc3545; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-        .stat-title { font-size:15px; color:#333; margin-bottom:10px; }
-        .stat-number { font-size:36px; color:#dc3545; font-weight:600; }
-        .stat-subtitle { font-size:12px; color:#999; margin-top:8px; }
-        .module { background-color:white; border-radius:8px; padding:25px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:20px; }
-        .module-title { font-size:18px; color:#333; margin-bottom:15px; }
-        .btn-action { background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; margin-right:10px; }
+        .sidebar-menu li { padding:14px 25px; cursor:pointer; color:#444; font-size:15px; transition:all 0.3s; border-left:3px solid transparent; }
+        .sidebar-menu li:hover { background-color:#fff5f5; color:#dc3545; border-left-color:#dc3545; }
+        .sidebar-menu li.active { background-color:#f8d7da; color:#dc3545; border-left-color:#dc3545; }
+        .content-area { flex:1; padding:30px; }
+        
+        /* 轮播图样式 */
+        .carousel-container {
+            position:relative; height:220px; border-radius:15px; overflow:hidden; margin-bottom:30px; box-shadow:0 10px 30px rgba(0,0,0,0.15);
+        }
+        .carousel-slides {
+            display:flex; transition:transform 0.5s ease-in-out; height:100%;
+        }
+        .carousel-slide {
+            min-width:100%; height:100%; display:flex; align-items:center; color:white; padding:0 60px;
+        }
+        .carousel-slide:nth-child(1) {
+            background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .carousel-slide:nth-child(2) {
+            background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .carousel-slide:nth-child(3) {
+            background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .carousel-slide:nth-child(4) {
+            background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .carousel-content {
+            max-width:800px;
+        }
+        .carousel-content h2 {
+            font-size:36px; font-weight:700; margin-bottom:15px;
+        }
+        .carousel-content p {
+            font-size:18px; opacity:0.95; line-height:1.6;
+        }
+        .carousel-icon {
+            font-size:80px; margin-right:40px; opacity:0.9;
+        }
+        .carousel-indicators {
+            position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:12px;
+        }
+        .carousel-indicator {
+            width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.5); cursor:pointer; transition:all 0.3s;
+        }
+        .carousel-indicator.active {
+            width:35px; border-radius:7px; background:white;
+        }
+        
+        /* 统计卡片 */
+        .stats-row { display:flex; gap:20px; margin-bottom:30px; }
+        .stat-card {
+            flex:1; background:white; padding:30px; text-align:center; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.08); transition:all 0.3s; position:relative; overflow:hidden;
+        }
+        .stat-card:hover {
+            transform:translateY(-5px); box-shadow:0 10px 30px rgba(0,0,0,0.15);
+        }
+        .stat-card::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:4px;
+        }
+        .stat-card:nth-child(1)::before { background:linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+        .stat-card:nth-child(2)::before { background:linear-gradient(90deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card:nth-child(3)::before { background:linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card:nth-child(4)::before { background:linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); }
+        .stat-icon {
+            font-size:40px; margin-bottom:15px;
+        }
+        .stat-title { font-size:15px; color:#666; margin-bottom:10px; font-weight:500; }
+        .stat-number { font-size:42px; font-weight:700; background:linear-gradient(135deg, #dc3545 0%, #c82333 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .stat-subtitle { font-size:13px; color:#999; margin-top:5px; }
+        
+        /* 模块 */
+        .module { background:white; border-radius:15px; padding:30px; box-shadow:0 5px 20px rgba(0,0,0,0.08); margin-bottom:25px; }
+        .module-title { font-size:20px; color:#333; margin-bottom:20px; font-weight:600; }
+        .btn-action {
+            background:linear-gradient(135deg, #dc3545 0%, #c82333 100%); color:white; border:none; padding:12px 28px; border-radius:8px; cursor:pointer; margin-right:12px; margin-bottom:12px; font-size:15px; transition:all 0.3s;
+        }
+        .btn-action:hover {
+            transform:translateY(-2px); box-shadow:0 5px 15px rgba(220,53,69,0.3);
+        }
     </style>
 </head>
 <body>
@@ -52,13 +118,60 @@
         </ul>
     </div>
     <div class="content-area">
-        <div class="welcome-banner"><h1>欢迎回来，管理员！</h1><p>今天是 <span id="today"></span></p></div>
+        <!-- 轮播图 -->
+        <div class="carousel-container" id="carousel">
+            <div class="carousel-slides" id="carouselSlides">
+                <div class="carousel-slide">
+                    <div class="carousel-icon">📚</div>
+                    <div class="carousel-content">
+                        <h2>欢迎回来，管理员！</h2>
+                        <p>管理您的单词学习平台，助力用户高效学习英语词汇</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="carousel-icon">📊</div>
+                    <div class="carousel-content">
+                        <h2>数据一目了然</h2>
+                        <p>实时监控平台数据，掌握用户学习动态</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="carousel-icon">🚀</div>
+                    <div class="carousel-content">
+                        <h2>高效管理</h2>
+                        <p>强大的管理功能，让平台运营更加顺畅</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="carousel-icon">🎯</div>
+                    <div class="carousel-content">
+                        <h2>今日目标</h2>
+                        <p>每天进步一点点，积累成就大梦想</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-indicators" id="carouselIndicators">
+                <span class="carousel-indicator active" onclick="goToSlide(0)"></span>
+                <span class="carousel-indicator" onclick="goToSlide(1)"></span>
+                <span class="carousel-indicator" onclick="goToSlide(2)"></span>
+                <span class="carousel-indicator" onclick="goToSlide(3)"></span>
+            </div>
+        </div>
+        
+        <!-- 日期显示 -->
+        <div style="text-align:right; margin-bottom:10px; color:#666; font-size:14px;">
+            今天是 <span id="today" style="font-weight:600; color:#dc3545;"></span>
+        </div>
+        
         <div class="stats-row" id="stats"></div>
-        <div class="module"><div class="module-title">快捷操作</div>
-            <button class="btn-action" onclick="window.location.href='adminPersonal.html'">个人中心</button>
-            <button class="btn-action" onclick="window.location.href='manageUserAdmin.html'">用户管理</button>
-            <button class="btn-action" onclick="window.location.href='../wordbook/manageWordBookAdmin.html'">词书管理</button>
-            <button class="btn-action" onclick="window.location.href='../word/manageWordAdmin.html'">单词管理</button>
+        
+        <div class="module">
+            <div class="module-title">🚀 快捷操作</div>
+            <button class="btn-action" onclick="window.location.href='adminPersonal.html'">👤 个人中心</button>
+            <button class="btn-action" onclick="window.location.href='manageUserAdmin.html'">👥 用户管理</button>
+            <button class="btn-action" onclick="window.location.href='../wordbook/manageWordBookAdmin.html'">📖 词书管理</button>
+            <button class="btn-action" onclick="window.location.href='../word/manageWordAdmin.html'">🔤 单词管理</button>
+            <button class="btn-action" onclick="window.location.href='../wordlearningrecord/viewUserLearningRecords.html'">📈 学习记录</button>
         </div>
     </div>
 </div>
@@ -66,21 +179,58 @@
 <script>
 if (!requireAuth('admin')) { /* redirect */ }
 document.getElementById('admin-name').textContent = '管理员：' + (localStorage.getItem('userId') || '');
-document.getElementById('today').textContent = new Date().toLocaleDateString('zh-CN');
+document.getElementById('today').textContent = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
+
+// 轮播图
+var currentSlide = 0;
+var slideInterval;
+
+function startCarousel() {
+    slideInterval = setInterval(nextSlide, 4500);
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % 4;
+    goToSlide(currentSlide);
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    const slides = document.getElementById('carouselSlides');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    slides.style.transform = `translateX(-${index * 100}%)`;
+    indicators.forEach((ind, i) => {
+        ind.classList.toggle('active', i === index);
+    });
+}
+
+function stopCarousel() {
+    if (slideInterval) clearInterval(slideInterval);
+}
 
 // Load simple stats
 var userId = localStorage.getItem('userId') || '';
 Promise.all([
     apiGet('/api/wordbooks'),
-    apiGet('/api/records/stats')
+    apiGet('/api/records/stats'),
+    apiGet('/api/admin/users')
 ]).then(function(results) {
     var books = results[0].data ? results[0].data.length : 0;
     var stats = results[1].data || {};
+    var users = results[2].data ? results[2].data.length : 0;
     document.getElementById('stats').innerHTML =
-        '<div class="stat-card"><div class="stat-title">词书总数</div><div class="stat-number">' + books + '</div></div>' +
-        '<div class="stat-card"><div class="stat-title">今日学习记录</div><div class="stat-number">' + (stats.todayCount||0) + '</div></div>' +
-        '<div class="stat-card"><div class="stat-title">累计记录</div><div class="stat-number">' + (stats.totalCount||0) + '</div></div>';
+        '<div class="stat-card"><div class="stat-icon">📚</div><div class="stat-title">词书总数</div><div class="stat-number">' + books + '</div></div>' +
+        '<div class="stat-card"><div class="stat-icon">👥</div><div class="stat-title">平台用户</div><div class="stat-number">' + users + '</div></div>' +
+        '<div class="stat-card"><div class="stat-icon">📅</div><div class="stat-title">今日学习</div><div class="stat-number">' + (stats.todayCount||0) + '</div></div>' +
+        '<div class="stat-card"><div class="stat-icon">📊</div><div class="stat-title">累计记录</div><div class="stat-number">' + (stats.totalCount||0) + '</div></div>';
 });
+
+// 初始化轮播图
+startCarousel();
+
+// 鼠标悬停暂停
+document.getElementById('carousel').addEventListener('mouseenter', stopCarousel);
+document.getElementById('carousel').addEventListener('mouseleave', startCarousel);
 </script>
 </body>
 </html>

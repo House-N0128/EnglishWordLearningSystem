@@ -14,6 +14,7 @@ public interface WordMapper {
     Word findById(String wordId);
 
     @Select("SELECT w.word_id AS wordId, w.spelling AS englishSpelling, w.definition AS chineseDefinition, " +
+            "w.part_of_speech AS partOfSpeech, " +
             "w.example_sentence AS exampleSentence, w.phonetic AS phoneticSymbol, " +
             "w.pronunciation_url AS wordPronunciation, w.image_url AS wordImage, w.created_at AS createTime " +
             "FROM t_word w JOIN t_word_book_ref r ON w.word_id = r.word_id WHERE r.word_book_id = #{wordBookId}")

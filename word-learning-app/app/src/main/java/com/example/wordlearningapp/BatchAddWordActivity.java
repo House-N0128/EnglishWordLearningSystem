@@ -1,9 +1,14 @@
 package com.example.wordlearningapp;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,15 +23,22 @@ import com.example.wordlearningapp.api.ApiClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BatchAddWordActivity extends AppCompatActivity {
 
+    private static final int PICK_EXCEL_FILE = 1001;
+
     private Spinner spBook;
     private EditText etBatchInput;
     private Button btnSubmit;
     private List<String> bookIds = new ArrayList<>();
+
+    private LinearLayout textModeLayout, excelModeLayout;
+    private TextView tvSelectedFile, tvExcelResult;
+    private Uri selectedFileUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +54,7 @@ public class BatchAddWordActivity extends AppCompatActivity {
         topBar.setBackgroundColor(0xFF318af8);
         topBar.setPadding(dp(16), 0, dp(16), 0);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48)));
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
         TextView btnBack = new TextView(this);
         btnBack.setText("← 返回");
@@ -58,7 +70,7 @@ public class BatchAddWordActivity extends AppCompatActivity {
         barTitle.setTextColor(0xFFFFFFFF);
         barTitle.setTypeface(null, Typeface.BOLD);
         barTitle.setGravity(Gravity.CENTER);
-        barTitle.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        barTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         topBar.addView(barTitle);
 
         TextView placeholder = new TextView(this);
@@ -66,58 +78,196 @@ public class BatchAddWordActivity extends AppCompatActivity {
         topBar.addView(placeholder);
         root.addView(topBar);
 
-        LinearLayout form = new LinearLayout(this);
-        form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(32, 24, 32, 24);
+        // ===== TOGGLE BUTTONS =====
+        LinearLayout toggleRow = new LinearLayout(this);
+        toggleRow.setOrientation(LinearLayout.HORIZONTAL);
+        toggleRow.setPadding(dp(16), dp(12), dp(16), dp(4));
 
-        TextView title = new TextView(this);
-        title.setText("批量导入单词");
-        title.setTextSize(20);
-        title.setTextColor(0xFF318af8);
-        title.setPadding(0, 8, 0, 20);
-        form.addView(title);
+        TextView btnText = makeToggleBtn("文本输入", true);
+        TextView btnExcel = makeToggleBtn("Excel导入", false);
+        toggleRow.addView(btnText);
+        toggleRow.addView(btnExcel);
+        root.addView(toggleRow);
 
-        // Book selector
+        // Book selector (shared)
+        LinearLayout bookRow = new LinearLayout(this);
+        bookRow.setOrientation(LinearLayout.HORIZONTAL);
+        bookRow.setPadding(dp(16), dp(8), dp(16), dp(4));
+
+        TextView lblBook = new TextView(this);
+        lblBook.setText("目标词书:");
+        lblBook.setTextSize(14);
+        lblBook.setTextColor(0xFF8899aa);
+        lblBook.setGravity(Gravity.CENTER_VERTICAL);
+        lblBook.setPadding(0, 0, dp(8), 0);
+        bookRow.addView(lblBook);
+
         spBook = new Spinner(this);
-        spBook.setPadding(16, 12, 16, 12);
+        spBook.setPadding(dp(12), dp(8), dp(12), dp(8));
         spBook.setBackgroundColor(0xFFf6f8fc);
-        form.addView(spBook);
+        spBook.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        bookRow.addView(spBook);
+        root.addView(bookRow);
 
-        // Instructions
+        // ===== TEXT MODE =====
+        textModeLayout = new LinearLayout(this);
+        textModeLayout.setOrientation(LinearLayout.VERTICAL);
+        textModeLayout.setPadding(dp(16), dp(8), dp(16), dp(16));
+
         TextView hint = new TextView(this);
         hint.setText("每行一个单词，格式：英文拼写,中文释义,音标(可选),例句(可选)\n单词ID由系统自动生成，已存在的单词自动跳过");
         hint.setTextSize(13);
         hint.setTextColor(0xFF8899aa);
-        hint.setPadding(0, 16, 0, 8);
-        form.addView(hint);
+        hint.setPadding(0, 0, 0, dp(8));
+        textModeLayout.addView(hint);
 
-        // Batch input area
         etBatchInput = new EditText(this);
         etBatchInput.setHint("hello,你好,/həˈloʊ/,Hello World!\nworld,世界,/wɜːld/,Hello World!");
         etBatchInput.setTextSize(14);
-        etBatchInput.setPadding(16, 12, 16, 12);
+        etBatchInput.setPadding(dp(16), dp(12), dp(16), dp(12));
         etBatchInput.setBackgroundColor(0xFFf6f8fc);
         etBatchInput.setMinLines(8);
-        etBatchInput.setGravity(android.view.Gravity.TOP);
-        form.addView(etBatchInput);
+        etBatchInput.setGravity(Gravity.TOP);
+        textModeLayout.addView(etBatchInput);
 
-        // Submit
         btnSubmit = new Button(this);
         btnSubmit.setText("批量导入");
         btnSubmit.setTextColor(0xFFFFFFFF);
         btnSubmit.setTextSize(16);
-        btnSubmit.setPadding(0, 14, 0, 14);
+        btnSubmit.setPadding(0, dp(14), 0, dp(14));
         btnSubmit.setBackgroundColor(0xFF318af8);
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        bp.setMargins(0, 16, 0, 0);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(0, dp(16), 0, 0);
         btnSubmit.setLayoutParams(bp);
-        btnSubmit.setOnClickListener(v -> doBatchAdd());
-        form.addView(btnSubmit);
+        btnSubmit.setOnClickListener(v -> doTextBatchAdd());
+        textModeLayout.addView(btnSubmit);
 
-        root.addView(form);
+        root.addView(textModeLayout);
+
+        // ===== EXCEL MODE =====
+        excelModeLayout = new LinearLayout(this);
+        excelModeLayout.setOrientation(LinearLayout.VERTICAL);
+        excelModeLayout.setPadding(dp(16), dp(8), dp(16), dp(16));
+        excelModeLayout.setVisibility(View.GONE);
+
+        TextView excelHint = new TextView(this);
+        excelHint.setText("Excel模板（第一行为表头）:\nspelling, definition, example_sentence, phonetic, pronunciation_url, image_url");
+        excelHint.setTextSize(12);
+        excelHint.setTextColor(0xFF8899aa);
+        excelHint.setPadding(0, 0, 0, dp(12));
+        excelModeLayout.addView(excelHint);
+
+        TextView btnPickFile = new TextView(this);
+        btnPickFile.setText("选择Excel文件（.xlsx / .xls）");
+        btnPickFile.setTextSize(15);
+        btnPickFile.setTextColor(0xFFFFFFFF);
+        btnPickFile.setGravity(Gravity.CENTER);
+        btnPickFile.setPadding(0, dp(13), 0, dp(13));
+        GradientDrawable pickBg = new GradientDrawable();
+        pickBg.setColor(0xFF318af8);
+        pickBg.setCornerRadius(dp(22));
+        btnPickFile.setBackground(pickBg);
+        btnPickFile.setOnClickListener(v -> openFilePicker());
+        excelModeLayout.addView(btnPickFile);
+
+        tvSelectedFile = new TextView(this);
+        tvSelectedFile.setText("未选择文件");
+        tvSelectedFile.setTextSize(13);
+        tvSelectedFile.setTextColor(0xFF8899aa);
+        tvSelectedFile.setPadding(0, dp(10), 0, dp(14));
+        excelModeLayout.addView(tvSelectedFile);
+
+        TextView btnUpload = new TextView(this);
+        btnUpload.setText("开始导入");
+        btnUpload.setTextSize(16);
+        btnUpload.setTextColor(0xFFFFFFFF);
+        btnUpload.setGravity(Gravity.CENTER);
+        btnUpload.setPadding(0, dp(14), 0, dp(14));
+        GradientDrawable upBg = new GradientDrawable();
+        upBg.setColors(new int[]{0xFF3577ef, 0xFF6cc3ff});
+        upBg.setOrientation(GradientDrawable.Orientation.LEFT_RIGHT);
+        upBg.setCornerRadius(dp(25));
+        btnUpload.setBackground(upBg);
+        btnUpload.setOnClickListener(v -> doExcelImport());
+        excelModeLayout.addView(btnUpload);
+
+        tvExcelResult = new TextView(this);
+        tvExcelResult.setTextSize(13);
+        tvExcelResult.setTextColor(0xFF273245);
+        tvExcelResult.setPadding(dp(12), dp(12), dp(12), dp(12));
+        tvExcelResult.setBackgroundColor(0xFFFFFFFF);
+        tvExcelResult.setVisibility(View.GONE);
+        excelModeLayout.addView(tvExcelResult);
+
+        root.addView(excelModeLayout);
+
         setContentView(root);
+
+        // Toggle listeners
+        btnText.setOnClickListener(v -> {
+            textModeLayout.setVisibility(View.VISIBLE);
+            excelModeLayout.setVisibility(View.GONE);
+            btnText.setTextColor(0xFFFFFFFF);
+            btnText.setBackgroundColor(0xFF318af8);
+            btnExcel.setTextColor(0xFF318af8);
+            btnExcel.setBackgroundColor(0xFFe8ecf1);
+        });
+        btnExcel.setOnClickListener(v -> {
+            textModeLayout.setVisibility(View.GONE);
+            excelModeLayout.setVisibility(View.VISIBLE);
+            btnExcel.setTextColor(0xFFFFFFFF);
+            btnExcel.setBackgroundColor(0xFF318af8);
+            btnText.setTextColor(0xFF318af8);
+            btnText.setBackgroundColor(0xFFe8ecf1);
+        });
+
         loadBooks();
+    }
+
+    private TextView makeToggleBtn(String text, boolean active) {
+        TextView btn = new TextView(this);
+        btn.setText(text);
+        btn.setTextSize(14);
+        btn.setTextColor(active ? 0xFFFFFFFF : 0xFF318af8);
+        btn.setBackgroundColor(active ? 0xFF318af8 : 0xFFe8ecf1);
+        btn.setGravity(Gravity.CENTER);
+        btn.setPadding(0, dp(10), 0, dp(10));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(active ? 0xFF318af8 : 0xFFe8ecf1);
+        bg.setCornerRadius(dp(20));
+        btn.setBackground(bg);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        bp.setMargins(0, 0, dp(6), 0);
+        btn.setLayoutParams(bp);
+        return btn;
+    }
+
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        String[] mimeTypes = {
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel"
+        };
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        startActivityForResult(intent, PICK_EXCEL_FILE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_EXCEL_FILE && resultCode == RESULT_OK && data != null) {
+            selectedFileUri = data.getData();
+            if (selectedFileUri != null) {
+                String name = selectedFileUri.getLastPathSegment();
+                if (name == null) name = "已选择文件";
+                tvSelectedFile.setText("已选择: " + name);
+                tvSelectedFile.setTextColor(0xFF25cb75);
+                tvExcelResult.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void loadBooks() {
@@ -127,6 +277,9 @@ public class BatchAddWordActivity extends AppCompatActivity {
                 if (r.get("code").getAsInt() == 200) {
                     JsonArray books = r.getAsJsonArray("data");
                     List<String> names = new ArrayList<>();
+                    bookIds.clear();
+                    names.add("不指定词书（仅导入单词库）");
+                    bookIds.add("");
                     for (int i = 0; i < books.size(); i++) {
                         JsonObject b = books.get(i).getAsJsonObject();
                         bookIds.add(b.get("wordBookId").getAsString());
@@ -139,18 +292,20 @@ public class BatchAddWordActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void doBatchAdd() {
+    private String getSelectedBookId() {
+        if (spBook.getSelectedItemPosition() < 0 || bookIds.isEmpty()) return null;
+        String bid = bookIds.get(spBook.getSelectedItemPosition());
+        return (bid != null && !bid.isEmpty()) ? bid : null;
+    }
+
+    // ===== 文本模式批量导入 =====
+    private void doTextBatchAdd() {
         String input = etBatchInput.getText().toString().trim();
         if (input.isEmpty()) {
             Toast.makeText(this, "请输入单词数据", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (spBook.getSelectedItemPosition() < 0 || bookIds.isEmpty()) {
-            Toast.makeText(this, "请选择词书", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        String bookId = bookIds.get(spBook.getSelectedItemPosition());
         String[] lines = input.split("\n");
         JsonArray wordsArr = new JsonArray();
         for (String line : lines) {
@@ -174,12 +329,13 @@ public class BatchAddWordActivity extends AppCompatActivity {
         btnSubmit.setEnabled(false);
         btnSubmit.setText("导入中...");
 
-        JsonArray finalWords = wordsArr;
+        JsonObject body = new JsonObject();
+        String bookId = getSelectedBookId();
+        if (bookId != null) body.addProperty("wordBookId", bookId);
+        body.add("words", wordsArr);
+
         new Thread(() -> {
             try {
-                JsonObject body = new JsonObject();
-                body.addProperty("wordBookId", bookId);
-                body.add("words", finalWords);
                 JsonObject result = ApiClient.get().post("/api/words/batch", body);
                 runOnUiThread(() -> {
                     btnSubmit.setEnabled(true);
@@ -193,6 +349,87 @@ public class BatchAddWordActivity extends AppCompatActivity {
                     btnSubmit.setEnabled(true);
                     btnSubmit.setText("批量导入");
                     Toast.makeText(this, "网络连接失败", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+
+    // ===== Excel批量导入 =====
+    private void doExcelImport() {
+        if (selectedFileUri == null) {
+            Toast.makeText(this, "请先选择Excel文件", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("正在导入...");
+        pd.setCancelable(false);
+        pd.show();
+
+        new Thread(() -> {
+            try {
+                InputStream is = getContentResolver().openInputStream(selectedFileUri);
+
+                java.util.Map<String, String> fields = new java.util.HashMap<>();
+                String bookId = getSelectedBookId();
+                if (bookId != null) fields.put("wordBookId", bookId);
+
+                JsonObject result = ApiClient.get().uploadFile(
+                        "/api/words/batch/import", "file", "import.xlsx", is,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        fields);
+                is.close();
+
+                runOnUiThread(() -> {
+                    pd.dismiss();
+                    int code = result.has("code") ? result.get("code").getAsInt() : -1;
+                    if (code == 200) {
+                        JsonObject data = result.getAsJsonObject("data");
+                        int newCount = data.has("newCount") ? data.get("newCount").getAsInt() : 0;
+                        int linkedCount = data.has("linkedCount") ? data.get("linkedCount").getAsInt() : 0;
+                        int skippedCount = data.has("skippedCount") ? data.get("skippedCount").getAsInt() : 0;
+                        int failCount = data.has("failCount") ? data.get("failCount").getAsInt() : 0;
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("导入完成！\n");
+                        sb.append("新增单词: ").append(newCount).append("个\n");
+                        if (bookId != null) sb.append("关联已有单词: ").append(linkedCount).append("个\n");
+                        if (skippedCount > 0) {
+                            sb.append("跳过(已存在): ").append(skippedCount).append("个\n");
+                            if (data.has("skippedWords")) {
+                                JsonArray sw = data.getAsJsonArray("skippedWords");
+                                if (sw.size() > 0) {
+                                    sb.append("跳过的单词: ");
+                                    for (int i = 0; i < Math.min(sw.size(), 10); i++) {
+                                        if (i > 0) sb.append(", ");
+                                        sb.append(sw.get(i).getAsString());
+                                    }
+                                    if (sw.size() > 10) sb.append("...等");
+                                    sb.append("\n");
+                                }
+                            }
+                        }
+                        if (failCount > 0) sb.append("失败: ").append(failCount).append("个");
+
+                        tvExcelResult.setText(sb.toString());
+                        tvExcelResult.setVisibility(View.VISIBLE);
+                        tvExcelResult.setTextColor(0xFF273245);
+                        Toast.makeText(this, "导入完成", Toast.LENGTH_SHORT).show();
+                    } else {
+                        String msg = result.has("message") ? result.get("message").getAsString() : "导入失败";
+                        tvExcelResult.setText("导入失败: " + msg);
+                        tvExcelResult.setVisibility(View.VISIBLE);
+                        tvExcelResult.setTextColor(0xFFe37b4b);
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    pd.dismiss();
+                    tvExcelResult.setText("导入失败: " + e.getMessage());
+                    tvExcelResult.setVisibility(View.VISIBLE);
+                    tvExcelResult.setTextColor(0xFFe37b4b);
+                    Toast.makeText(this, "文件读取失败", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

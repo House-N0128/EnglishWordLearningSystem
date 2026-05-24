@@ -45,40 +45,46 @@ public class UserManageActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFFf2f8fc);
 
-        // ===== TOP BAR: 48dp, #318af8 =====
+        // ===== TOP BAR: 48dp, #318af8 (same as AdminMainActivity) =====
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(12), 0, dp(16), 0);
+        topBar.setPadding(dp(16), 0, dp(16), 0);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
         topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
-        TextView btnBack = new TextView(this);
-        btnBack.setText("←");
-        btnBack.setTextSize(22);
-        btnBack.setTextColor(0xFFFFFFFF);
-        btnBack.setTypeface(null, Typeface.BOLD);
-        btnBack.setPadding(0, 0, dp(12), 0);
-        btnBack.setOnClickListener(v -> finish());
-        topBar.addView(btnBack);
+        TextView adminUser = new TextView(this);
+        adminUser.setText("管理员：" + AuthManager.get().getUserId());
+        adminUser.setTextSize(16);
+        adminUser.setTextColor(0xFFFFFFFF);
+        adminUser.setTypeface(null, Typeface.BOLD);
+        adminUser.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        topBar.addView(adminUser);
 
-        TextView barTitle = new TextView(this);
-        barTitle.setText("用户管理");
-        barTitle.setTextSize(16);
-        barTitle.setTextColor(0xFFFFFFFF);
-        barTitle.setTypeface(null, Typeface.BOLD);
-        barTitle.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        topBar.addView(barTitle);
+        TextView btnRefresh = new TextView(this);
+        btnRefresh.setText("刷新");
+        btnRefresh.setTextSize(15);
+        btnRefresh.setTextColor(0xFF318af8);
+        btnRefresh.setBackgroundColor(0xFFFFFFFF);
+        btnRefresh.setPadding(dp(16), dp(7), dp(16), dp(7));
+        btnRefresh.setGravity(Gravity.CENTER);
+        GradientDrawable rfBg = new GradientDrawable();
+        rfBg.setColor(0xFFFFFFFF);
+        rfBg.setCornerRadius(dp(16));
+        btnRefresh.setBackground(rfBg);
+        btnRefresh.setOnClickListener(v -> loadAllUsers());
+        topBar.addView(btnRefresh);
 
         TextView btnLogout = new TextView(this);
         btnLogout.setText("退出登录");
-        btnLogout.setTextSize(14);
+        btnLogout.setTextSize(15);
         btnLogout.setTextColor(0xFF318af8);
+        btnLogout.setBackgroundColor(0xFFFFFFFF);
+        btnLogout.setPadding(dp(16), dp(7), dp(16), dp(7));
         btnLogout.setGravity(Gravity.CENTER);
-        btnLogout.setPadding(dp(16), dp(6), dp(16), dp(6));
         GradientDrawable lgBg = new GradientDrawable();
         lgBg.setColor(0xFFFFFFFF);
-        lgBg.setCornerRadius(dp(14));
+        lgBg.setCornerRadius(dp(16));
         btnLogout.setBackground(lgBg);
         btnLogout.setOnClickListener(v -> {
             AuthManager.get().clearAuth();
@@ -208,22 +214,25 @@ public class UserManageActivity extends AppCompatActivity {
         navbar.setBackgroundColor(0xFFFFFFFF);
         navbar.setPadding(0, dp(8), 0, dp(12));
         navbar.setElevation(dp(8));
+        navbar.setWeightSum(5f);
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
         navItem(navbar, "", "主页", false, () -> startActivity(new Intent(this, AdminMainActivity.class)));
         navItem(navbar, "", "用户管理", true, () -> {});
         navItem(navbar, "", "词书管理", false, () -> startActivity(new Intent(this, WordBooksActivity.class)));
         navItem(navbar, "", "单词管理", false, () -> startActivity(new Intent(this, WordSearchActivity.class)));
+        navItem(navbar, "", "个人信息", false, () -> startActivity(new Intent(this, AdminProfileActivity.class)));
         return navbar;
     }
 
     private void navItem(LinearLayout parent, String icon, String label, boolean active, Runnable action) {
         TextView item = new TextView(this);
         item.setText(icon.isEmpty() ? label : icon + "\n" + label);
-        item.setTextSize(15);
+        item.setTextSize(13);
         item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
         item.setGravity(Gravity.CENTER);
+        item.setMaxLines(1);
         item.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         item.setOnClickListener(v -> action.run());
         parent.addView(item);

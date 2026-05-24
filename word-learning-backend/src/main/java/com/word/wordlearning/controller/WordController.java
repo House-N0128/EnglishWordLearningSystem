@@ -187,7 +187,7 @@ public class WordController {
     @PostMapping("/batch")
     public Result<String> batchAdd(@RequestBody Map<String, Object> body) {
         String bookId = (String) body.get("wordBookId");
-        if (bookId == null) return Result.error(400, "缺少词书ID");
+        boolean hasBook = bookId != null && !bookId.trim().isEmpty();
 
         @SuppressWarnings("unchecked")
         List<Map<String, String>> words = (List<Map<String, String>>) body.get("words");
@@ -202,11 +202,9 @@ public class WordController {
                 String definition = w.get("chineseDefinition");
                 if (spelling == null || definition == null) { fail++; continue; }
 
-                // Skip if already exists by spelling
                 Word exist = wordMapper.findBySpelling(spelling);
                 if (exist != null) { skipped++; continue; }
 
-                // Auto-generate ID
                 String wordId = w.get("wordId");
                 if (wordId == null || wordId.isEmpty()) {
                     wordId = "WD" + String.format("%05d", idSeq++);
@@ -221,116 +219,120 @@ public class WordController {
                 nw.setWordPronunciation(w.getOrDefault("wordPronunciation", ""));
                 nw.setWordImage(w.getOrDefault("wordImage", ""));
                 wordMapper.insert(nw);
-                wordMapper.insertBookRef(bookId, wordId);
+                if (hasBook) wordMapper.insertBookRef(bookId, wordId);
                 success++;
             } catch (Exception e) { fail++; }
         }
-        wordBookMapper.syncWordCount(bookId);
+        if (hasBook) wordBookMapper.syncWordCount(bookId);
         String msg = "成功" + success + "个";
         if (skipped > 0) msg += "，跳过" + skipped + "个已存在";
         if (fail > 0) msg += "，失败" + fail + "个";
         return Result.success(msg);
     }
 
-    // 支持文件上传的批量导入接口（不需要词书ID）
+    // 支持Excel文件上传的批量导入接口
+    // - 带 wordBookId：关联到指定词书（三种场景：新增+关联 / 仅关联 / 跳过）
+    // - 不带 wordBookId：只导入单词到单词库（已存在的跳过）
     @PostMapping(value = "/batch/import", consumes = "multipart/form-data")
-    public Result<Map<String, Integer>> batchImport(
+    public Result<Map<String, Object>> batchImport(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "wordBookId", required = false) String wordBookId) {
         if (file.isEmpty()) {
             return Result.error(400, "请选择要导入的文件");
         }
 
-        int successCount = 0;
+        boolean hasBook = wordBookId != null && !wordBookId.trim().isEmpty();
+        int newCount = 0;
+        int linkedCount = 0;
+        int skippedCount = 0;
         int failCount = 0;
+        List<String> skippedWords = new ArrayList<>();
 
         try (InputStream is = file.getInputStream()) {
-            // 使用Apache POI读取Excel文件
             Workbook workbook = WorkbookFactory.create(is);
             Sheet sheet = workbook.getSheetAt(0);
 
-            // 跳过表头（第一行）
-            int firstDataRow = 1;
-            int lastRow = sheet.getLastRowNum();
+            Integer maxNum = wordMapper.maxWordIdNum();
+            int idSeq = (maxNum == null) ? 1 : maxNum + 1;
 
-            for (int i = firstDataRow; i <= lastRow; i++) {
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 try {
-                    Word word = new Word();
-                    
-                    // spelling (A列)
                     String spelling = getCellValueAsString(row.getCell(0));
-                    if (spelling == null || spelling.trim().isEmpty()) {
-                        failCount++;
-                        continue;
-                    }
-                    word.setEnglishSpelling(spelling.trim());
+                    if (spelling == null || spelling.trim().isEmpty()) { failCount++; continue; }
+                    spelling = spelling.trim();
 
                     // part_of_speech (B列)
                     String partOfSpeech = getCellValueAsString(row.getCell(1));
-                    word.setPartOfSpeech(partOfSpeech != null ? partOfSpeech.trim() : "");
 
                     // definition (C列)
                     String definition = getCellValueAsString(row.getCell(2));
-                    if (definition == null || definition.trim().isEmpty()) {
-                        failCount++;
-                        continue;
-                    }
-                    word.setChineseDefinition(definition.trim());
+                    if (definition == null || definition.trim().isEmpty()) { failCount++; continue; }
+                    definition = definition.trim();
 
                     // example_sentence (D列)
                     String exampleSentence = getCellValueAsString(row.getCell(3));
-                    word.setExampleSentence(exampleSentence != null ? exampleSentence.trim() : "");
 
                     // phonetic (E列)
                     String phonetic = getCellValueAsString(row.getCell(4));
-                    word.setPhoneticSymbol(phonetic != null ? phonetic.trim() : "");
 
                     // pronunciation_url (F列)
                     String pronunciationUrl = getCellValueAsString(row.getCell(5));
-                    word.setWordPronunciation(pronunciationUrl != null ? pronunciationUrl.trim() : "");
 
                     // image_url (G列)
                     String imageUrl = getCellValueAsString(row.getCell(6));
-                    word.setWordImage(imageUrl != null ? imageUrl.trim() : "");
 
-                    // 自动生成word_id（格式：WD+6位数字）
-                    int count = wordMapper.countAll();
-                    String wordId = "WD" + String.format("%06d", count + 1);
-                    word.setWordId(wordId);
+                    Word exist = wordMapper.findBySpelling(spelling);
 
-                    // 创建时间由数据库自动生成
-
-                    // 检查是否已存在（通过spelling判断）
-                    List<Word> existList = wordMapper.search(spelling.trim());
-                    boolean exists = existList.stream().anyMatch(w -> w.getEnglishSpelling().equalsIgnoreCase(spelling.trim()));
-                    if (!exists) {
-                        wordMapper.insert(word);
+                    if (exist == null) {
+                        // 单词不存在 → 创建
+                        String wordId = "WD" + String.format("%05d", idSeq++);
+                        Word w = new Word();
+                        w.setWordId(wordId);
+                        w.setEnglishSpelling(spelling);
+                        w.setChineseDefinition(definition);
+                        w.setPartOfSpeech(partOfSpeech != null ? partOfSpeech.trim() : "");
+                        w.setExampleSentence(exampleSentence != null ? exampleSentence.trim() : "");
+                        w.setPhoneticSymbol(phonetic != null ? phonetic.trim() : "");
+                        w.setWordPronunciation(pronunciationUrl != null ? pronunciationUrl.trim() : "");
+                        w.setWordImage(imageUrl != null ? imageUrl.trim() : "");
+                        wordMapper.insert(w);
+                        if (hasBook) wordMapper.insertBookRef(wordBookId, wordId);
+                        newCount++;
+                    } else if (hasBook) {
+                        // 单词存在且有词书 → 检查关联
+                        if (wordMapper.existsBookRef(wordBookId, exist.getWordId()) > 0) {
+                            skippedCount++;
+                            skippedWords.add(spelling);
+                        } else {
+                            wordMapper.insertBookRef(wordBookId, exist.getWordId());
+                            linkedCount++;
+                        }
                     } else {
-                        // 如果已存在，获取已存在的单词ID
-                        wordId = existList.get(0).getWordId();
+                        // 单词存在且无词书 → 纯导入模式，跳过
+                        skippedCount++;
+                        skippedWords.add(spelling);
                     }
-
-                    // 如果提供了词书ID，建立关联
-                    if (wordBookId != null && !wordBookId.trim().isEmpty()) {
-                        wordMapper.insertBookRef(wordBookId.trim(), wordId);
-                    }
-
-                    successCount++;
                 } catch (Exception e) {
                     failCount++;
                 }
             }
 
-            } catch (Exception e) {
+            workbook.close();
+            if (hasBook) wordBookMapper.syncWordCount(wordBookId);
+
+        } catch (Exception e) {
             return Result.error(500, "文件解析失败：" + e.getMessage());
         }
 
-        Map<String, Integer> result = new HashMap<>();
-        result.put("successCount", successCount);
+        Map<String, Object> result = new HashMap<>();
+        result.put("newCount", newCount);
+        if (hasBook) result.put("linkedCount", linkedCount);
+        result.put("skippedCount", skippedCount);
         result.put("failCount", failCount);
+        result.put("skippedWords", skippedWords);
 
         return Result.success(result);
     }

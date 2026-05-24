@@ -53,13 +53,19 @@ public class AdminstratorService {
     }
 
     public boolean changePassword(String userId, String oldPassword, String newPassword) {
-        // 先验证原密码
         Adminstrator admin = adminstratorMapper.findByUserIdAndPassword(userId, oldPassword);
         if (admin == null) {
-            return false; // 原密码错误
+            return false;
         }
-        // 更新密码
         adminstratorMapper.updatePassword(userId, newPassword);
         return true;
+    }
+
+    public boolean updateAdminProfile(Adminstrator admin) {
+        return adminstratorMapper.updateProfile(admin) > 0;
+    }
+
+    public boolean isEmailUsedByOtherAdmin(String email, String excludeUserId) {
+        return adminstratorMapper.findByEmailExcludeSelf(email, excludeUserId) != null;
     }
 }
