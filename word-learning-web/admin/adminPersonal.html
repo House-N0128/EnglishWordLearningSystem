@@ -275,16 +275,6 @@
             box-shadow: 0 5px 15px rgba(40,167,69,0.4);
         }
 
-        .btn-cancel-account {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-        }
-
-        .btn-cancel-account:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
-        }
-
         /* 弹窗样式 */
         .modal-mask{
             position: fixed;
@@ -441,7 +431,6 @@
 
             <div class="btn-group">
                 <button class="btn-action btn-edit-pwd" onclick="goChangePwd()">🔐 修改登录密码</button>
-                <button class="btn-action btn-cancel-account" onclick="freezeAdminAccount()">🚫 冻结账号</button>
             </div>
         </div>
     </div>
@@ -463,17 +452,6 @@ function goAdminIndex(){
 }
 function goChangePwd(){
     location.href = "changepassword.html";
-}
-
-// 冻结账号
-function freezeAdminAccount(){
-    if(confirm("确定要冻结当前管理员账号吗？冻结后需要其他管理员解冻才能恢复！")){
-        clearAuth();
-        showMsg("账号已冻结，即将跳转登录页");
-        setTimeout(()=>{
-            location.href = "../login.html";
-        },1500);
-    }
 }
 
 // 消息提示
