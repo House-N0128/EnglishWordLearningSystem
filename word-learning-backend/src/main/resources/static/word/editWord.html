@@ -291,6 +291,24 @@
                 <div class="input-tip">国际音标标注</div>
             </div>
 
+            <!-- 词性 -->
+            <div class="form-group">
+                <label class="form-label">词性</label>
+                <select class="form-select" id="partOfSpeechInput">
+                    <option value="">请选择词性</option>
+                    <option value="n.">名词 (n.)</option>
+                    <option value="v.">动词 (v.)</option>
+                    <option value="adj.">形容词 (adj.)</option>
+                    <option value="adv.">副词 (adv.)</option>
+                    <option value="prep.">介词 (prep.)</option>
+                    <option value="conj.">连词 (conj.)</option>
+                    <option value="pron.">代词 (pron.)</option>
+                    <option value="num.">数词 (num.)</option>
+                    <option value="interj.">感叹词 (interj.)</option>
+                </select>
+                <div class="input-tip">选择单词的词性</div>
+            </div>
+
             <!-- 中文释义 -->
             <div class="form-group">
                 <label class="form-label">中文释义 *</label>
@@ -384,6 +402,7 @@ async function loadWordInfo() {
             document.getElementById('wordIdInput').value = word.wordId || '';
             document.getElementById('spellingInput').value = word.englishSpelling || '';
             document.getElementById('phoneticInput').value = word.phoneticSymbol || '';
+            document.getElementById('partOfSpeechInput').value = word.partOfSpeech || '';
             document.getElementById('definitionInput').value = word.chineseDefinition || '';
             document.getElementById('exampleInput').value = word.exampleSentence || '';
             document.getElementById('audioInput').value = word.wordPronunciation || '';
@@ -402,7 +421,8 @@ async function saveWord() {
     const spelling = document.getElementById('spellingInput').value.trim();
     const definition = document.getElementById('definitionInput').value.trim();
     const phonetic = document.getElementById('phoneticInput').value.trim();
-    const example = document.getElementById('exampleInput').value.trim();
+        const partOfSpeech = document.getElementById('partOfSpeechInput').value.trim();
+        const example = document.getElementById('exampleInput').value.trim();
     const audio = document.getElementById('audioInput').value.trim();
     const image = document.getElementById('imageInput').value.trim();
 
@@ -421,6 +441,7 @@ async function saveWord() {
             englishSpelling: spelling,
             chineseDefinition: definition,
             phoneticSymbol: phonetic,
+            partOfSpeech: partOfSpeech,
             exampleSentence: example,
             wordPronunciation: audio,
             wordImage: image

@@ -71,25 +71,46 @@ public class WordBooksActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFFf2f8fc);
 
-        // Top bar
+        // Top bar (same as AdminMainActivity)
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
-        topBar.setPadding(dp(12), 0, dp(16), 0);
+        topBar.setBackgroundColor(0xFF318af8);
+        topBar.setPadding(dp(16), 0, dp(16), 0);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
         topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
-        topBar.setBackground(tbBg);
+
         TextView adminUser = new TextView(this);
         adminUser.setText("管理员：" + AuthManager.get().getUserId());
-        adminUser.setTextSize(16); adminUser.setTextColor(0xFFFFFFFF); adminUser.setTypeface(null, Typeface.BOLD);
+        adminUser.setTextSize(16);
+        adminUser.setTextColor(0xFFFFFFFF);
+        adminUser.setTypeface(null, Typeface.BOLD);
         adminUser.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         topBar.addView(adminUser);
+
+        TextView btnRefresh = new TextView(this);
+        btnRefresh.setText("刷新");
+        btnRefresh.setTextSize(15);
+        btnRefresh.setTextColor(0xFF318af8);
+        btnRefresh.setBackgroundColor(0xFFFFFFFF);
+        btnRefresh.setPadding(dp(16), dp(7), dp(16), dp(7));
+        btnRefresh.setGravity(Gravity.CENTER);
+        GradientDrawable rfBg = new GradientDrawable();
+        rfBg.setColor(0xFFFFFFFF);
+        rfBg.setCornerRadius(dp(16));
+        btnRefresh.setBackground(rfBg);
+        btnRefresh.setOnClickListener(v -> loadBooks());
+        topBar.addView(btnRefresh);
+
         TextView btnLogout = new TextView(this);
-        btnLogout.setText("退出登录"); btnLogout.setTextSize(14); btnLogout.setTextColor(0xFF318af8); btnLogout.setGravity(Gravity.CENTER);
-        btnLogout.setPadding(dp(16), dp(6), dp(16), dp(6));
-        GradientDrawable lgBg = new GradientDrawable(); lgBg.setColor(0xFFFFFFFF); lgBg.setCornerRadius(dp(14));
+        btnLogout.setText("退出登录");
+        btnLogout.setTextSize(15);
+        btnLogout.setTextColor(0xFF318af8);
+        btnLogout.setBackgroundColor(0xFFFFFFFF);
+        btnLogout.setPadding(dp(16), dp(7), dp(16), dp(7));
+        btnLogout.setGravity(Gravity.CENTER);
+        GradientDrawable lgBg = new GradientDrawable();
+        lgBg.setColor(0xFFFFFFFF);
+        lgBg.setCornerRadius(dp(16));
         btnLogout.setBackground(lgBg);
         btnLogout.setOnClickListener(v -> { AuthManager.get().clearAuth(); startActivity(new Intent(this, LoginActivity.class)); finish(); });
         topBar.addView(btnLogout);
@@ -164,16 +185,18 @@ public class WordBooksActivity extends AppCompatActivity {
         LinearLayout navbar = new LinearLayout(this);
         navbar.setOrientation(LinearLayout.HORIZONTAL); navbar.setBackgroundColor(0xFFFFFFFF);
         navbar.setPadding(0, dp(8), 0, dp(12)); navbar.setElevation(dp(8));
+        navbar.setWeightSum(5f);
         navbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
-        String[][] tabs = {{"主页", "用户管理", "词书管理", "单词管理"}};
-        Class<?>[] targets = {AdminMainActivity.class, UserManageActivity.class, WordBooksActivity.class, WordSearchActivity.class};
-        for (int i = 0; i < 4; i++) {
+        String[] tabs = {"主页", "用户管理", "词书管理", "单词管理", "个人信息"};
+        Class<?>[] targets = {AdminMainActivity.class, UserManageActivity.class, WordBooksActivity.class, WordSearchActivity.class, AdminProfileActivity.class};
+        for (int i = 0; i < 5; i++) {
             TextView tv = new TextView(this);
-            tv.setText(tabs[0][i]); tv.setTextSize(15);
+            tv.setText(tabs[i]); tv.setTextSize(13);
             tv.setTextColor(i == 2 ? 0xFF17c2ae : 0xFF8899aa);
             tv.setTypeface(null, i == 2 ? Typeface.BOLD : Typeface.NORMAL);
             tv.setGravity(Gravity.CENTER);
+            tv.setMaxLines(1);
             tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
             int idx = i; tv.setOnClickListener(v -> startActivity(new Intent(this, targets[idx])));
             navbar.addView(tv);

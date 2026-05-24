@@ -60,12 +60,26 @@ public class AdminMainActivity extends AppCompatActivity {
                 0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         topBar.addView(adminUser);
 
+        TextView btnRefresh = new TextView(this);
+        btnRefresh.setText("刷新");
+        btnRefresh.setTextSize(15);
+        btnRefresh.setTextColor(0xFF318af8);
+        btnRefresh.setBackgroundColor(0xFFFFFFFF);
+        btnRefresh.setPadding(dp(16), dp(7), dp(16), dp(7));
+        btnRefresh.setGravity(Gravity.CENTER);
+        GradientDrawable rfBg = new GradientDrawable();
+        rfBg.setColor(0xFFFFFFFF);
+        rfBg.setCornerRadius(dp(16));
+        btnRefresh.setBackground(rfBg);
+        btnRefresh.setOnClickListener(v -> loadData());
+        topBar.addView(btnRefresh);
+
         TextView btnLogout = new TextView(this);
         btnLogout.setText("退出登录");
         btnLogout.setTextSize(15);
         btnLogout.setTextColor(0xFF318af8);
         btnLogout.setBackgroundColor(0xFFFFFFFF);
-        btnLogout.setPadding(dp(20), dp(7), dp(20), dp(7));
+        btnLogout.setPadding(dp(16), dp(7), dp(16), dp(7));
         btnLogout.setGravity(Gravity.CENTER);
         GradientDrawable lgBg = new GradientDrawable();
         lgBg.setColor(0xFFFFFFFF);
@@ -149,10 +163,8 @@ public class AdminMainActivity extends AppCompatActivity {
         navbar.setOrientation(LinearLayout.HORIZONTAL);
         navbar.setBackgroundColor(0xFFFFFFFF);
         navbar.setPadding(0, dp(8), 0, dp(12));
-        GradientDrawable nbBg = new GradientDrawable();
-        nbBg.setColor(0xFFFFFFFF);
-        nbBg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), 0, 0, 0, 0});
-        navbar.setBackground(nbBg);
+        navbar.setElevation(dp(8));
+        navbar.setWeightSum(5f);
         navbar.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(61)));
         navbar.setGravity(Gravity.CENTER);
@@ -164,6 +176,8 @@ public class AdminMainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, WordBooksActivity.class)));
         addNavItem(navbar, "", "单词管理", false, () ->
                 startActivity(new Intent(this, WordSearchActivity.class)));
+        addNavItem(navbar, "", "个人信息", false, () ->
+                startActivity(new Intent(this, AdminProfileActivity.class)));
 
         root.addView(navbar);
         setContentView(root);
@@ -208,10 +222,11 @@ public class AdminMainActivity extends AppCompatActivity {
                             boolean active, Runnable action) {
         TextView item = new TextView(this);
         item.setText(icon.isEmpty() ? label : icon + "\n" + label);
-        item.setTextSize(active ? 15 : 15);
-        item.setTextColor(active ? 0xFF17c2ae : 0xFF318af8);
+        item.setTextSize(13);
+        item.setTextColor(active ? 0xFF17c2ae : 0xFF8899aa);
         item.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
         item.setGravity(Gravity.CENTER);
+        item.setMaxLines(1);
         item.setLayoutParams(new LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         item.setOnClickListener(v -> action.run());

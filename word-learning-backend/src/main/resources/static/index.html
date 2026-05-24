@@ -5,109 +5,376 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 登录</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft Yahei", sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
-            background: linear-gradient(135deg, #4a88f4 0%, #8a4fc9 100%);
             min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-        .login-card {
-            background: #fff;
-            width: 400px;
-            border-radius: 10px;
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
+
+        /* 装饰性背景圆点 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: bgMove 20s linear infinite;
+        }
+
+        @keyframes bgMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* 毛玻璃卡片 */
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 440px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 头部区域 */
         .card-header {
-            background: #007bff;
-            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             text-align: center;
-            padding: 25px 15px;
+            padding: 40px 20px;
+            position: relative;
         }
-        .card-header h1 { font-size: 26px; margin-bottom: 8px; font-weight: 600; }
-        .card-header p { font-size: 15px; opacity: 0.9; }
-        .tab-bar { display: flex; border-bottom: 1px solid #eee; }
+
+        .card-header::after {
+            content: '📖';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Tab 切换 */
+        .tab-bar {
+            display: flex;
+            padding: 0 20px;
+            background: white;
+            gap: 10px;
+        }
+
         .tab {
-            flex: 1; text-align: center; padding: 15px; cursor: pointer;
-            font-size: 16px; color: #666; background: #f8f9fa; transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #8b8ca3;
+            background: transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            border: none;
         }
-        .tab.active { background: #fff; color: #007bff; border-bottom: 2px solid #007bff; }
-        .form-content { padding: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 15px; color: #333; margin-bottom: 8px; }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .tab.active {
+            color: #667eea;
+        }
+
+        .tab.active::after {
+            width: 60%;
+        }
+
+        .tab:hover:not(.active) {
+            color: #764ba2;
+        }
+
+        /* 表单内容 */
+        .form-content {
+            padding: 30px 30px 35px;
+            background: white;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a4b65;
+            margin-bottom: 8px;
+        }
+
         .form-group input {
-            width: 100%; padding: 12px 15px; border: 1px solid #ddd;
-            border-radius: 6px; font-size: 15px; outline: none; transition: border-color 0.2s;
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8e9f0;
+            border-radius: 16px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
         }
-        .form-group input:focus { border-color: #007bff; }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #bcbdd0;
+            font-weight: 400;
+        }
+
+        /* 按钮样式 */
         .btn {
-            width: 100%; padding: 13px; border: none; border-radius: 6px;
-            font-size: 16px; font-weight: 500; cursor: pointer; margin-bottom: 15px; transition: opacity 0.2s;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .btn:hover { opacity: 0.9; }
-        .btn-login { background: #007bff; color: #fff; }
-        .btn-register { background: #28a745; color: #fff; }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+        }
+
+        /* 忘记密码链接 */
+        .forgot-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-link a {
+            color: #8b8ca3;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .forgot-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .forgot-link a:hover {
+            color: #667eea;
+        }
+
+        .forgot-link a:hover::after {
+            width: 100%;
+        }
+
+        /* 错误提示 */
         .error-msg {
-            display: none; text-align: center; margin-top: 8px; font-size: 14px;
-            color: #e74c3c; background: #fef0ef; padding: 10px; border-radius: 6px;
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #fee 0%, #ffe5e5 100%);
+            color: #e74c3c;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 3px solid #e74c3c;
+        }
+
+        /* 弹窗美化 */
+        #forgotPasswordModal > div {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .login-card {
+                width: 90%;
+                margin: 20px;
+            }
+            
+            .form-content {
+                padding: 25px 20px;
+            }
+            
+            .card-header h1 {
+                font-size: 26px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="login-card">
     <div class="card-header">
-        <h1>单词学习平台</h1>
+        <h1>📖 单词学习平台</h1>
         <p>开启您的英语学习之旅</p>
     </div>
     <div class="tab-bar">
-        <div class="tab active" id="tab-user" onclick="switchTab('user')">普通用户</div>
-        <div class="tab" id="tab-admin" onclick="switchTab('admin')">管理员</div>
+        <button class="tab active" id="tab-user" onclick="switchTab('user')">👤 普通用户</button>
+        <button class="tab" id="tab-admin" onclick="switchTab('admin')">👑 管理员</button>
     </div>
     <div class="form-content">
         <div class="form-group">
-            <label>登录账号</label>
+            <label>📱 登录账号</label>
             <input type="text" id="userId" placeholder="请输入您的账号">
         </div>
         <div class="form-group">
-            <label>登录密码</label>
+            <label>🔒 登录密码</label>
             <input type="password" id="password" placeholder="请输入您的密码" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
-        <button class="btn btn-login" onclick="doLogin()">登录</button>
-        <button class="btn btn-register" id="btn-register" onclick="goRegister()">注册账号</button>
-        <div style="text-align: center; margin-top: 10px;">
-            <a href="#" onclick="showForgotPassword()" style="color: #007bff; text-decoration: none; font-size: 14px;">忘记密码？</a>
+        <button class="btn btn-login" onclick="doLogin()">✨ 登录</button>
+        <button class="btn btn-register" id="btn-register" onclick="goRegister()">📝 注册账号</button>
+        <div class="forgot-link">
+            <a href="#" onclick="showForgotPassword()">❓ 忘记密码？</a>
         </div>
         <div class="error-msg" id="error-msg"></div>
     </div>
 </div>
+
 <!-- 找回密码弹窗 -->
-<div id="forgotPasswordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-    <div style="background:#fff; width:400px; border-radius:10px; padding:30px; margin:100px auto;">
-        <h3 style="margin-bottom:20px; text-align:center;">找回密码</h3>
+<div id="forgotPasswordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#fff; width:420px; border-radius:28px; padding:35px; margin:20px;">
+        <h3 style="margin-bottom:25px; text-align:center; font-size:24px; font-weight:700; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">找回密码</h3>
         <div id="resetStep1">
             <div class="form-group">
-                <label>邮箱地址</label>
-                <input type="email" id="resetEmail" placeholder="请输入注册邮箱">
+                <label>📧 邮箱地址</label>
+                <input type="email" id="resetEmail" placeholder="请输入注册邮箱" style="border-radius:14px;">
             </div>
-            <button class="btn btn-login" onclick="sendResetCode()">发送验证码</button>
+            <button class="btn btn-login" onclick="sendResetCode()" style="border-radius:14px;">📨 发送验证码</button>
         </div>
         <div id="resetStep2" style="display:none;">
             <div class="form-group">
-                <label>验证码</label>
-                <input type="text" id="resetCode" placeholder="请输入验证码">
+                <label>🔢 验证码</label>
+                <input type="text" id="resetCode" placeholder="请输入验证码" style="border-radius:14px;">
             </div>
             <div class="form-group">
-                <label>新密码</label>
-                <input type="password" id="newPassword" placeholder="请输入新密码">
+                <label>🔐 新密码</label>
+                <input type="password" id="newPassword" placeholder="请输入新密码（至少6位）" style="border-radius:14px;">
             </div>
-            <button class="btn btn-login" onclick="resetPassword()">重置密码</button>
+            <button class="btn btn-login" onclick="resetPassword()" style="border-radius:14px;">✅ 重置密码</button>
         </div>
-        <div style="text-align:center; margin-top:15px;">
-            <a href="#" onclick="closeForgotPassword()" style="color:#999;">返回登录</a>
+        <div style="text-align:center; margin-top:20px;">
+            <a href="#" onclick="closeForgotPassword()" style="color:#8b8ca3; text-decoration:none; font-size:14px;">← 返回登录</a>
         </div>
-        <div id="resetErrorMsg" style="display:none; color:#e74c3c; text-align:center; margin-top:10px;"></div>
+        <div id="resetErrorMsg" style="display:none; color:#e74c3c; text-align:center; margin-top:15px; padding:10px; background:#fee; border-radius:12px; font-size:13px;"></div>
     </div>
 </div>
 
@@ -140,18 +407,8 @@ async function doLogin() {
     var result = await apiPost(endpoint, { userid: userId, password: password });
 
     if (result.code === 200) {
-        // 调试：打印返回的数据结构
-        console.log('登录成功，返回数据:', result);
-        console.log('用户ID:', result.data.userid);
-        
-        // 设置登录状态
         var loginUserId = result.data.userid || result.data.userId || userId;
         setAuth(loginUserId, currentRole);
-        
-        // 调试：验证 localStorage 是否设置成功
-        console.log('localStorage userId:', localStorage.getItem('userId'));
-        console.log('localStorage userRole:', localStorage.getItem('userRole'));
-        
         window.location.href = currentRole === 'admin' ? '/admin/indexAdmin.html' : '/user/index.html';
     } else {
         showError(result.message);
@@ -162,8 +419,7 @@ function goRegister() {
     window.location.href = '/user/signupOrdinaryUser.html';
 }
 
-
-// ========== 找回密码相关函数 ==========
+// 找回密码相关函数
 function showForgotPassword() {
     document.getElementById('forgotPasswordModal').style.display = 'flex';
     document.getElementById('resetStep1').style.display = 'block';
@@ -189,10 +445,9 @@ async function sendResetCode() {
     }
     
     try {
-        // 改这里：接口路径和参数名
         var result = await apiPost('/api/user/send-verification-code', { contact: email });
         if (result.code === 200) {
-            alert('验证码已发送到您的邮箱');
+            alert('✅ 验证码已发送到您的邮箱');
             document.getElementById('resetStep1').style.display = 'none';
             document.getElementById('resetStep2').style.display = 'block';
         } else {
@@ -218,8 +473,6 @@ async function resetPassword() {
     }
     
     try {
-        // 注意：后端是先验证验证码，再重置密码
-        // 第一步：验证验证码
         var verifyResult = await apiPost('/api/user/verify-code', {
             contact: email,
             verifyCode: code
@@ -230,14 +483,13 @@ async function resetPassword() {
             return;
         }
         
-        // 第二步：重置密码
         var resetResult = await apiPost('/api/user/reset-password', {
             contact: email,
             newPassword: newPassword
         });
         
         if (resetResult.code === 200) {
-            alert('密码重置成功，请重新登录');
+            alert('🎉 密码重置成功，请重新登录');
             closeForgotPassword();
         } else {
             showResetError(resetResult.message);

@@ -19,4 +19,10 @@ public interface AdminstratorMapper {
 
     @Update("UPDATE t_administrator SET loginPassword = #{newPassword} WHERE userId = #{userId}")
     int updatePassword(String userId, String newPassword);
+
+    @Update("UPDATE t_administrator SET phoneNumber = #{phoneNumber}, email = #{email} WHERE userId = #{userId}")
+    int updateProfile(Adminstrator admin);
+
+    @Select("SELECT * FROM t_administrator WHERE email = #{email} AND userId != #{excludeUserId}")
+    Adminstrator findByEmailExcludeSelf(String email, String excludeUserId);
 }

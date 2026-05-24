@@ -56,6 +56,8 @@
         <activity android:name=".AdminMainActivity" />
         <activity android:name=".UserManageActivity" />
         <activity android:name=".UserRecordActivity" />
+        <activity android:name=".AdminProfileActivity" />
+        <activity android:name=".AdminEditProfileActivity" />
         <activity android:name=".TodayWordsActivity" />
     </application>
 

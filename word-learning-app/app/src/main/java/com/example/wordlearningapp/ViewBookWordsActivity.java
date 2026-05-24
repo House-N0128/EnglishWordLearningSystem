@@ -176,8 +176,9 @@ public class ViewBookWordsActivity extends AppCompatActivity {
                             String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
                             String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
                             String phonetic = w.has("phoneticSymbol") && !w.get("phoneticSymbol").isJsonNull() ? w.get("phoneticSymbol").getAsString() : "";
+                            String partOfSpeech = w.has("partOfSpeech") && !w.get("partOfSpeech").isJsonNull() ? w.get("partOfSpeech").getAsString() : "";
 
-                            // Compact row: spelling + phonetic | edit + remove
+                            // Compact row: spelling + partOfSpeech + definition | edit + remove
                             LinearLayout row = new LinearLayout(this);
                             row.setOrientation(LinearLayout.HORIZONTAL);
                             row.setBackgroundColor(0xFFFFFFFF);
@@ -191,8 +192,13 @@ public class ViewBookWordsActivity extends AppCompatActivity {
                             rp.setMargins(0, 0, 0, dp(2));
                             row.setLayoutParams(rp);
 
+                            StringBuilder displayText = new StringBuilder(spelling);
+                            if (!phonetic.isEmpty()) displayText.append(" ").append(phonetic);
+                            if (!partOfSpeech.isEmpty()) displayText.append(" ").append(partOfSpeech);
+                            displayText.append("  ").append(definition);
+
                             TextView sp = new TextView(this);
-                            sp.setText(spelling + (phonetic.isEmpty() ? "" : " " + phonetic) + "  " + definition);
+                            sp.setText(displayText.toString());
                             sp.setTextSize(13);
                             sp.setTextColor(0xFF318af8);
                             sp.setTypeface(null, Typeface.BOLD);

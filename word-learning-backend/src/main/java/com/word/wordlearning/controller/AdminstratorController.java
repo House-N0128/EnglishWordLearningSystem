@@ -150,51 +150,79 @@ public class AdminstratorController {
     }
 
     @PutMapping("/updateName")
-    public Result<String> updateAdminName(@RequestBody Map<String, String> body) {
+    public Result<String> updateAdminName(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody Map<String, String> body) {
         String newAdminName = body.get("adminName");
         if (newAdminName == null || newAdminName.trim().isEmpty()) {
             return Result.error(400, "管理员名称不能为空");
         }
-        
-        // 从请求中获取当前管理员ID（实际项目中应从登录状态获取）
-        // 这里假设当前管理员是默认的 "admin"
-        String currentAdminId = "admin";
-        
-        boolean success = adminstratorService.updateAdminName(currentAdminId, newAdminName.trim());
+
+        boolean success = adminstratorService.updateAdminName(userId, newAdminName.trim());
         if (success) {
             return Result.success("管理员名称修改成功");
         } else {
-            return Result.error(500, "修改失败，该用户名已存在");
+            return Result.error(400, "修改失败，该账号已存在");
         }
     }
 
     @GetMapping("/info")
-    public Result<com.word.wordlearning.entity.Adminstrator> getAdminInfo() {
-        // 这里假设当前管理员是默认的 "admin"
-        String currentAdminId = "admin";
-        com.word.wordlearning.entity.Adminstrator admin = adminstratorService.getAdminInfo(currentAdminId);
+    public Result<com.word.wordlearning.entity.Adminstrator> getAdminInfo(
+            @RequestHeader("X-User-Id") String userId) {
+        com.word.wordlearning.entity.Adminstrator admin = adminstratorService.getAdminInfo(userId);
         if (admin != null) {
+            admin.setLoginPassword(null);
             return Result.success(admin);
         } else {
             return Result.error(404, "管理员不存在");
         }
     }
 
+    @PutMapping("/profile")
+    public Result<String> updateAdminProfile(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody Map<String, String> body) {
+        String phoneNumber = body.get("phoneNumber");
+        String email = body.get("email");
+
+        if (phoneNumber != null && !phoneNumber.isEmpty() && !phoneNumber.matches("\\d{11}")) {
+            return Result.error(400, "请输入正确的11位手机号");
+        }
+        if (email != null && !email.isEmpty()) {
+            if (!email.contains("@")) {
+                return Result.error(400, "请输入正确的邮箱地址");
+            }
+            // 检查邮箱是否已被普通用户注册
+            if (userMapper.findByPhoneOrEmail(email) != null) {
+                return Result.error(400, "该邮箱已被用户注册");
+            }
+            // 检查邮箱是否已被其他管理员使用
+            if (adminstratorService.isEmailUsedByOtherAdmin(email, userId)) {
+                return Result.error(400, "该邮箱已被其他管理员使用");
+            }
+        }
+
+        com.word.wordlearning.entity.Adminstrator admin = new com.word.wordlearning.entity.Adminstrator();
+        admin.setUserId(userId);
+        admin.setPhoneNumber(phoneNumber);
+        admin.setEmail(email);
+
+        boolean success = adminstratorService.updateAdminProfile(admin);
+        if (success) {
+            return Result.success("个人信息更新成功");
+        } else {
+            return Result.error(500, "更新失败");
+        }
+    }
+
     @PostMapping("/changePassword")
-    public Result<String> changePassword(@RequestBody Map<String, String> body) {
-        // 打印接收到的参数，便于排查问题
-        System.out.println("========== 修改密码请求 ==========");
-        System.out.println("接收到的参数: " + body);
-        
-        String userId = body.get("userId");
+    public Result<String> changePassword(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody Map<String, String> body) {
         String oldPassword = body.get("oldPassword");
         String newPassword = body.get("newPassword");
         String confirmPassword = body.get("confirmPassword");
-        
-        // 参数校验
-        if (userId == null || userId.isEmpty()) {
-            return Result.error(400, "管理员ID不能为空");
-        }
+
         if (oldPassword == null || oldPassword.isEmpty()) {
             return Result.error(400, "原密码不能为空");
         }
@@ -204,17 +232,11 @@ public class AdminstratorController {
         if (confirmPassword == null || !newPassword.equals(confirmPassword)) {
             return Result.error(400, "两次输入的密码不一致");
         }
-        
-        // 使用前端传入的管理员ID
-        System.out.println("当前管理员ID: " + userId);
-        
+
         boolean success = adminstratorService.changePassword(userId, oldPassword, newPassword);
-        
         if (success) {
-            System.out.println("密码修改成功");
             return Result.success("密码修改成功");
         } else {
-            System.out.println("密码修改失败：原密码错误");
             return Result.error(400, "原密码错误");
         }
     }
