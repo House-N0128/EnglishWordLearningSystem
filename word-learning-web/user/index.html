@@ -3,48 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词学习平台</title>
+    <title>单词学习平台 - 首页</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        html, body {
-            height: 100%;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .stats-row { display:flex; gap:20px; margin-bottom:25px; }
-        .stat-card { background-color:white; flex:1; padding:25px; text-align:center; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .stat-title { font-size:15px; color:#333; margin-bottom:10px; }
-        .stat-number { font-size:30px; color:#007bff; font-weight:600; margin-bottom:8px; }
-        .stat-subtitle { font-size:13px; color:#999; }
-        .stat-text { font-size:24px; color:#007bff; font-weight:600; margin-bottom:8px; }
-        .module { background-color:white; border-radius:6px; padding:20px; margin-bottom:25px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .module-title { font-size:18px; color:#333; margin-bottom:20px; font-weight:500; }
-        .book-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; }
-        .book-card { border:1px solid #eee; border-radius:6px; padding:20px; }
-        .book-name { font-size:16px; font-weight:500; margin-bottom:10px; }
-        .book-info { display:flex; justify-content:space-between; font-size:13px; color:#666; margin-bottom:15px; }
-        .btn-learn { background-color:#007bff; color:white; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; width:100%; }
-        .word-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
-        .word-card { border:1px solid #eee; border-radius:6px; padding:20px; }
-        .word-name { font-size:17px; font-weight:600; margin-bottom:10px; }
-        .word-desc { font-size:13px; color:#666; margin-bottom:15px; line-height:1.5; }
-        .btn-detail { background-color:#6c757d; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:13px; }
-        .empty-hint { text-align:center; color:#999; padding:30px; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:13px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '📖';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 侧边栏 */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 0 20px 20px 0;
+            padding: 24px 0;
+            margin: 20px 0 20px 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 14px 28px;
+            cursor: pointer;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        /* 内容区域 */
+        .content-area {
+            flex: 1;
+            padding: 30px 40px;
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 28px 20px;
+            text-align: center;
+            border-radius: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-subtitle {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .stat-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        /* 模块 */
+        .module {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .module-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .module-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        /* 词书网格 */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid #eef2ff;
+        }
+
+        .book-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.15);
+            border-color: #667eea;
+        }
+
+        .book-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .book-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 18px;
+        }
+
+        .btn-learn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-learn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* 单词网格 */
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .word-card {
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid #eef2ff;
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.15);
+            border-color: #667eea;
+        }
+
+        .word-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .word-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .btn-detail {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 6px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-detail:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-hint {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        /* 页脚 */
+        footer {
+            background: #2d3748;
+            color: #aaa;
+            text-align: center;
+            padding: 25px;
+            font-size: 13px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .book-grid, .word-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-area {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -59,30 +395,30 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li style="background:#f0f7ff;color:#007bff;">首页</li>
-            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
-            <li onclick="window.location.href='../word/searchWord.html'">单词查询</li>
-            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
-            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
-            <li onclick="window.location.href='getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='cancelUser.html'">注销账号</li>
+            <li>🏠 首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">📚 词书浏览</li>
+            <li onclick="window.location.href='../word/searchWord.html'">🔍 单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">⭐ 我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">📊 学习记录</li>
+            <li onclick="window.location.href='getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-title">今日学习单词数</div>
+                <div class="stat-title">今日学习</div>
                 <div class="stat-number" id="today-count">-</div>
                 <div class="stat-subtitle">今日已学单词</div>
             </div>
             <div class="stat-card">
-                <div class="stat-title">累计学习单词数</div>
+                <div class="stat-title">累计学习</div>
                 <div class="stat-number" id="total-count">-</div>
                 <div class="stat-subtitle">累计学习单词总数</div>
             </div>
             <div class="stat-card">
-                <div class="stat-title">当前学习词书</div>
+                <div class="stat-title">当前词书</div>
                 <div class="stat-text" id="current-book">-</div>
                 <div class="stat-subtitle">点击查看学习进度</div>
             </div>
@@ -98,68 +434,109 @@
     </div>
 </div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="/api.js"></script>
 <script>
-// 如果没有登录，自动设置一个测试用户（仅用于开发测试）
+// 设置用户信息
 if (!localStorage.getItem('userId')) {
     localStorage.setItem('userId', '10010');
     localStorage.setItem('userRole', 'USER');
 }
-// 不再跳转到登录页
 
 var userId = localStorage.getItem('userId') || '';
-document.getElementById('display-name').textContent = '用户名：' + userId;
+document.getElementById('display-name').textContent = '👤 ' + userId;
 
-// stats
+// 统计数据
 apiGet('/api/records/stats').then(function(r) {
     if (r.code === 200) {
-        document.getElementById('today-count').textContent = r.data.todayCount;
-        document.getElementById('total-count').textContent = r.data.totalCount;
-        document.getElementById('current-book').textContent = r.data.currentBookName;
+        document.getElementById('today-count').textContent = r.data.todayCount || 0;
+        document.getElementById('total-count').textContent = r.data.totalCount || 0;
+        document.getElementById('current-book').textContent = r.data.currentBookName || '暂无';
     }
 });
 
-// books
+// 词书列表
 apiGet('/api/wordbooks').then(function(r) {
     var container = document.getElementById('book-grid');
     if (r.code === 200 && r.data.length > 0) {
         var html = '';
         r.data.forEach(function(b) {
-             // 获取词书ID，用于跳转
             var bookId = b.wordBookId || b.id;
+            var levelIcon = b.difficultyLevel === '初级' ? '🌱' : (b.difficultyLevel === '中级' ? '📘' : '🔥');
             html += '<div class="book-card">' +
-                '<div class="book-name">' + b.wordBookName + '</div>' +
+                '<div class="book-name">' + levelIcon + ' ' + b.wordBookName + '</div>' +
                 '<div class="book-info"><span>难度：' + b.difficultyLevel + '</span><span>' + b.wordCount + '词</span></div>' +
-                '<button class="btn-learn" onclick="window.location.href=\'../wordlearningrecord/recordWordStudy.html?bookId=' + bookId + '\'">选择学习</button>' +
+                '<button class="btn-learn" onclick="window.location.href=\'../wordlearningrecord/recordWordStudy.html?bookId=' + bookId + '\'">开始学习 →</button>' +
                 '</div>';
         });
         container.innerHTML = html;
     } else {
-        container.innerHTML = '<div class="empty-hint">暂无词书</div>';
+        container.innerHTML = '<div class="empty-hint">📭 暂无词书</div>';
     }
 });
 
-apiGet('/api/records/recent').then(function(r) {
+// 最近学习
+async function loadRecentWords() {
     var container = document.getElementById('word-grid');
-    if (r.code === 200 && r.data && r.data.length > 0) {
+    container.innerHTML = '<div class="empty-hint">⏳ 加载中...</div>';
+    
+    try {
+        const recordsRes = await apiGet('/api/records/list');
+        if (recordsRes.code !== 200 || !recordsRes.data || recordsRes.data.length === 0) {
+            container.innerHTML = '<div class="empty-hint">📭 暂无学习记录</div>';
+            return;
+        }
+        
+        const uniqueWordIds = [];
+        const seen = new Set();
+        for (let i = recordsRes.data.length - 1; i >= 0; i--) {
+            const wordId = recordsRes.data[i].wordId;
+            if (!seen.has(wordId)) {
+                seen.add(wordId);
+                uniqueWordIds.unshift(wordId);
+            }
+            if (uniqueWordIds.length >= 3) break;
+        }
+        
+        if (uniqueWordIds.length === 0) {
+            container.innerHTML = '<div class="empty-hint">📭 暂无学习记录</div>';
+            return;
+        }
+        
         var html = '';
-        r.data.forEach(function(w) {
-            // 使用单词拼写作为参数
-            var wordName = encodeURIComponent(w.englishSpelling);
-            html += '<div class="word-card">' +
-                '<div class="word-name">' + (w.englishSpelling || '-') + '</div>' +
-                '<div class="word-desc">释义：' + (w.chineseDefinition || '-') + '</div>' +
-                '<button class="btn-detail" style="margin-top:10px; background-color:#007bff; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;" onclick="window.location.href=\'../word/viewWordDetail.html?word=' + wordName + '\'">查看详情</button>' +
-                '</div>';
-        });
-        container.innerHTML = html;
-    } else {
-        container.innerHTML = '<div class="empty-hint">暂无学习记录</div>';
+        for (var wordId of uniqueWordIds) {
+            try {
+                const wordRes = await apiGet('/api/words/' + wordId);
+                if (wordRes.code === 200) {
+                    var w = wordRes.data;
+                    var spelling = w.spelling || w.englishSpelling || '-';
+                    var definition = w.definition || w.chineseDefinition || '-';
+                    var wordName = encodeURIComponent(spelling);
+                    html += '<div class="word-card">' +
+                        '<div class="word-name">📖 ' + spelling + '</div>' +
+                        '<div class="word-desc">释义：' + definition.substring(0, 50) + (definition.length > 50 ? '...' : '') + '</div>' +
+                        '<button class="btn-detail" onclick="window.location.href=\'../word/viewWordDetail.html?word=' + wordName + '\'">查看详情 →</button>' +
+                        '</div>';
+                }
+            } catch(e) {
+                console.log('获取单词详情失败:', wordId);
+            }
+        }
+        container.innerHTML = html || '<div class="empty-hint">📭 暂无学习记录</div>';
+        
+    } catch (err) {
+        console.error('加载失败:', err);
+        container.innerHTML = '<div class="empty-hint">⚠️ 加载失败，请稍后重试</div>';
     }
-});
+}
+
+loadRecentWords();
 </script>
 </body>
 </html>

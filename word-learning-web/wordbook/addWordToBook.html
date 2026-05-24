@@ -13,66 +13,60 @@
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            background-color: #f5f5f5;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         .top-nav {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background-color: #dc3545;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            box-shadow: 0 2px 15px rgba(220,53,69,0.3);
+            padding: 12px 20px;
         }
 
         .nav-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            letter-spacing: 1px;
         }
 
         .user-area {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .user-name {
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .btn-logout {
             background-color: rgba(255,255,255,0.2);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
+            font-size: 13px;
         }
 
         .btn-logout:hover {
             background-color: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
         }
 
         .main-container {
             display: flex;
             flex: 1;
-            min-height: calc(100vh - 60px);
         }
 
         .sidebar {
-            width: 200px;
-            background: white;
-            border-right: 1px solid #e0e0e0;
-            padding: 25px 0;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #eee;
+            padding: 20px 0;
         }
 
         .sidebar-menu {
@@ -80,19 +74,17 @@
         }
 
         .sidebar-menu li {
-            padding: 14px 25px;
+            padding: 12px 25px;
             cursor: pointer;
-            color: #444;
+            color: #333;
             font-size: 15px;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
+            transition: background-color 0.2s;
         }
 
         .sidebar-menu li:hover,
         .sidebar-menu li.active {
-            background-color: #fff5f5;
+            background-color: #f8d7da;
             color: #dc3545;
-            border-left-color: #dc3545;
         }
 
         .sidebar-menu .sub-item {
@@ -103,179 +95,149 @@
 
         .content-area {
             flex: 1;
-            padding: 35px;
+            padding: 25px;
         }
 
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .page-title {
-            font-size: 26px;
+            font-size: 22px;
             color: #333;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .page-icon {
-            font-size: 28px;
         }
 
         .header-info {
-            font-size: 15px;
+            font-size: 14px;
             color: #666;
-            margin-top: 8px;
-            padding: 10px 15px;
-            background: #fff9c4;
-            border-radius: 8px;
-            display: inline-block;
+            margin-top: 5px;
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 14px;
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            background-color: #6c757d;
             color: white;
         }
 
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108,117,141,0.4);
+            background-color: #5a6268;
         }
 
         .btn-green {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            background-color: #28a745;
             color: white;
         }
 
         .btn-green:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40,167,69,0.4);
+            background-color: #218838;
         }
 
         .btn-blue {
-            background: linear-gradient(135deg, #007bff 0%, #0069d9 100%);
+            background-color: #007bff;
             color: white;
         }
 
         .btn-blue:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+            background-color: #0069d9;
         }
 
         .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 30px;
-            margin-bottom: 25px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 20px;
         }
 
         .card-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
         }
 
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            font-size: 15px;
-            color: #444;
-            margin-bottom: 10px;
-            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .form-control {
             width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: #fafafa;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
         .form-control:focus {
             outline: none;
             border-color: #dc3545;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         }
 
         .input-tip {
-            font-size: 13px;
-            color: #888;
-            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
         }
 
         .btn-group {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .upload-area {
-            border: 2px dashed #e0e0e0;
-            border-radius: 15px;
-            padding: 50px 20px;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            padding: 40px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            background: #fafafa;
+            transition: border-color 0.2s;
         }
 
         .upload-area:hover {
             border-color: #dc3545;
-            background: #fff5f5;
         }
 
         .upload-area.dragover {
             border-color: #dc3545;
-            background: #fff5f5;
-            transform: scale(1.02);
+            background-color: #fff5f5;
         }
 
         .upload-icon {
-            font-size: 56px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: 15px;
         }
 
         .upload-text {
-            font-size: 16px;
-            color: #444;
-            font-weight: 500;
+            font-size: 14px;
+            color: #666;
         }
 
         .upload-hint {
-            font-size: 13px;
-            color: #888;
-            margin-top: 10px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
         }
 
         #fileInput {
@@ -293,38 +255,28 @@
         }
 
         th, td {
-            padding: 16px 20px;
+            padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
         }
 
         th {
-            background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+            background-color: #f8f9fa;
             font-weight: 600;
-            color: #444;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 1px;
-        }
-
-        tr {
-            transition: all 0.3s;
+            color: #333;
         }
 
         tr:hover {
-            background-color: #fff8f0;
-            transform: scale(1.002);
+            background-color: #f8f9fa;
         }
 
         .status-success {
             color: #28a745;
-            font-weight: 600;
         }
 
         .status-error {
             color: #dc3545;
-            font-weight: 600;
         }
 
         #loadingOverlay {
@@ -343,53 +295,42 @@
         .loading-text {
             color: white;
             font-size: 16px;
-            background: rgba(255,255,255,0.1);
-            padding: 20px 40px;
-            border-radius: 10px;
         }
 
         #toastMsg {
             position: fixed;
-            top: 30px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 16px 28px;
-            border-radius: 10px;
+            padding: 12px 24px;
+            border-radius: 6px;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             opacity: 0;
-            transition: all 0.3s;
+            transition: opacity 0.3s;
             z-index: 2000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .tab-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .tab-btn {
-            padding: 14px 28px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            background-color: white;
-            transition: all 0.3s;
-        }
-
-        .tab-btn:hover:not(.active) {
-            border-color: #dc3545;
-            color: #dc3545;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #ddd;
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background-color: #dc3545;
             color: white;
             border-color: #dc3545;
-            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
         }
 
         .tab-content {
@@ -402,24 +343,22 @@
 
         .search-results {
             margin-top: 15px;
-            max-height: 250px;
+            max-height: 200px;
             overflow-y: auto;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
             display: none;
-            background: white;
         }
 
         .search-result-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background-color 0.2s;
         }
 
         .search-result-item:hover {
-            background-color: #fff5f5;
-            padding-left: 25px;
+            background-color: #f8f9fa;
         }
 
         .search-result-item:last-child {
@@ -429,30 +368,28 @@
         .result-word {
             font-weight: 600;
             color: #333;
-            font-size: 15px;
         }
 
         .result-definition {
             color: #666;
-            font-size: 14px;
-            margin-top: 5px;
+            font-size: 13px;
+            margin-top: 4px;
         }
 
         .search-tip {
-            font-size: 13px;
-            color: #888;
-            padding: 15px;
+            font-size: 12px;
+            color: #999;
+            padding: 10px 15px;
             text-align: center;
         }
 
         .selected-badge {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background-color: #dc3545;
             color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 3px;
             font-size: 12px;
-            font-weight: 500;
-            margin-left: 12px;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -480,37 +417,36 @@
         <div class="content-area">
             <div class="page-header">
                 <div>
-                    <h1 class="page-title"><span class="page-icon">➕</span>给词书添加单词</h1>
+                    <h1 class="page-title">给词书添加单词</h1>
                     <div class="header-info" id="bookInfo"></div>
                 </div>
                 <div>
-                    <button class="btn btn-secondary" id="backBtn">🔙 返回词书管理</button>
+                    <button class="btn btn-secondary" id="backBtn">返回词书管理</button>
                 </div>
             </div>
 
             <div class="tab-container">
-                <button class="tab-btn active" id="singleTab">📝 单个添加</button>
-                <button class="tab-btn" id="batchTab">📊 批量添加</button>
+                <button class="tab-btn active" id="singleTab">单个添加</button>
+                <button class="tab-btn" id="batchTab">批量添加</button>
             </div>
 
             <div class="card tab-content active" id="singleForm">
-                <div class="card-title">📝 单个添加单词</div>
+                <div class="card-title">单个添加单词</div>
                 <form id="singleAddForm">
                     <div class="form-group">
-                        <label>🔤 英文拼写 * <span style="font-weight:normal;color:#999;">- 输入后自动搜索已有单词</span></label>
+                        <label>英文拼写 * <span style="font-weight:normal;color:#999;">- 输入后自动搜索已有单词</span></label>
                         <input type="text" class="form-control" id="englishSpelling" placeholder="请输入英文单词">
                         <div class="search-results" id="searchResults"></div>
                     </div>
                     <div class="form-group">
-                        <label>📖 中文释义 *</label>
+                        <label>中文释义 *</label>
                         <input type="text" class="form-control" id="chineseDefinition" placeholder="请输入中文释义">
                     </div>
                     <div class="form-group">
-                        <label>🔊 音标</label>
+                        <label>音标</label>
                         <input type="text" class="form-control" id="phoneticSymbol" placeholder="请输入音标">
                     </div>
                     <div class="form-group">
-<<<<<<< HEAD
                         <label>词性</label>
                         <select class="form-control" id="partOfSpeech">
                             <option value="">请选择词性</option>
@@ -527,89 +463,71 @@
                     </div>
                     <div class="form-group">
                         <label>例句</label>
-=======
-                        <label>🏷️ 词性</label>
-                        <select class="form-control" id="partOfSpeech">
-                            <option value="">请选择词性</option>
-                            <option value="n.">📌 名词 (n.)</option>
-                            <option value="v.">🎯 动词 (v.)</option>
-                            <option value="adj.">🌈 形容词 (adj.)</option>
-                            <option value="adv.">⚡ 副词 (adv.)</option>
-                            <option value="prep.">🔗 介词 (prep.)</option>
-                            <option value="conj.">🔄 连词 (conj.)</option>
-                            <option value="pron.">👤 代词 (pron.)</option>
-                            <option value="num.">🔢 数词 (num.)</option>
-                            <option value="interj.">💬 感叹词 (interj.)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>💬 例句</label>
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
                         <textarea class="form-control" id="exampleSentence" rows="3" placeholder="请输入例句"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>🔊 音频链接</label>
+                        <label>音频链接</label>
                         <input type="text" class="form-control" id="wordPronunciation" placeholder="请输入单词发音音频URL">
-                        <div class="input-tip">💡 支持 MP3、WAV 等格式的音频链接</div>
+                        <div class="input-tip">支持 MP3、WAV 等格式的音频链接</div>
                     </div>
                     <div class="form-group">
-                        <label>🖼️ 图片链接</label>
+                        <label>图片链接</label>
                         <input type="text" class="form-control" id="wordImage" placeholder="请输入单词示意图URL">
-                        <div class="input-tip">💡 支持 JPG、PNG、GIF 等格式的图片链接</div>
+                        <div class="input-tip">支持 JPG、PNG、GIF 等格式的图片链接</div>
                     </div>
                     <div class="form-group">
-                        <label>🔄 添加方式</label>
-                        <div style="display:flex;gap:30px;">
-                            <label style="cursor:pointer;font-size:15px;">
-                                <input type="radio" name="addType" value="new" checked> ✨ 新建单词
+                        <label>添加方式</label>
+                        <div style="display:flex;gap:20px;">
+                            <label style="cursor:pointer;">
+                                <input type="radio" name="addType" value="new" checked> 新建单词
                             </label>
-                            <label style="cursor:pointer;font-size:15px;">
-                                <input type="radio" name="addType" value="existing" id="existingRadio"> 🔍 选择已有单词
+                            <label style="cursor:pointer;">
+                                <input type="radio" name="addType" value="existing" id="existingRadio"> 选择已有单词
                             </label>
                         </div>
                         <input type="hidden" id="selectedWordId">
                     </div>
                     <div class="btn-group">
-                        <button type="submit" class="btn btn-green">✅ 添加到词书</button>
-                        <button type="button" class="btn btn-secondary" onclick="clearSingleForm()">🔄 重置</button>
+                        <button type="submit" class="btn btn-green">添加到词书</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearSingleForm()">重置</button>
                     </div>
                 </form>
             </div>
 
             <div class="card tab-content" id="batchForm">
-                <div class="card-title">📊 批量添加单词</div>
+                <div class="card-title">批量添加单词</div>
                 
                 <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
+                    <div class="upload-icon">📊</div>
                     <div class="upload-text">点击选择 Excel 文件或拖拽文件到这里</div>
                     <div class="upload-hint">支持 .xlsx 格式，文件大小不超过 10MB</div>
                     <input type="file" id="fileInput" accept=".xlsx,.xls">
                 </div>
 
-                <div style="margin-top: 25px;">
-                    <button class="btn btn-blue" id="downloadTemplateBtn">📥 下载模板文件</button>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-blue" id="downloadTemplateBtn">下载模板文件</button>
                 </div>
 
-                <div id="batchResult" style="display:none; margin-top: 25px;">
-                    <h4 style="margin-bottom: 20px;font-size:18px;font-weight:600;color:#333;">📋 导入结果</h4>
+                <div id="batchResult" style="display:none; margin-top: 20px;">
+                    <h4 style="margin-bottom: 15px;">导入结果</h4>
                     <div class="table-area">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>📋 序号</th>
-                                    <th>🔤 英文拼写</th>
-                                    <th>📖 中文释义</th>
-                                    <th>📊 状态</th>
-                                    <th>📝 备注</th>
+                                    <th>序号</th>
+                                    <th>英文拼写</th>
+                                    <th>中文释义</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
                                 </tr>
                             </thead>
                             <tbody id="resultTableBody">
                             </tbody>
                         </table>
                     </div>
-                    <div style="margin-top: 20px; font-size: 15px;">
-                        <span style="color:#28a745;font-weight:600;">✅ 成功: <span id="successCount">0</span> 个</span>
-                        <span style="margin-left: 30px; color:#dc3545;font-weight:600;">❌ 失败: <span id="failCount">0</span> 个</span>
+                    <div style="margin-top: 15px; font-size: 14px;">
+                        <span style="color:#28a745;">成功: <span id="successCount">0</span> 个</span>
+                        <span style="margin-left: 20px; color:#dc3545;">失败: <span id="failCount">0</span> 个</span>
                     </div>
                 </div>
             </div>
@@ -681,8 +599,13 @@
             searchTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/words/search?keyword=${encodeURIComponent(keyword)}`);
-                    const data = await response.json();
-                    displaySearchResults(data);
+                    const result = await response.json();
+                    
+                    if (result.code === 200 && result.data && result.data.length > 0) {
+                        displaySearchResults(result.data);
+                    } else {
+                        document.getElementById('searchResults').style.display = 'none';
+                    }
                 } catch (error) {
                     console.error('搜索失败:', error);
                 }
@@ -690,7 +613,6 @@
         });
 
         function displaySearchResults(words) {
-<<<<<<< HEAD
     const resultsDiv = document.getElementById('searchResults');
     resultsDiv.innerHTML = words.map(word => `
         <div class="search-result-item" onclick="selectExistingWord('${word.wordId}', '${word.englishSpelling}', '${word.chineseDefinition}', '${word.phoneticSymbol || ''}', '${word.partOfSpeech || ''}', '${word.exampleSentence || ''}', '${word.wordPronunciation || ''}', '${word.wordImage || ''}')">
@@ -717,54 +639,18 @@
     displaySearchResults([{wordId, englishSpelling: spelling, chineseDefinition: definition}]);
 }
 
-=======
-            const searchResults = document.getElementById('searchResults');
-            if (!words || words.length === 0) {
-                searchResults.innerHTML = '<div class="search-tip">未找到匹配的单词</div>';
-                searchResults.style.display = 'block';
-                return;
-            }
-
-            searchResults.innerHTML = words.map(word => `
-                <div class="search-result-item" onclick="selectExistingWord('${word.id}', '${word.spelling}', '${word.definition}', '${word.phonetic || ''}', '${word.partOfSpeech || ''}', '${word.exampleSentence || ''}', '${word.pronunciation || ''}', '${word.image || ''}')">
-                    <div class="result-word">${word.spelling} ${word.partOfSpeech ? `(${word.partOfSpeech})` : ''}</div>
-                    <div class="result-definition">${word.definition}</div>
-                </div>
-            `).join('');
-            searchResults.style.display = 'block';
-        }
-
-        function selectExistingWord(wordId, spelling, definition, phonetic, partOfSpeech, example, pronunciation, image) {
-            document.getElementById('englishSpelling').value = spelling;
-            document.getElementById('chineseDefinition').value = definition;
-            document.getElementById('phoneticSymbol').value = phonetic;
-            document.getElementById('partOfSpeech').value = partOfSpeech;
-            document.getElementById('exampleSentence').value = example;
-            document.getElementById('wordPronunciation').value = pronunciation;
-            document.getElementById('wordImage').value = image;
-            document.getElementById('selectedWordId').value = wordId;
-            document.getElementById('existingRadio').checked = true;
-            document.getElementById('searchResults').style.display = 'none';
-        }
-
-        function clearSingleForm() {
-            document.getElementById('singleAddForm').reset();
-            document.getElementById('selectedWordId').value = '';
-            document.getElementById('searchResults').style.display = 'none';
-        }
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
 
         document.getElementById('singleAddForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const wordBookId = getUrlParam('wordBookId');
-            if (!wordBookId) {
-                showMessage('词书ID无效', true);
+            const bookId = getUrlParam('bookId');
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
                 return;
             }
 
+            const addType = document.querySelector('input[name="addType"]:checked').value;
             const selectedWordId = document.getElementById('selectedWordId').value;
-<<<<<<< HEAD
             
             if (addType === 'existing') {
                 if (!selectedWordId) {
@@ -780,12 +666,22 @@
                 const exampleSentence = document.getElementById('exampleSentence').value.trim();
                 const wordPronunciation = document.getElementById('wordPronunciation').value.trim();
                 const wordImage = document.getElementById('wordImage').value.trim();
-=======
-            const addType = document.querySelector('input[name="addType"]:checked').value;
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
 
+                if (!englishSpelling) {
+                    showMessage('请输入英文拼写', true);
+                    return;
+                }
+                if (!chineseDefinition) {
+                    showMessage('请输入中文释义', true);
+                    return;
+                }
+
+                await addNewWordToBook(bookId, englishSpelling, chineseDefinition, phoneticSymbol, partOfSpeech, exampleSentence, wordPronunciation, wordImage);
+            }
+        });
+
+        async function addNewWordToBook(bookId, englishSpelling, chineseDefinition, phoneticSymbol, partOfSpeech, exampleSentence, pronunciation, image) {
             showLoading();
-<<<<<<< HEAD
             try {
                 const response = await fetch(`${API_BASE_URL}/words`, {
                     method: 'POST',
@@ -793,7 +689,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                            wordId: 'WD' + Date.now(),
+                            wordId: 'WD' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 100).toString().padStart(2, '0'),
                             wordBookId: bookId,
                             englishSpelling: englishSpelling,
                             chineseDefinition: chineseDefinition,
@@ -805,68 +701,45 @@
                         })
                 });
                 const result = await response.json();
-=======
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
 
-            try {
-                let response;
-                
-                if (addType === 'existing' && selectedWordId) {
-                    // 添加已有单词到词书
-                    response = await fetch(`${API_BASE_URL}/wordbooks/${wordBookId}/words/${selectedWordId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                } else {
-                    // 添加新单词
-                    const wordData = {
-                        spelling: document.getElementById('englishSpelling').value,
-                        definition: document.getElementById('chineseDefinition').value,
-                        phonetic: document.getElementById('phoneticSymbol').value,
-                        partOfSpeech: document.getElementById('partOfSpeech').value,
-                        exampleSentence: document.getElementById('exampleSentence').value,
-                        pronunciation: document.getElementById('wordPronunciation').value,
-                        image: document.getElementById('wordImage').value
-                    };
-
-                    response = await fetch(`${API_BASE_URL}/wordbooks/${wordBookId}/words`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(wordData)
-                    });
-                }
-
-                if (response.ok) {
-                    showMessage('添加成功！');
+                if (result.code === 200) {
+                    showMessage('添加成功');
                     clearSingleForm();
                 } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.message || '添加失败', true);
+                    showMessage('添加失败: ' + result.message, true);
                 }
             } catch (error) {
-                console.error('添加失败:', error);
-                showMessage('添加失败，请稍后重试', true);
+                showMessage('网络请求失败: ' + error.message, true);
             } finally {
                 hideLoading();
             }
-<<<<<<< HEAD
         }
 
         async function addExistingWordToBook(bookId, wordId) {
             showLoading();
             try {
-                const response = await fetch(`${API_BASE_URL}/words/batch`, {
+                // 先获取已有单词的详细信息
+                const wordResponse = await fetch(`${API_BASE_URL}/words/${wordId}`);
+                const wordResult = await wordResponse.json();
+                
+                if (wordResult.code !== 200) {
+                    showMessage('获取单词信息失败', true);
+                    return;
+                }
+                
+                const wordData = wordResult.data;
+                
+                // 使用 /api/words 接口来关联已有的单词，避免触发 batch 接口的 MAX 查询
+                const response = await fetch(`${API_BASE_URL}/words`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
+                        wordId: wordId,
                         wordBookId: bookId,
-                        words: [{wordId: wordId, englishSpelling: '', chineseDefinition: ''}]
+                        englishSpelling: wordData.englishSpelling || wordData.spelling || '',
+                        chineseDefinition: wordData.chineseDefinition || wordData.definition || ''
                     })
                 });
                 const result = await response.json();
@@ -902,111 +775,80 @@
 
         uploadArea.addEventListener('click', () => {
             fileInput.click();
-=======
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
         });
 
-        document.getElementById('uploadArea').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
-
-        document.getElementById('uploadArea').addEventListener('dragover', (e) => {
+        uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            document.getElementById('uploadArea').classList.add('dragover');
+            uploadArea.classList.add('dragover');
         });
 
-        document.getElementById('uploadArea').addEventListener('dragleave', () => {
-            document.getElementById('uploadArea').classList.remove('dragover');
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
         });
 
-        document.getElementById('uploadArea').addEventListener('drop', (e) => {
+        uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            document.getElementById('uploadArea').classList.remove('dragover');
+            uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                handleFileUpload(files[0]);
+                handleFile(files[0]);
             }
         });
 
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                handleFileUpload(file);
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
             }
         });
 
-        function handleFileUpload(file) {
-            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-                showMessage('请选择Excel文件', true);
+        async function handleFile(file) {
+            const bookId = getUrlParam('bookId');
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
                 return;
             }
 
-            const wordBookId = getUrlParam('wordBookId');
-            if (!wordBookId) {
-                showMessage('词书ID无效', true);
+            if (!file.name.match(/\.(xlsx|xls)$/)) {
+                showMessage('请选择 Excel 文件', true);
                 return;
             }
 
             showLoading();
 
-            const formData = new FormData();
-            formData.append('file', file);
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('wordBookId', bookId);
 
-            fetch(`${API_BASE_URL}/wordbooks/${wordBookId}/words/batch`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+                const importResponse = await fetch(`${API_BASE_URL}/words/batch/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const importResult = await importResponse.json();
+
+                if (importResult.code === 200) {
+                    const { successCount, failCount } = importResult.data;
+                    
+                    document.getElementById('successCount').textContent = successCount;
+                    document.getElementById('failCount').textContent = failCount;
+                    document.getElementById('batchResult').style.display = 'block';
+                    
+                    showMessage(`成功导入 ${successCount} 个单词并关联到词书`);
+                } else {
+                    showMessage('批量导入失败: ' + importResult.message, true);
+                }
+            } catch (error) {
+                showMessage('批量导入失败: ' + error.message, true);
+            } finally {
                 hideLoading();
-                displayBatchResult(data);
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('批量导入失败:', error);
-                showMessage('批量导入失败，请稍后重试', true);
-            });
-        }
-
-        function displayBatchResult(results) {
-            const resultTableBody = document.getElementById('resultTableBody');
-            const successCount = document.getElementById('successCount');
-            const failCount = document.getElementById('failCount');
-
-            resultTableBody.innerHTML = results.map((item, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.spelling || '-'}</td>
-                    <td>${item.definition || '-'}</td>
-                    <td class="${item.success ? 'status-success' : 'status-error'}">
-                        ${item.success ? '成功' : '失败'}
-                    </td>
-                    <td>${item.message || '-'}</td>
-                </tr>
-            `).join('');
-
-            const success = results.filter(r => r.success).length;
-            successCount.textContent = success;
-            failCount.textContent = results.length - success;
-
-            document.getElementById('batchResult').style.display = 'block';
+            }
         }
 
         document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
-<<<<<<< HEAD
             const templateContent = `spelling,part_of_speech,definition,example_sentence,phonetic,pronunciation_url,image_url
 abandon,v.,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,,
 ability,n.,能力，才能,She has the ability to learn languages quickly.,/əˈbɪləti/,,`;
             
-=======
-            const templateContent = `英文拼写,词性,中文释义,音标,例句,音频链接,图片链接
-abandon,v.,抛弃，放弃,/əˈbændən/,He abandoned his plan.,,
-ability,n.,能力，才能,/əˈbɪləti/,She has the ability to learn quickly.,,
-absolutely,adv.,绝对地，完全地,/ˈæbsəluːtli/,I absolutely agree with you.,,
-absorb,v.,吸收，吸引,/əbˈsɔːrb/,Plants absorb carbon dioxide.,,
-abstract,adj.,抽象的,/ˈæbstrækt/,This is an abstract concept.,,`;
-
->>>>>>> 995894eba633b69f85282073cd76ebb5d5253377
             const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1014,46 +856,53 @@ abstract,adj.,抽象的,/ˈæbstrækt/,This is an abstract concept.,,`;
             link.click();
         });
 
-        document.getElementById('backBtn').addEventListener('click', () => {
-            window.location.href = 'manageWordBookAdmin.html';
-        });
+        function goBack() {
+            window.location.href = "manageWordBookAdmin.html";
+        }
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            window.location.href = '../login.html';
-        });
-
-        document.getElementById('menuAdminHome').addEventListener('click', () => {
-            window.location.href = '../admin/indexAdmin.html';
-        });
-
-        document.getElementById('menuPersonal').addEventListener('click', () => {
-            window.location.href = '../admin/adminPersonal.html';
-        });
-
-        document.getElementById('menuUserManage').addEventListener('click', () => {
-            window.location.href = '../admin/manageUserAdmin.html';
-        });
-
-        document.getElementById('menuManageWord').addEventListener('click', () => {
-            window.location.href = '../word/manageWordAdmin.html';
-        });
-
-        document.getElementById('menuLearningRecord').addEventListener('click', () => {
-            window.location.href = 'learningRecordQuery.html';
-        });
-
-        // 页面加载时获取词书信息
-        document.addEventListener('DOMContentLoaded', async () => {
-            const wordBookId = getUrlParam('wordBookId');
-            if (wordBookId) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/wordbooks/${wordBookId}`);
-                    const data = await response.json();
-                    document.getElementById('bookInfo').textContent = `当前词书: ${data.name || '未知'} | 难度等级: ${data.level || '未设置'}`;
-                } catch (error) {
-                    console.error('获取词书信息失败:', error);
-                }
+        function handleLogout() {
+            if (confirm("确定要退出登录吗？")) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userInfo');
+                showMessage("已退出登录，跳转至登录页");
+                setTimeout(() => {
+                    window.location.href = "../admin/signin.html";
+                }, 500);
             }
+        }
+
+        function setupSidebarNavigation() {
+            const menuItems = {
+                'menuAdminHome': '../admin/indexAdmin.html',
+                'menuPersonal': '../admin/adminPersonal.html',
+                'menuUserManage': '../admin/manageUserAdmin.html',
+                'menuLearningRecord': '../wordlearningrecord/viewUserLearningRecords.html',
+                'menuManageWord': '../word/manageWordAdmin.html'
+            };
+
+            Object.keys(menuItems).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('click', () => {
+                        window.location.href = menuItems[id];
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookId = getUrlParam('bookId');
+            
+            if (!bookId) {
+                showMessage('未指定词书ID', true);
+                return;
+            }
+
+            document.getElementById('bookInfo').textContent = `当前词书ID: ${bookId}`;
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            setupSidebarNavigation();
         });
     </script>
 </body>
