@@ -277,7 +277,7 @@ public class WordSearchActivity extends AppCompatActivity {
 
     private void filterWords() {
         String kw = etSearch.getText().toString().trim().toLowerCase();
-        String selectedBook = spBook.getSelectedItem() != null ? spBook.getSelectedItem().toString() : "所属词书";
+        String selectedBook = (spBook != null && spBook.getSelectedItem() != null) ? spBook.getSelectedItem().toString() : "所属词书";
         String filterBookId = null;
         if (!"所属词书".equals(selectedBook) && !"全部".equals(selectedBook)) {
             filterBookId = bookNameToId.get(selectedBook);
@@ -322,7 +322,10 @@ public class WordSearchActivity extends AppCompatActivity {
             } else {
                 LinearLayout card = new LinearLayout(this);
                 card.setOrientation(LinearLayout.HORIZONTAL); card.setPadding(dp(16), dp(16), dp(16), dp(16));
-                card.setBackground(getDrawable(R.drawable.bg_white_card)); card.setElevation(dp(2)); card.setGravity(Gravity.CENTER_VERTICAL);
+                GradientDrawable cardBg = new GradientDrawable();
+                cardBg.setColor(0xFFFFFFFF);
+                cardBg.setCornerRadius(dp(18));
+                card.setBackground(cardBg); card.setElevation(dp(2)); card.setGravity(Gravity.CENTER_VERTICAL);
                 card.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) {{ setMargins(0, 0, 0, dp(12)); }});
                 LinearLayout left = new LinearLayout(this); left.setOrientation(LinearLayout.VERTICAL);
                 left.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -331,7 +334,10 @@ public class WordSearchActivity extends AppCompatActivity {
                 card.addView(left);
                 Button detailBtn = new Button(this); detailBtn.setText("查看详情"); detailBtn.setTextSize(14); detailBtn.setTextColor(0xFFFFFFFF);
                 detailBtn.setPadding(dp(20), dp(8), dp(20), dp(8)); detailBtn.setMinHeight(0); detailBtn.setMinimumHeight(0);
-                detailBtn.setBackground(getDrawable(R.drawable.bg_btn_primary));
+                GradientDrawable btnBg = new GradientDrawable();
+                btnBg.setColor(0xFF318af8);
+                btnBg.setCornerRadius(dp(8));
+                detailBtn.setBackground(btnBg);
                 detailBtn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT) {{ setMargins(dp(16), 0, 0, 0); }});
                 String fId = wordId;
                 detailBtn.setOnClickListener(v -> { Intent in = new Intent(this, WordDetailActivity.class); in.putExtra("wordId", fId); startActivity(in); });
