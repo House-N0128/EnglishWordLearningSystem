@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
@@ -143,11 +144,11 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show();
                         navigateToHome();
                     } else {
-                        String enhancedMessage = enhanceErrorMessage(code, message);
-                        showError(enhancedMessage);
+                        handleLoginError(code, message);
                     }
                 });
             } catch (Exception e) {
+                Log.e(TAG, "登录异常: " + e.getMessage(), e);
                 runOnUiThread(() -> {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("登录");
@@ -155,6 +156,53 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         }).start();
+    }
+
+    private void handleLoginError(int code, String message) {
+        Log.d(TAG, "处理登录错误 - code: " + code + ", message: " + message);
+
+        // 检查消息中是否包含账号被禁用/冻结的信息
+        if (message != null && (message.contains("禁用") || message.contains("冻结") ||
+                message.contains("封禁") || message.contains("disabled") || message.contains("freeze"))) {
+            Log.d(TAG, "检测到账号被禁用/冻结: " + message);
+            showDisabledAccountDialog(message);
+            return;
+        }
+
+        // 其他错误使用常规提示
+        String enhancedMessage = enhanceErrorMessage(code, message);
+        showError(enhancedMessage);
+    }
+
+    private void showDisabledAccountDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("⚠️ 账号已被禁用");
+
+        builder.setMessage("您的账号已被禁用，无法登录\n\n" +
+                "后端返回信息：" + message + "\n\n" +
+                "可能的原因：\n" +
+                "• 违反平台使用规定\n" +
+                "• 异常登录行为\n" +
+                "• 被管理员手动禁用\n\n" +
+                "如需解封，请联系客服：\n" +
+                "📧 support@wordlearning.com\n" +
+                "📞 400-xxx-xxxx");
+
+        builder.setPositiveButton("我知道了", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        builder.setNegativeButton("联系客服", (dialog, which) -> {
+            Toast.makeText(this, "客服邮箱：support@wordlearning.com", Toast.LENGTH_LONG).show();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+
+        // 设置按钮颜色
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(0xFF3577ef);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(0xFFd93025);
     }
 
     private void showError(String msg) {
