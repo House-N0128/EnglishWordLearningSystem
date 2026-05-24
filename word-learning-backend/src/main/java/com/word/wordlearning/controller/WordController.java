@@ -218,6 +218,7 @@ public class WordController {
                 nw.setWordId(wordId);
                 nw.setEnglishSpelling(spelling);
                 nw.setChineseDefinition(definition);
+                nw.setPartOfSpeech(w.getOrDefault("partOfSpeech", ""));
                 nw.setPhoneticSymbol(w.getOrDefault("phoneticSymbol", ""));
                 nw.setExampleSentence(w.getOrDefault("exampleSentence", ""));
                 nw.setWordPronunciation(w.getOrDefault("wordPronunciation", ""));
