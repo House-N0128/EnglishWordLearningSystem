@@ -17,15 +17,7 @@ import okhttp3.Response;
 
 public class ApiClient {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-<<<<<<< HEAD
-    // 如果用 Android 模拟器（模拟器和电脑在同一台机器）：
     private static final String BASE_URL = "http://10.0.2.2:8080";
-
-    // 如果用真机测试（手机和电脑连同一个 WiFi）：
-    //private static final String BASE_URL = "http://你电脑的局域网IP:8080";
-=======
-    private static final String BASE_URL = "http://10.0.2.2:8080";
->>>>>>> 62adab6170de6557610ee7c2fc43a1de8e0eff8b
     private static ApiClient instance;
 
     private final OkHttpClient client;
