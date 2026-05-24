@@ -170,6 +170,9 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (code == 401) {
+            if (originalMessage != null && originalMessage.contains("禁用")) {
+                return "账号已被禁用，请联系客服";
+            }
             return "账号或密码错误\n如未注册请先注册";
         }
 

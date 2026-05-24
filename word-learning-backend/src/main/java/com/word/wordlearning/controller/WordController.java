@@ -89,6 +89,9 @@ public class WordController {
         
         // 如果提供了词书ID，则建立关联
         if (bookId != null && !bookId.trim().isEmpty()) {
+            if (wordMapper.existsBookRef(bookId, wordId) > 0) {
+                return Result.error(400, "该单词已在此词书中，无需重复添加");
+            }
             wordMapper.insertBookRef(bookId, wordId);
             wordBookMapper.syncWordCount(bookId);
         }
@@ -185,7 +188,7 @@ public class WordController {
     }
 
     @PostMapping("/batch")
-    public Result<String> batchAdd(@RequestBody Map<String, Object> body) {
+    public Result<Map<String, Object>> batchAdd(@RequestBody Map<String, Object> body) {
         String bookId = (String) body.get("wordBookId");
         boolean hasBook = bookId != null && !bookId.trim().isEmpty();
 
@@ -194,6 +197,7 @@ public class WordController {
         if (words == null || words.isEmpty()) return Result.error(400, "单词列表为空");
 
         int success = 0, fail = 0, skipped = 0;
+        List<String> skippedWords = new ArrayList<>();
         Integer maxNum = wordMapper.maxWordIdNum();
         int idSeq = (maxNum == null) ? 1 : maxNum + 1;
         for (Map<String, String> w : words) {
@@ -203,7 +207,7 @@ public class WordController {
                 if (spelling == null || definition == null) { fail++; continue; }
 
                 Word exist = wordMapper.findBySpelling(spelling);
-                if (exist != null) { skipped++; continue; }
+                if (exist != null) { skipped++; skippedWords.add(spelling); continue; }
 
                 String wordId = w.get("wordId");
                 if (wordId == null || wordId.isEmpty()) {
@@ -224,10 +228,12 @@ public class WordController {
             } catch (Exception e) { fail++; }
         }
         if (hasBook) wordBookMapper.syncWordCount(bookId);
-        String msg = "成功" + success + "个";
-        if (skipped > 0) msg += "，跳过" + skipped + "个已存在";
-        if (fail > 0) msg += "，失败" + fail + "个";
-        return Result.success(msg);
+        Map<String, Object> result = new HashMap<>();
+        result.put("newCount", success);
+        result.put("skippedCount", skipped);
+        result.put("failCount", fail);
+        result.put("skippedWords", skippedWords);
+        return Result.success(result);
     }
 
     // 支持Excel文件上传的批量导入接口

@@ -60,12 +60,4 @@ public class AdminstratorService {
         adminstratorMapper.updatePassword(userId, newPassword);
         return true;
     }
-
-    public boolean updateAdminProfile(Adminstrator admin) {
-        return adminstratorMapper.updateProfile(admin) > 0;
-    }
-
-    public boolean isEmailUsedByOtherAdmin(String email, String excludeUserId) {
-        return adminstratorMapper.findByEmailExcludeSelf(email, excludeUserId) != null;
-    }
 }

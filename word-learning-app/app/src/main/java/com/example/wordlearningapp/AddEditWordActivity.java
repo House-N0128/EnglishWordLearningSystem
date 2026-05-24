@@ -210,7 +210,7 @@ public class AddEditWordActivity extends AppCompatActivity {
     private void buildBatchMode(LinearLayout parent) {
         // Template hint
         TextView templateHint = new TextView(this);
-        templateHint.setText("Excel模板（第一行为表头，至少需要spelling和definition两列）:\nspelling, definition, example_sentence, phonetic, pronunciation_url, image_url");
+        templateHint.setText("Excel模板（第一行为表头）:\nspelling, part_of_speech, definition, example_sentence, phonetic, pronunciation_url, image_url\n至少需要 spelling 和 definition 两列");
         templateHint.setTextSize(12);
         templateHint.setTextColor(0xFF8899aa);
         templateHint.setPadding(0, 0, 0, dp(12));
