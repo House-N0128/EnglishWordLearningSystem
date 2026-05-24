@@ -31,6 +31,8 @@ android {
     }
 }
 
+// ... existing code ...
+
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -43,4 +45,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }
