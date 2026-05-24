@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.wordlearningapp.api.ApiClient;
 import com.example.wordlearningapp.util.AuthManager;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvUsername, tvToday, tvTotal, tvBook;
     private LinearLayout cardCurrentBook, bookList, recentWords;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private String currentBookId = "";
 
     @Override
@@ -44,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
         cardCurrentBook = findViewById(R.id.card_current_book);
         bookList = findViewById(R.id.book_list);
         recentWords = findViewById(R.id.recent_words);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+
+        setupSwipeRefresh();
 
         findViewById(R.id.btn_logout).setOnClickListener(v -> {
             AuthManager.get().clearAuth();
@@ -53,6 +58,30 @@ public class MainActivity extends AppCompatActivity {
 
         setupNavBar();
         loadData();
+    }
+
+    private void setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d(TAG, "触发下拉刷新");
+            Toast.makeText(this, "正在刷新...", Toast.LENGTH_SHORT).show();
+            loadData();
+        });
+
+        swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light
+        );
+
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+    }
+
+    private void finishRefresh() {
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+            Log.d(TAG, "刷新完成");
+        }
     }
 
     @Override
@@ -184,11 +213,15 @@ public class MainActivity extends AppCompatActivity {
                     JsonArray booksArr = booksRes.getAsJsonArray("data");
                     runOnUiThread(() -> buildBookList(booksArr));
                 }
+
+                runOnUiThread(() -> finishRefresh());
+
             } catch (Exception e) {
                 Log.e(TAG, "加载数据异常: " + e.getMessage(), e);
                 runOnUiThread(() -> {
                     tvUsername.setText("加载失败");
                     Toast.makeText(MainActivity.this, "加载数据失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    finishRefresh();
                 });
             }
         }).start();
