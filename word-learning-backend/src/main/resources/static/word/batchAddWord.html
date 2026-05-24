@@ -284,8 +284,8 @@
                 <div class="template-title">📋 Excel 模板下载</div>
                 <div class="template-desc">
                     下载标准模板文件，按照模板格式填写单词信息后上传。模板包含以下列：<br>
-                    <strong>spelling（单词拼写）、definition（释义）、example_sentence（例句）、phonetic（音标）、pronunciation_url（发音URL）、image_url（图片URL）</strong><br>
-                    <span style="color:#666;font-size:13px;">注：单词ID由系统自动生成，无需填写</span>
+                    <strong>spelling（单词拼写）、part_of_speech（词性）、definition（释义）、example_sentence（例句）、phonetic（音标）、pronunciation_url（发音URL）、image_url（图片URL）</strong><br>
+                    <span style="color:#666;font-size:13px;">注：单词ID由系统自动生成，无需填写；词性可选值：n.、v.、adj.、adv.、prep.、conj.、pron.、num.、interj.</span>
                 </div>
                 <button class="btn-download" onclick="downloadTemplate()">下载模板文件</button>
             </div>
@@ -392,10 +392,10 @@ function handleFileSelect(file) {
 
 // 下载模板
 function downloadTemplate() {
-    const templateContent = "spelling,definition,example_sentence,phonetic,pronunciation_url,image_url\n" +
-                           "abandon,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,http://dict.example.com/abandon.mp3,images/words/abandon.png\n" +
-                           "ability,能力，才能,She has the ability to learn quickly.,/əˈbɪləti/,http://dict.example.com/ability.mp3,images/words/ability.png\n" +
-                           "consequence,后果，结果,Every action has its consequence.,/ˈkɒnsɪkwəns/,http://dict.example.com/consequence.mp3,images/words/consequence.png";
+    const templateContent = "spelling,part_of_speech,definition,example_sentence,phonetic,pronunciation_url,image_url\n" +
+                           "abandon,v.,抛弃，放弃,He decided to abandon his old habits.,/əˈbændən/,http://dict.example.com/abandon.mp3,images/words/abandon.png\n" +
+                           "ability,n.,能力，才能,She has the ability to learn quickly.,/əˈbɪləti/,http://dict.example.com/ability.mp3,images/words/ability.png\n" +
+                           "consequence,n.,后果，结果,Every action has its consequence.,/ˈkɒnsɪkwəns/,http://dict.example.com/consequence.mp3,images/words/consequence.png";
     
     const blob = new Blob([templateContent], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);

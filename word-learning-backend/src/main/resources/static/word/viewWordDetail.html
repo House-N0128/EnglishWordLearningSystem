@@ -5,39 +5,364 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>单词学习平台 - 单词详情</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft Yahei",sans-serif; }
-        body { background-color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
-        .top-nav { background-color:#007bff; color:white; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
-        .nav-title { font-size:18px; font-weight:600; }
-        .user-area { display:flex; align-items:center; gap:15px; }
-        .user-name { font-size:15px; }
-        .btn-nav { background-color:rgba(255,255,255,0.2); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-nav:hover { background-color:rgba(255,255,255,0.3); }
-        .main-container { display:flex; flex:1; }
-        .sidebar { width:180px; background-color:white; border-right:1px solid #eee; padding:20px 0; }
-        .sidebar-menu { list-style:none; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:#333; font-size:15px; display:flex; align-items:center; gap:8px; transition:background-color 0.2s; }
-        .sidebar-menu li:hover { background-color:#f0f7ff; color:#007bff; }
-        .content-area { flex:1; padding:30px; }
-        .page-title { font-size:20px; color:#333; font-weight:600; margin-bottom:30px; }
-        .detail-card { background-color:white; width:600px; margin:0 auto; border-radius:8px; padding:35px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
-        .word-header { text-align:center; margin-bottom:30px; }
-        .word-name { font-size:28px; color:#333; font-weight:600; margin-bottom:10px; }
-        .phonetic { font-size:16px; color:#666; margin-bottom:15px; }
-        .section { margin-bottom:25px; }
-        .section-title { font-size:16px; color:#333; font-weight:600; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #eee; }
-        .meaning-item { background-color:#f8f9fa; padding:12px; border-left:3px solid #007bff; border-radius:4px; font-size:14px; color:#555; }
-        .example-item { background-color:#f8f9fa; padding:12px; border-left:3px solid #28a745; border-radius:4px; margin-bottom:10px; }
-        .example-en { font-size:14px; color:#333; margin-bottom:5px; }
-        .example-cn { font-size:13px; color:#666; }
-        .btn-group { display:flex; gap:15px; justify-content:center; margin-top:35px; }
-        .btn { padding:10px 30px; border:none; border-radius:4px; cursor:pointer; font-size:14px; }
-        .btn-favorite { background-color:#ffc107; color:white; }
-        .btn-back { background-color:#007bff; color:white; }
-        footer { background-color:#343a40; color:#aaa; text-align:center; padding:20px; font-size:12px; margin-top:auto; }
-        .footer-links { margin-bottom:8px; }
-        .footer-links a { color:#aaa; text-decoration:none; margin:0 10px; }
-        .footer-links a:hover { color:white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '📖';
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 侧边栏 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 0;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        /* 内容区域 */
+        .content-area {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 详情卡片 */
+        .detail-card {
+            background: white;
+            max-width: 700px;
+            margin: 0 auto;
+            border-radius: 32px;
+            padding: 45px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 单词头部 */
+        .word-header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .word-name {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .phonetic {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+
+        .part-of-speech {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 章节 */
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meaning-item {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            padding: 18px;
+            border-left: 4px solid #667eea;
+            border-radius: 16px;
+            font-size: 16px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .example-item {
+            background: linear-gradient(135deg, #fff8f0 0%, #fff0e0 100%);
+            padding: 18px;
+            border-left: 4px solid #f59e0b;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .example-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .example-en {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .example-cn {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-favorite {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.3);
+        }
+
+        .btn-favorite:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245,158,11,0.4);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108,117,125,0.3);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(108,117,125,0.4);
+        }
+
+        /* 空状态 */
+        .empty-tip {
+            text-align: center;
+            color: #999;
+            padding: 60px;
+            font-size: 16px;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-spinner::after {
+            content: '📖';
+            font-size: 40px;
+            display: inline-block;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 页脚 */
+        footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .detail-card {
+                padding: 25px;
+                margin: 0 10px;
+            }
+            .word-name {
+                font-size: 32px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            .content-area {
+                padding: 0 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -52,82 +377,99 @@
 <div class="main-container">
     <div class="sidebar">
         <ul class="sidebar-menu">
-            <li onclick="window.location.href='../user/index.html'">首页</li>
-            <li onclick="window.location.href='../wordbook/browseWordBook.html'">词书浏览</li>
-            <li onclick="window.location.href='searchWord.html'">单词查询</li>
-            <li onclick="window.location.href='../collection/manageCollectedWord.html'">我的收藏</li>
-            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">学习记录</li>
-            <li onclick="window.location.href='../user/getUserInfo.html'">个人信息</li>
-            <li onclick="window.location.href='../user/changePassword.html'">修改密码</li>
-            <li onclick="window.location.href='../user/cancelUser.html'">注销账号</li>
+            <li onclick="window.location.href='../user/index.html'">🏠 首页</li>
+            <li onclick="window.location.href='../wordbook/browseWordBook.html'">📚 词书浏览</li>
+            <li onclick="window.location.href='searchWord.html'">🔍 单词查询</li>
+            <li onclick="window.location.href='../collection/manageCollectedWord.html'">⭐ 我的收藏</li>
+            <li onclick="window.location.href='../wordlearningrecord/viewPersonalStudyRecord.html'">📊 学习记录</li>
+            <li onclick="window.location.href='../user/getUserInfo.html'">👤 个人信息</li>
+            <li onclick="window.location.href='../user/changePassword.html'">🔐 修改密码</li>
+            <li onclick="window.location.href='../user/cancelUser.html'">🗑️ 注销账号</li>
         </ul>
     </div>
     <div class="content-area">
         <div class="page-title" id="page-title">单词详情</div>
         <div class="detail-card" id="detail-content">
-            <div class="empty-tip" style="text-align:center;color:#999;padding:40px;">请从查询页面搜索单词后查看详情</div>
+            <div class="loading-spinner"></div>
         </div>
     </div>
 </div>
 <footer>
-    <div class="footer-links"><a href="#">版权信息</a><a href="#">客服链接</a></div>
-    <div>版权所有 &copy; 2025 单词学习平台</div>
+    <div class="footer-links">
+        <a href="#">版权信息</a>
+        <a href="#">客服链接</a>
+        <a href="#">隐私政策</a>
+    </div>
+    <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="../api.js"></script>
 <script>
 if (!requireAuth('user')) { /* redirect */ }
-document.getElementById('display-name').textContent = '用户名：' + (localStorage.getItem('userId') || '');
+document.getElementById('display-name').textContent = '👤 ' + (localStorage.getItem('userId') || '');
 
 var params = new URLSearchParams(window.location.search);
-var wordId = params.get('id') || params.get('wordId');  // 支持 id 或 wordId
-var wordName = params.get('word');  // 支持通过单词名查询
-console.log('wordId:', wordId, 'wordName:', wordName);
+var wordId = params.get('id') || params.get('wordId');
+var wordName = params.get('word');
 
 function loadWordDetail(wordId, wordName) {
     if (wordId) {
-        // 通过 ID 查询
         apiGet('/api/words/' + wordId).then(function(r) {
             if (r.code === 200) {
                 displayWord(r.data);
             } else {
-                document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">未找到该单词</div>';
+                document.getElementById('detail-content').innerHTML = '<div class="empty-tip">😢 未找到该单词</div>';
             }
         });
     } else if (wordName) {
-        // 通过单词名搜索
-        console.log('开始搜索单词:', wordName);
         apiGet('/api/words/search?keyword=' + encodeURIComponent(wordName)).then(function(r) {
             if (r.code === 200 && r.data && r.data.length > 0) {
                 displayWord(r.data[0]);
             } else {
-                document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">未找到单词："' + wordName + '"</div>';
+                document.getElementById('detail-content').innerHTML = '<div class="empty-tip">😢 未找到单词："' + wordName + '"</div>';
             }
         });
     } else {
-        document.getElementById('detail-content').innerHTML = '<div class="empty-tip" style="text-align:center;color:#999;padding:40px;">请从查询页面搜索单词后查看详情</div>';
+        document.getElementById('detail-content').innerHTML = '<div class="empty-tip">🔍 请从查询页面搜索单词后查看详情</div>';
     }
 }
 
 function displayWord(w) {
-    document.getElementById('page-title').textContent = '单词详情 - ' + w.englishSpelling;
+    var partOfSpeech = w.partOfSpeech || '';
+    if (!partOfSpeech && w.chineseDefinition) {
+        var match = w.chineseDefinition.match(/^([a-z]+\.?)/);
+        if (match) partOfSpeech = match[1];
+    }
+    var partOfSpeechHtml = partOfSpeech ? '<div class="part-of-speech">' + partOfSpeech + '</div>' : '';
+    
+    document.getElementById('page-title').textContent = '单词详情 - ' + (w.englishSpelling || w.spelling);
     document.getElementById('detail-content').innerHTML =
-        '<div class="word-header"><div class="word-name">' + w.englishSpelling + '</div>' +
-        '<div class="phonetic">' + (w.phoneticSymbol || '') + '</div></div>' +
-        '<div class="section"><div class="section-title">中文释义</div>' +
-        '<div class="meaning-item">' + (w.chineseDefinition || '暂无释义') + '</div></div>' +
-        (w.exampleSentence ? '<div class="section"><div class="section-title">例句</div>' +
-        '<div class="example-item"><div class="example-en">' + w.exampleSentence + '</div></div></div>' : '') +
-        '<div class="btn-group"><button class="btn btn-favorite" onclick="collectWord(\'' + w.wordId + '\')">收藏单词</button>' +
-        '<button class="btn btn-back" onclick="history.back()">返回</button></div>';
+        '<div class="word-header">' +
+            '<div class="word-name">' + (w.englishSpelling || w.spelling) + '</div>' +
+            '<div class="phonetic">/' + (w.phoneticSymbol || w.phonetic || '') + '/</div>' +
+            partOfSpeechHtml +
+        '</div>' +
+        '<div class="section">' +
+            '<div class="section-title"><span>📖</span> 中文释义</div>' +
+            '<div class="meaning-item">' + (w.chineseDefinition || w.definition || '暂无释义') + '</div>' +
+        '</div>' +
+        (w.exampleSentence ? '<div class="section">' +
+            '<div class="section-title"><span>📝</span> 例句</div>' +
+            '<div class="example-item">' +
+                '<div class="example-en">' + w.exampleSentence + '</div>' +
+            '</div>' +
+        '</div>' : '') +
+        '<div class="btn-group">' +
+            '<button class="btn btn-favorite" onclick="collectWord(\'' + (w.wordId || w.id) + '\')">❤️ 收藏单词</button>' +
+            '<button class="btn btn-back" onclick="history.back()">← 返回</button>' +
+        '</div>';
 }
 
-// 执行加载
 loadWordDetail(wordId, wordName);
 
 function collectWord(wordId) {
     apiPost('/api/collections/add', { wordId: wordId }).then(function(r) {
         if (r.code === 200) {
-            alert('收藏成功');
+            alert('❤️ 收藏成功！');
         } else {
             alert(r.message || '收藏失败');
         }
