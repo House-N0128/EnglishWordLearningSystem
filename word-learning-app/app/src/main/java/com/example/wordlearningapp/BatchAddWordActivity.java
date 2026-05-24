@@ -49,12 +49,17 @@ public class BatchAddWordActivity extends AppCompatActivity {
         root.setBackgroundColor(0xFFf2f8fc);
 
         // Top bar
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setPadding(dp(16), statusBarH + dp(8), dp(16), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView btnBack = new TextView(this);
         btnBack.setText("← 返回");
@@ -115,14 +120,14 @@ public class BatchAddWordActivity extends AppCompatActivity {
         textModeLayout.setPadding(dp(16), dp(8), dp(16), dp(16));
 
         TextView hint = new TextView(this);
-        hint.setText("每行一个单词，格式：英文拼写,中文释义,音标(可选),例句(可选)\n单词ID由系统自动生成，已存在的单词自动跳过");
+        hint.setText("每行一个单词，格式：拼写,释义,音标,例句,音频链接,图片链接\n逗号分隔，后两项可选，单词ID自动生成");
         hint.setTextSize(13);
         hint.setTextColor(0xFF8899aa);
         hint.setPadding(0, 0, 0, dp(8));
         textModeLayout.addView(hint);
 
         etBatchInput = new EditText(this);
-        etBatchInput.setHint("hello,你好,/həˈloʊ/,Hello World!\nworld,世界,/wɜːld/,Hello World!");
+        etBatchInput.setHint("hello,你好,/həˈloʊ/,Hello World!,http://audio.mp3,http://img.png\nworld,世界,/wɜːld/,Hello World!");
         etBatchInput.setTextSize(14);
         etBatchInput.setPadding(dp(16), dp(12), dp(16), dp(12));
         etBatchInput.setBackgroundColor(0xFFf6f8fc);
@@ -318,6 +323,8 @@ public class BatchAddWordActivity extends AppCompatActivity {
             word.addProperty("chineseDefinition", parts[1].trim());
             if (parts.length > 2) word.addProperty("phoneticSymbol", parts[2].trim());
             if (parts.length > 3) word.addProperty("exampleSentence", parts[3].trim());
+            if (parts.length > 4) word.addProperty("wordPronunciation", parts[4].trim());
+            if (parts.length > 5) word.addProperty("wordImage", parts[5].trim());
             wordsArr.add(word);
         }
 

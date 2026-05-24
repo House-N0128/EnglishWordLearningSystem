@@ -30,12 +30,10 @@ import java.util.List;
 public class UserManageActivity extends AppCompatActivity {
 
     private LinearLayout listArea;
-    private TextView tvPager;
     private EditText etSearch;
     private Spinner spStatus;
     private List<JsonObject> allUsersData = new ArrayList<>();
     private List<JsonObject> filteredData = new ArrayList<>();
-    private int pageSize = 8, currentPage = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +43,18 @@ public class UserManageActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFFf2f8fc);
 
-        // ===== TOP BAR: 48dp, #318af8 (same as AdminMainActivity) =====
+        // ===== TOP BAR: 48dp + status bar, #318af8 (same as AdminMainActivity) =====
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setPadding(dp(16), statusBarH + dp(8), dp(16), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView adminUser = new TextView(this);
         adminUser.setText("管理员：" + AuthManager.get().getUserId());
@@ -98,7 +101,7 @@ public class UserManageActivity extends AppCompatActivity {
         ScrollView scroll = new ScrollView(this);
         LinearLayout main = new LinearLayout(this);
         main.setOrientation(LinearLayout.VERTICAL);
-        main.setPadding(dp(12), dp(8), dp(12), dp(80));
+        main.setPadding(dp(12), dp(8), dp(12), dp(16));
 
         // Page title
         TextView title = new TextView(this);
@@ -150,44 +153,6 @@ public class UserManageActivity extends AppCompatActivity {
         listArea = new LinearLayout(this);
         listArea.setOrientation(LinearLayout.VERTICAL);
         main.addView(listArea);
-
-        // Pagination
-        LinearLayout pager = new LinearLayout(this);
-        pager.setOrientation(LinearLayout.HORIZONTAL);
-        pager.setGravity(Gravity.CENTER);
-        pager.setPadding(0, dp(8), 0, 0);
-
-        Button btnPrev = new Button(this);
-        btnPrev.setText("上一页");
-        btnPrev.setTextColor(0xFFFFFFFF);
-        btnPrev.setTextSize(13);
-        btnPrev.setPadding(dp(12), dp(6), dp(12), dp(6));
-        GradientDrawable prevBg = new GradientDrawable();
-        prevBg.setColor(0xFF318af8);
-        prevBg.setCornerRadius(dp(14));
-        btnPrev.setBackground(prevBg);
-        btnPrev.setOnClickListener(v -> { if (currentPage > 0) { currentPage--; renderPage(); } });
-        pager.addView(btnPrev);
-
-        tvPager = new TextView(this);
-        tvPager.setTextSize(13);
-        tvPager.setTextColor(0xFF8899aa);
-        tvPager.setPadding(dp(16), 0, dp(16), 0);
-        pager.addView(tvPager);
-
-        Button btnNext = new Button(this);
-        btnNext.setText("下一页");
-        btnNext.setTextColor(0xFFFFFFFF);
-        btnNext.setTextSize(13);
-        btnNext.setPadding(dp(12), dp(6), dp(12), dp(6));
-        GradientDrawable nextBg = new GradientDrawable();
-        nextBg.setColor(0xFF318af8);
-        nextBg.setCornerRadius(dp(14));
-        btnNext.setBackground(nextBg);
-        btnNext.setOnClickListener(v -> { int total = (filteredData.size() + pageSize - 1) / pageSize; if (currentPage < total - 1) { currentPage++; renderPage(); } });
-        pager.addView(btnNext);
-
-        main.addView(pager);
 
         scroll.addView(main);
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
@@ -283,19 +248,13 @@ public class UserManageActivity extends AppCompatActivity {
         }
 
         filteredData = filtered;
-        currentPage = 0;
         renderPage();
     }
 
     private void renderPage() {
         listArea.removeAllViews();
-        int start = currentPage * pageSize;
-        int end = Math.min(start + pageSize, filteredData.size());
-        int total = (filteredData.size() + pageSize - 1) / pageSize;
-        if (total == 0) total = 1;
-        tvPager.setText("第" + (currentPage + 1) + "页 / 共" + total + "页");
 
-        for (int i = start; i < end; i++) {
+        for (int i = 0; i < filteredData.size(); i++) {
             JsonObject u = filteredData.get(i);
             String uid = u.has("userId") ? u.get("userId").getAsString() : "";
             String name = u.has("userName") && !u.get("userName").isJsonNull() ? u.get("userName").getAsString() : "";

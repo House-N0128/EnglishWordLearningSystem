@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.wordlearningapp.api.ApiClient;
+import com.example.wordlearningapp.util.AuthManager;
 import com.example.wordlearningapp.util.WordImageLoader;
 import com.google.gson.JsonObject;
 
@@ -67,6 +68,10 @@ public class WordDetailActivity extends AppCompatActivity {
             return;
         }
 
+        if ("admin".equals(AuthManager.get().getRole())) {
+            btnCollect.setVisibility(Button.GONE);
+        }
+
         loadData();
     }
 
@@ -119,7 +124,8 @@ public class WordDetailActivity extends AppCompatActivity {
 
         if (audioUrl != null && !audioUrl.isEmpty()) {
             btnAudio.setVisibility(Button.VISIBLE);
-            btnAudio.setOnClickListener(v -> playAudio(audioUrl));
+            String fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : ApiClient.get().getBaseUrl() + (audioUrl.startsWith("/") ? audioUrl : "/" + audioUrl);
+            btnAudio.setOnClickListener(v -> playAudio(fullAudioUrl));
         } else {
             btnAudio.setVisibility(Button.GONE);
         }

@@ -2,82 +2,927 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词学习平台 - 注册</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>单词学习平台 - 注册 | 自动分配账号</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins','Microsoft Yahei',sans-serif; }
-        body { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; position:relative; overflow:hidden; }
-        body::before { content:''; position:absolute; width:200%; height:200%; background:radial-gradient(circle,rgba(255,255,255,0.1) 1px,transparent 1px); background-size:40px 40px; animation:bgMove 20s linear infinite; }
-        @keyframes bgMove { 0% { transform:translate(0,0); } 100% { transform:translate(40px,40px); } }
-        .register-card { background:rgba(255,255,255,0.98); backdrop-filter:blur(10px); width:520px; max-width:100%; border-radius:32px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); transition:transform 0.3s,box-shadow 0.3s; position:relative; z-index:1; animation:fadeInUp 0.5s; }
-        @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        .register-card:hover { transform:translateY(-5px); box-shadow:0 30px 60px -12px rgba(0,0,0,0.3); }
-        .card-header { background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; text-align:center; padding:35px 20px; position:relative; }
-        .card-header::after { content:'📝'; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:40px; background:white; width:60px; height:60px; border-radius:30px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
-        .card-header h1 { font-size:28px; margin-bottom:8px; font-weight:700; }
-        .card-header p { font-size:14px; opacity:0.9; }
-        .card-body { padding:35px 40px; background:white; }
-        .error-msg { display:none; text-align:center; font-size:14px; color:#e74c3c; background:linear-gradient(135deg,#fee2e2,#fecaca); padding:12px; border-radius:16px; margin-bottom:20px; font-weight:500; }
-        .form-group { margin-bottom:22px; }
-        .form-group label { display:block; font-size:14px; font-weight:600; color:#4a4b65; margin-bottom:8px; }
-        .form-group input { width:100%; padding:14px 16px; border:2px solid #eef2ff; border-radius:16px; font-size:15px; outline:none; transition:all 0.3s; background:#f8f9ff; }
-        .form-group input:focus { border-color:#10b981; background:white; box-shadow:0 0 0 4px rgba(16,185,129,0.1); }
-        .form-group .hint { font-size:12px; color:#8b8ca3; margin-top:6px; }
-        .row { display:flex; gap:20px; }
-        .row .form-group { flex:1; }
-        .agreement { display:flex; align-items:center; font-size:13px; color:#555; margin:25px 0; padding:12px; background:#f8f9ff; border-radius:16px; }
-        .agreement input { width:18px; height:18px; margin-right:10px; cursor:pointer; }
-        .agreement a { color:#10b981; text-decoration:none; font-weight:600; }
-        .btn { width:100%; height:50px; border:none; border-radius:40px; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:15px; transition:all 0.3s; position:relative; overflow:hidden; }
-        .btn::before { content:''; position:absolute; top:50%; left:50%; width:0; height:0; border-radius:50%; background:rgba(255,255,255,0.3); transform:translate(-50%,-50%); transition:width 0.6s,height 0.6s; }
-        .btn:hover::before { width:300px; height:300px; }
-        .btn-register { background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; box-shadow:0 4px 15px rgba(16,185,129,0.4); }
-        .btn-register:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(16,185,129,0.5); }
-        .btn-back { background:linear-gradient(135deg, #6c757d 0%, #495057 100%); color:white; }
-        .btn-back:hover { transform:translateY(-2px); }
-        @media (max-width:550px) { .card-body { padding:25px 20px; } .row { flex-direction:column; gap:0; } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Microsoft Yahei', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+            background-size: 42px 42px;
+            animation: bgMove 22s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes bgMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(42px, 42px); }
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.98);
+            width: 620px;
+            max-width: 100%;
+            border-radius: 44px;
+            overflow: hidden;
+            box-shadow: 0 30px 55px -12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(35px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-align: center;
+            padding: 32px 20px 28px;
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '🤖';
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 44px;
+            background: white;
+            width: 68px;
+            height: 68px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            font-size: 14px;
+            opacity: 0.92;
+        }
+
+        .card-body {
+            padding: 42px 38px 38px;
+            background: white;
+        }
+
+        .error-msg {
+            display: none;
+            text-align: center;
+            font-size: 13px;
+            color: #c2410c;
+            background: #fff1f0;
+            padding: 12px 16px;
+            border-radius: 24px;
+            margin-bottom: 24px;
+            border-left: 4px solid #ef4444;
+            font-weight: 500;
+        }
+
+        .success-toast {
+            background: #e0f2e9;
+            color: #0b5e42;
+            border-left-color: #10b981;
+        }
+
+        .auto-id-card {
+            background: linear-gradient(120deg, #eef2ff 0%, #e0e7ff 100%);
+            border-radius: 24px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .auto-id-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .auto-id-value {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: monospace;
+            color: #0f3b2c;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            word-break: break-all;
+        }
+
+        .refresh-id-btn {
+            background: #10b981;
+            border: none;
+            color: white;
+            font-size: 12px;
+            padding: 5px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .refresh-id-btn:hover {
+            background: #059669;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #2c3e4e;
+            margin-bottom: 6px;
+        }
+
+        .form-group label .required {
+            color: #e67e22;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+            background-color: #fefefe;
+        }
+
+        .form-group input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .form-group .hint {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 6px;
+        }
+
+        .email-verify-group {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .email-verify-group .input-wrapper {
+            flex: 2;
+        }
+
+        .verify-btn {
+            flex-shrink: 0;
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 0 18px;
+            height: 48px;
+            border-radius: 36px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .verify-btn:hover {
+            border-color: #10b981;
+            color: #0f3b2c;
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .verify-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 60px;
+        }
+
+        .verify-badge.success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .verify-badge.error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .verify-badge.info {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .code-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .code-group input {
+            flex: 2;
+        }
+
+        .code-group button {
+            flex-shrink: 0;
+            width: auto;
+            min-width: 100px;
+        }
+
+        .resend-link {
+            font-size: 12px;
+            text-align: right;
+            margin-top: 6px;
+        }
+
+        .resend-link button {
+            background: none;
+            border: none;
+            color: #10b981;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: underline;
+        }
+
+        .resend-link button:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .row .form-group {
+            flex: 1;
+        }
+
+        .agreement {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #334155;
+            margin: 22px 0 24px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 28px;
+        }
+
+        .agreement input {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .agreement a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 44px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: all 0.25s;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .card-body {
+                padding: 28px 18px;
+            }
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .email-verify-group {
+                flex-direction: column;
+            }
+            .code-group {
+                flex-direction: column;
+            }
+            .code-group button {
+                width: 100%;
+                height: 44px;
+            }
+            .verify-btn {
+                width: 100%;
+                height: 44px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="register-card">
-    <div class="card-header"><h1>📝 单词学习平台</h1><p>创建您的学习账户</p></div>
+    <div class="card-header">
+        <h1>📖 单词学习平台</h1>
+    </div>
     <div class="card-body">
         <div class="error-msg" id="error-msg"></div>
-        <div class="form-group"><label>📱 登录账号</label><input type="text" id="userId" placeholder="请输入账号"><div class="hint">账号应为字母数字组合</div></div>
-        <div class="form-group"><label>🔒 登录密码</label><input type="password" id="password" placeholder="请输入密码（6-20位）"><div class="hint">密码长度6-20位</div></div>
-        <div class="form-group"><label>✅ 确认密码</label><input type="password" id="confirmPassword" placeholder="请再次输入密码"></div>
-        <div class="form-group"><label>👤 用户昵称</label><input type="text" id="userName" placeholder="请输入昵称"><div class="hint">昵称长度为2-10个字符</div></div>
-        <div class="row">
-            <div class="form-group"><label>📞 联系电话</label><input type="tel" id="phoneNumber" placeholder="请输入手机号"></div>
-            <div class="form-group"><label>📧 邮箱地址</label><input type="email" id="email" placeholder="请输入邮箱"></div>
+
+        <!-- 系统生成的账号展示 -->
+        <div class="auto-id-card">
+            <div class="auto-id-label">
+                <span>🔐 系统分配登录账号</span>
+                <button type="button" class="refresh-id-btn" id="refreshIdBtn">⟳ 重新生成</button>
+            </div>
+            <div>
+                <span class="auto-id-value" id="generatedUserId">——</span>
+            </div>
+            <div class="hint" style="margin-top: 8px;">⭐ 请牢记此账号用于登录</div>
         </div>
-        <div class="agreement"><input type="checkbox" id="agreement"><label>我已阅读并同意 <a href="#">《用户服务协议》</a> 和 <a href="#">《隐私政策》</a></label></div>
-        <button class="btn btn-register" onclick="doRegister()">✨ 注册新账号</button>
+
+        <!-- 手机号输入 -->
+        <div class="form-group">
+            <label>📱 手机号码 <span class="required">*</span></label>
+            <input type="tel" id="phoneBase" placeholder="请输入11位手机号码" autocomplete="off">
+            <div class="hint">手机号将作为登录账号的基础部分</div>
+        </div>
+
+        <!-- 密码 -->
+        <div class="form-group">
+            <label>🔒 登录密码 <span class="required">*</span></label>
+            <input type="password" id="password" placeholder="6-20位密码">
+            <div class="hint">密码长度6~20位</div>
+        </div>
+
+        <!-- 确认密码 -->
+        <div class="form-group">
+            <label>✅ 确认密码 <span class="required">*</span></label>
+            <input type="password" id="confirmPassword" placeholder="请再次输入密码">
+        </div>
+
+        <!-- 昵称 -->
+        <div class="form-group">
+            <label>👤 用户昵称</label>
+            <input type="text" id="userName" placeholder="2~10个字符（选填）">
+            <div class="hint">不填则默认使用手机号后四位</div>
+        </div>
+
+        <!-- 邮箱 + 验证按钮 -->
+        <div class="form-group">
+            <label>📧 电子邮箱 <span class="required">*</span></label>
+            <div class="email-verify-group">
+                <div class="input-wrapper">
+                    <input type="email" id="email" placeholder="your@example.com" autocomplete="off">
+                </div>
+                <button type="button" class="verify-btn" id="sendCodeBtn">📨 发送验证码</button>
+            </div>
+            <div id="emailVerifyStatus" class="verify-badge" style="display: none;"></div>
+        </div>
+
+        <!-- 验证码输入区域（初始隐藏） -->
+        <div class="form-group" id="codeGroup" style="display: none;">
+            <label>🔢 验证码 <span class="required">*</span></label>
+            <div class="code-group">
+                <input type="text" id="verificationCode" placeholder="请输入6位验证码" maxlength="6" autocomplete="off">
+                <button type="button" class="verify-btn" id="verifyCodeBtn">✓ 校验验证码</button>
+            </div>
+            <div class="resend-link" id="resendLink" style="display: none;">
+                <button id="resendCodeBtn">🔄 重新发送验证码</button>
+                <span id="countdownText" style="color: #9ca3af; margin-left: 10px;"></span>
+            </div>
+            <div class="hint">验证码已发送至邮箱，5分钟内有效</div>
+        </div>
+
+        <!-- 协议 -->
+        <div class="agreement">
+            <input type="checkbox" id="agreement">
+            <label>我已阅读并同意 <a href="#">《用户服务协议》</a> 和 <a href="#">《隐私政策》</a></label>
+        </div>
+
+        <!-- 按钮 -->
+        <button class="btn btn-register" id="registerBtn">✨ 注册新账号</button>
         <button class="btn btn-back" onclick="window.location.href='../index.html'">← 返回登录</button>
     </div>
 </div>
-<script src="../api.js"></script>
+
 <script>
-function showError(msg) { var e=document.getElementById('error-msg'); e.textContent=msg; e.style.display='block'; setTimeout(function(){e.style.display='none';},3000); }
-function doRegister() {
-    var userId = document.getElementById('userId').value.trim();
-    var password = document.getElementById('password').value.trim();
-    var confirm = document.getElementById('confirmPassword').value.trim();
-    var userName = document.getElementById('userName').value.trim();
-    if (!userId || !password) { showError('请输入账号和密码'); return; }
-    if (password !== confirm) { showError('两次密码不一致'); return; }
-    if (password.length < 6) { showError('密码长度至少6位'); return; }
-    if (!document.getElementById('agreement').checked) { showError('请阅读并同意服务协议'); return; }
-    apiPost('/api/user/register', {
-        userId: userId, loginPassword: password,
-        userName: userName || userId,
-        phoneNumber: document.getElementById('phoneNumber').value.trim() || '',
-        email: document.getElementById('email').value.trim() || ''
-    }).then(function(r) {
-        if (r.code === 200) { alert('🎉 注册成功！请返回登录'); window.location.href = '../index.html'; }
-        else { showError(r.message); }
+    // ==================== 配置 ====================
+    const BASE_URL = 'http://localhost:8080';
+
+    // ==================== DOM 元素 ====================
+    const phoneBaseInput = document.getElementById('phoneBase');
+    const generatedUserIdSpan = document.getElementById('generatedUserId');
+    const refreshIdBtn = document.getElementById('refreshIdBtn');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const userNameInput = document.getElementById('userName');
+    const emailInput = document.getElementById('email');
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+    const resendCodeBtn = document.getElementById('resendCodeBtn');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const emailStatusDiv = document.getElementById('emailVerifyStatus');
+    const codeGroup = document.getElementById('codeGroup');
+    const resendLink = document.getElementById('resendLink');
+    const countdownSpan = document.getElementById('countdownText');
+    const agreementCheck = document.getElementById('agreement');
+    const registerBtn = document.getElementById('registerBtn');
+    const errorMsgDiv = document.getElementById('error-msg');
+
+    // ==================== 状态变量 ====================
+    let isEmailVerified = false;
+    let currentVerifiedEmail = "";
+    let currentGeneratedUserId = "";
+    let countdownInterval = null;
+    let canResend = true;
+    let pendingEmail = "";
+
+    // ==================== 辅助函数 ====================
+    function showError(msg, isSuccess = false) {
+        errorMsgDiv.textContent = msg;
+        errorMsgDiv.style.display = 'block';
+        if (isSuccess) {
+            errorMsgDiv.classList.add('success-toast');
+        } else {
+            errorMsgDiv.classList.remove('success-toast');
+        }
+        setTimeout(() => {
+            errorMsgDiv.style.display = 'none';
+        }, 4000);
+    }
+
+    function hideError() {
+        errorMsgDiv.style.display = 'none';
+    }
+
+    function get4DigitTimestamp() {
+        const now = new Date();
+        const value = (now.getMinutes() * 100 + now.getSeconds()) % 10000;
+        return value.toString().padStart(4, '0');
+    }
+
+    function generateUserId(phone) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone.length < 7) return "";
+        return cleanPhone + get4DigitTimestamp();
+    }
+
+    function refreshDisplayUserId() {
+        const phone = phoneBaseInput.value.trim();
+        if (!phone) {
+            generatedUserIdSpan.innerText = "请填写手机号";
+            currentGeneratedUserId = "";
+            return;
+        }
+        const newId = generateUserId(phone);
+        if (newId) {
+            generatedUserIdSpan.innerText = newId;
+            currentGeneratedUserId = newId;
+        } else {
+            generatedUserIdSpan.innerText = "手机号无效";
+            currentGeneratedUserId = "";
+        }
+    }
+
+    function forceRefreshUserId() {
+        const phone = phoneBaseInput.value.trim();
+        if (!phone) {
+            showError("请先填写手机号码");
+            return;
+        }
+        if (phone.replace(/\D/g, '').length < 11) {
+            showError("请输入完整的11位手机号码");
+            return;
+        }
+        refreshDisplayUserId();
+        if (currentGeneratedUserId) {
+            showError("✅ 已生成新账号: " + currentGeneratedUserId, true);
+        }
+    }
+
+    function updateEmailUI(valid, message, emailValue) {
+        emailStatusDiv.style.display = 'flex';
+        if (valid) {
+            emailStatusDiv.className = 'verify-badge success';
+            emailStatusDiv.innerHTML = `<i>✅</i> ${message}`;
+            isEmailVerified = true;
+            currentVerifiedEmail = emailValue;
+            codeGroup.style.display = 'none';
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        } else {
+            emailStatusDiv.className = 'verify-badge error';
+            emailStatusDiv.innerHTML = `<i>❌</i> ${message}`;
+            isEmailVerified = false;
+            currentVerifiedEmail = "";
+        }
+    }
+
+    function resetEmailVerify() {
+        const currentEmail = emailInput.value.trim();
+        if (currentEmail !== currentVerifiedEmail) {
+            if (isEmailVerified) {
+                isEmailVerified = false;
+                currentVerifiedEmail = "";
+                emailStatusDiv.style.display = 'flex';
+                emailStatusDiv.className = 'verify-badge error';
+                emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱已修改，请重新验证`;
+            }
+            codeGroup.style.display = 'none';
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            verificationCodeInput.value = '';
+        }
+    }
+
+    function startCountdown(seconds = 60) {
+        let remaining = seconds;
+        canResend = false;
+        resendCodeBtn.disabled = true;
+        countdownSpan.textContent = `${remaining}秒后重发`;
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+        
+        countdownInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                canResend = true;
+                resendCodeBtn.disabled = false;
+                countdownSpan.textContent = '';
+            } else {
+                countdownSpan.textContent = `${remaining}秒后重发`;
+            }
+        }, 1000);
+    }
+
+    // ==================== 原生 fetch 请求（不带认证头，和找回密码页面一样） ====================
+    async function sendVerificationCode() {
+        hideError();
+        const email = emailInput.value.trim();
+        
+        if (!email) {
+            showError("请填写邮箱地址");
+            return false;
+        }
+        
+        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError("邮箱格式不正确，例如: name@example.com");
+            return false;
+        }
+
+        const originalText = sendCodeBtn.innerText;
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.innerText = "⏳ 发送中...";
+
+        try {
+            // 直接使用原生 fetch，不携带认证头（和 forgetPassword 页面一样）
+            const response = await fetch(BASE_URL + '/api/user/send-verification-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contact: email })
+            });
+            
+            const result = await response.json();
+            console.log("发送验证码响应:", result);
+            
+            if (result && result.code === 200) {
+                pendingEmail = email;
+                codeGroup.style.display = 'block';
+                resendLink.style.display = 'block';
+                verificationCodeInput.value = '';
+                
+                emailStatusDiv.style.display = 'flex';
+                emailStatusDiv.className = 'verify-badge info';
+                emailStatusDiv.innerHTML = `<i>📧</i> 验证码已发送至 ${email}，请查收`;
+                
+                showError("✅ 验证码已发送，请查看邮箱", true);
+                startCountdown(60);
+                return true;
+            } else {
+                const errMsg = result?.message || "发送验证码失败";
+                updateEmailUI(false, errMsg, "");
+                showError(errMsg);
+                return false;
+            }
+        } catch (error) {
+            console.error("发送验证码失败:", error);
+            let errMsg = "发送失败，请检查网络连接";
+            updateEmailUI(false, errMsg, "");
+            showError(errMsg);
+            return false;
+        } finally {
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.innerText = originalText;
+        }
+    }
+
+    async function verifyCode() {
+        hideError();
+        
+        const email = emailInput.value.trim();
+        const code = verificationCodeInput.value.trim();
+        
+        if (!email) {
+            showError("请填写邮箱地址");
+            return false;
+        }
+        
+        if (!code) {
+            showError("请输入验证码");
+            return false;
+        }
+        
+        if (code.length !== 6) {
+            showError("验证码为6位数字");
+            return false;
+        }
+        
+        verifyCodeBtn.disabled = true;
+        const originalText = verifyCodeBtn.innerText;
+        verifyCodeBtn.innerText = "⏳ 校验中...";
+        
+        try {
+            // 直接使用原生 fetch，不携带认证头
+            const response = await fetch(BASE_URL + '/api/user/verify-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contact: email, code: code })
+            });
+            
+            const result = await response.json();
+            console.log("校验验证码响应:", result);
+            
+            if (result && result.code === 200) {
+                updateEmailUI(true, "✓ 邮箱验证通过，可以使用", email);
+                showError("✅ 邮箱验证成功！可以继续注册", true);
+                return true;
+            } else {
+                const errMsg = result?.message || "验证码错误";
+                updateEmailUI(false, errMsg, "");
+                showError(errMsg);
+                return false;
+            }
+        } catch (error) {
+            console.error("校验验证码失败:", error);
+            let errMsg = "校验失败，请重试";
+            updateEmailUI(false, errMsg, "");
+            showError(errMsg);
+            return false;
+        } finally {
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.innerText = originalText;
+        }
+    }
+
+    async function resendCode() {
+        if (!canResend) {
+            showError("请等待倒计时结束");
+            return;
+        }
+        
+        const email = emailInput.value.trim();
+        if (!email) {
+            showError("请填写邮箱地址");
+            return;
+        }
+        
+        if (email !== pendingEmail) {
+            resetEmailVerify();
+        }
+        
+        await sendVerificationCode();
+    }
+
+    async function doRegister() {
+        hideError();
+
+        const phone = phoneBaseInput.value.trim();
+        const cleanPhone = phone.replace(/\D/g, '');
+        
+        if (!phone) {
+            showError("请填写手机号码");
+            return;
+        }
+        if (cleanPhone.length !== 11) {
+            showError("请输入完整的11位手机号码");
+            return;
+        }
+
+        refreshDisplayUserId();
+        const loginAccount = currentGeneratedUserId;
+        if (!loginAccount || loginAccount.includes("请填写") || loginAccount.includes("无效")) {
+            showError("登录账号生成失败，请重新填写手机号");
+            return;
+        }
+
+        const password = passwordInput.value.trim();
+        const confirmPwd = confirmInput.value.trim();
+        
+        if (!password) {
+            showError("请输入登录密码");
+            return;
+        }
+        if (password.length < 6 || password.length > 20) {
+            showError("密码长度需为6-20位");
+            return;
+        }
+        if (password !== confirmPwd) {
+            showError("两次输入的密码不一致");
+            return;
+        }
+
+        let nickname = userNameInput.value.trim();
+        if (!nickname) {
+            nickname = "用户" + cleanPhone.slice(-4);
+        }
+        if (nickname.length < 2 || nickname.length > 10) {
+            showError("昵称长度需为2-10个字符");
+            return;
+        }
+
+        const email = emailInput.value.trim();
+        if (!email) {
+            showError("请填写电子邮箱");
+            return;
+        }
+        
+        if (!isEmailVerified) {
+            showError("❌ 请先完成邮箱验证：发送验证码 → 输入验证码 → 校验通过");
+            return;
+        }
+        
+        if (currentVerifiedEmail !== email) {
+            showError("邮箱内容已更改，请重新验证邮箱");
+            isEmailVerified = false;
+            emailStatusDiv.style.display = 'flex';
+            emailStatusDiv.className = 'verify-badge error';
+            emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱已修改，请重新验证`;
+            return;
+        }
+
+        if (!agreementCheck.checked) {
+            showError("请阅读并同意《用户服务协议》和《隐私政策》");
+            return;
+        }
+
+        const registerData = {
+            userId: loginAccount,
+            loginPassword: password,
+            userName: nickname,
+            phoneNumber: cleanPhone,
+            email: email
+        };
+
+        registerBtn.disabled = true;
+        const originalBtnText = registerBtn.innerText;
+        registerBtn.innerText = "⏳ 注册中...";
+
+        try {
+            // 直接使用原生 fetch，不携带认证头
+            const response = await fetch(BASE_URL + '/api/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registerData)
+            });
+            
+            const result = await response.json();
+            
+            if (result && result.code === 200) {
+                alert(`🎉 注册成功！\n\n您的登录账号是：${loginAccount}\n请牢记此账号用于登录平台。`);
+                window.location.href = "../index.html";
+            } else {
+                const errMsg = result?.message || "注册失败，请稍后重试";
+                showError(errMsg);
+                
+                if (errMsg.includes("邮箱") || errMsg.includes("已存在")) {
+                    isEmailVerified = false;
+                    emailStatusDiv.style.display = 'flex';
+                    emailStatusDiv.className = 'verify-badge error';
+                    emailStatusDiv.innerHTML = `<i>⚠️</i> 邮箱验证失效，请重新验证`;
+                }
+            }
+        } catch (error) {
+            console.error("注册请求失败:", error);
+            showError("网络错误，注册失败，请检查网络连接");
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.innerText = originalBtnText;
+        }
+    }
+
+    // ==================== 事件绑定 ====================
+    phoneBaseInput.addEventListener('input', function() {
+        refreshDisplayUserId();
     });
-}
+    
+    refreshIdBtn.addEventListener('click', forceRefreshUserId);
+    
+    emailInput.addEventListener('input', function() {
+        resetEmailVerify();
+        codeGroup.style.display = 'none';
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+    });
+    
+    sendCodeBtn.addEventListener('click', sendVerificationCode);
+    verifyCodeBtn.addEventListener('click', verifyCode);
+    resendCodeBtn.addEventListener('click', resendCode);
+    registerBtn.addEventListener('click', doRegister);
+
+    verificationCodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            verifyCode();
+        }
+    });
+
+    refreshDisplayUserId();
 </script>
 </body>
 </html>

@@ -28,7 +28,7 @@ public class AddEditWordActivity extends AppCompatActivity {
 
     private static final int PICK_EXCEL_FILE = 1001;
 
-    private EditText etSpelling, etPhonetic, etPos, etChinese, etExample;
+    private EditText etSpelling, etPhonetic, etPos, etChinese, etExample, etAudio, etImage;
     private Button btnSubmit;
     private TextView tvTitle;
     private String wordId, bookId;
@@ -52,13 +52,15 @@ public class AddEditWordActivity extends AppCompatActivity {
         // ===== TOP BAR =====
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
-        topBar.setPadding(dp(6), 0, dp(18), 0);
+        topBar.setBackgroundColor(0xFF318af8);
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
+        topBar.setPadding(dp(6), statusBarH + dp(8), dp(18), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
-        topBar.setBackground(tbBg);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView btnBack = new TextView(this);
         btnBack.setText("←");
@@ -184,6 +186,9 @@ public class AddEditWordActivity extends AppCompatActivity {
         etExample.setLines(2);
         etExample.setMinHeight(dp(60));
         etExample.setGravity(Gravity.TOP);
+
+        etAudio = addField(parent, "音频链接");
+        etImage = addField(parent, "图片链接");
 
         btnSubmit = new Button(this);
         btnSubmit.setText("添加单词");
@@ -327,6 +332,8 @@ public class AddEditWordActivity extends AppCompatActivity {
                         setText(etPos, w, "partOfSpeech");
                         setText(etChinese, w, "chineseDefinition");
                         setText(etExample, w, "exampleSentence");
+                        setText(etAudio, w, "wordPronunciation");
+                        setText(etImage, w, "wordImage");
                     });
                 }
             } catch (Exception e) {}
@@ -375,6 +382,8 @@ public class AddEditWordActivity extends AppCompatActivity {
                 body.addProperty("partOfSpeech", etPos.getText().toString().trim());
                 body.addProperty("chineseDefinition", chinese);
                 body.addProperty("exampleSentence", etExample.getText().toString().trim());
+                body.addProperty("wordPronunciation", etAudio.getText().toString().trim());
+                body.addProperty("wordImage", etImage.getText().toString().trim());
                 if (bookId != null) body.addProperty("wordBookId", bookId);
 
                 JsonObject res;

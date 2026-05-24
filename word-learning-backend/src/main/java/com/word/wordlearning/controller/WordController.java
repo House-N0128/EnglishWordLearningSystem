@@ -62,9 +62,9 @@ public class WordController {
         String audio = body.get("wordPronunciation") != null ? (String) body.get("wordPronunciation") : "";
         String image = body.get("wordImage") != null ? (String) body.get("wordImage") : "";
 
-        // 检查必填字段
+        // 自动生成单词ID
         if (wordId == null || wordId.trim().isEmpty()) {
-            return Result.error(400, "缺少单词ID");
+            wordId = generateWordId();
         }
         if (spelling == null || spelling.trim().isEmpty()) {
             return Result.error(400, "缺少英文拼写");

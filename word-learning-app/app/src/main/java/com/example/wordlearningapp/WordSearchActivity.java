@@ -36,6 +36,7 @@ public class WordSearchActivity extends AppCompatActivity {
     private boolean isAdmin;
     private JsonArray allWords;
     private Map<String, String> bookIdToName = new HashMap<>();
+    private Map<String, String> bookNameToId = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +67,17 @@ public class WordSearchActivity extends AppCompatActivity {
         root.setBackgroundColor(0xFFf2f8fc);
 
         // Top bar (same as AdminMainActivity)
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setPadding(dp(16), statusBarH + dp(8), dp(16), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView adminUser = new TextView(this);
         adminUser.setText("管理员：" + AuthManager.get().getUserId());
@@ -250,7 +256,10 @@ public class WordSearchActivity extends AppCompatActivity {
                         JsonArray books = rb.getAsJsonArray("data");
                         for (int i = 0; i < books.size(); i++) {
                             JsonObject b = books.get(i).getAsJsonObject();
-                            bookIdToName.put(b.get("wordBookId").getAsString(), b.get("wordBookName").getAsString());
+                            String bid = b.get("wordBookId").getAsString();
+                            String bname = b.get("wordBookName").getAsString();
+                            bookIdToName.put(bid, bname);
+                            bookNameToId.put(bname, bid);
                         }
                         runOnUiThread(() -> {
                             java.util.List<String> items = new java.util.ArrayList<>(); items.add("所属词书"); items.add("全部");
@@ -268,6 +277,12 @@ public class WordSearchActivity extends AppCompatActivity {
 
     private void filterWords() {
         String kw = etSearch.getText().toString().trim().toLowerCase();
+        String selectedBook = spBook.getSelectedItem() != null ? spBook.getSelectedItem().toString() : "所属词书";
+        String filterBookId = null;
+        if (!"所属词书".equals(selectedBook) && !"全部".equals(selectedBook)) {
+            filterBookId = bookNameToId.get(selectedBook);
+        }
+
         wordListContainer.removeAllViews();
         if (allWords == null) return;
 
@@ -277,6 +292,10 @@ public class WordSearchActivity extends AppCompatActivity {
             String definition = w.has("chineseDefinition") ? w.get("chineseDefinition").getAsString() : "";
             String wordId = w.has("wordId") ? w.get("wordId").getAsString() : "";
             if (!kw.isEmpty() && !spelling.toLowerCase().contains(kw) && !definition.toLowerCase().contains(kw)) continue;
+            if (filterBookId != null) {
+                String wBookId = w.has("wordBookId") && !w.get("wordBookId").isJsonNull() ? w.get("wordBookId").getAsString() : "";
+                if (!filterBookId.equals(wBookId)) continue;
+            }
 
             if (isAdmin) {
                 LinearLayout row = new LinearLayout(this);

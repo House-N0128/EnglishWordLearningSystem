@@ -40,16 +40,17 @@ public class ViewBookWordsActivity extends AppCompatActivity {
         root.setBackgroundColor(0xFFf2f8fc);
 
         // Top bar
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(6), 0, dp(18), 0);
+        topBar.setPadding(dp(6), statusBarH + dp(8), dp(18), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
-        topBar.setBackground(tbBg);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView btnBack = new TextView(this);
         btnBack.setText("←");
@@ -226,6 +227,14 @@ public class ViewBookWordsActivity extends AppCompatActivity {
                                     .setNegativeButton("取消", null)
                                     .show());
                             row.addView(delBtn);
+
+                            Button detailBtn = tinyBtn("详情", 0xFF17c2ae, 0xFFFFFFFF);
+                            detailBtn.setOnClickListener(v -> {
+                                Intent in = new Intent(this, WordDetailActivity.class);
+                                in.putExtra("wordId", wordId);
+                                startActivity(in);
+                            });
+                            row.addView(detailBtn);
 
                             listArea.addView(row);
                         }

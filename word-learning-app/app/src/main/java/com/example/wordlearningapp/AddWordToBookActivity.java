@@ -52,13 +52,14 @@ public class AddWordToBookActivity extends AppCompatActivity {
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(6), 0, dp(18), 0);
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
+        topBar.setPadding(dp(6), statusBarH + dp(8), dp(18), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
-        GradientDrawable tbBg = new GradientDrawable();
-        tbBg.setColor(0xFF318af8);
-        tbBg.setCornerRadii(new float[]{0, 0, 0, 0, dp(18), dp(18), dp(18), dp(18)});
-        topBar.setBackground(tbBg);
+        topBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView btnBack = new TextView(this);
         btnBack.setText("←");
@@ -108,7 +109,7 @@ public class AddWordToBookActivity extends AppCompatActivity {
         singleModeLayout.setOrientation(LinearLayout.VERTICAL);
         singleModeLayout.setPadding(dp(16), dp(8), dp(16), dp(20));
 
-        etWordId = addField(singleModeLayout, "单词ID");
+        etWordId = addField(singleModeLayout, "单词ID（可选，留空自动生成）");
         etSpelling = addField(singleModeLayout, "英文拼写");
         etPhonetic = addField(singleModeLayout, "音标");
         etChinese = addField(singleModeLayout, "中文释义");
@@ -298,8 +299,8 @@ public class AddWordToBookActivity extends AppCompatActivity {
         String spelling = etSpelling.getText().toString().trim();
         String chinese = etChinese.getText().toString().trim();
 
-        if (wordId.isEmpty() || spelling.isEmpty() || chinese.isEmpty()) {
-            Toast.makeText(this, "请填写单词ID、拼写和释义", Toast.LENGTH_SHORT).show();
+        if (spelling.isEmpty() || chinese.isEmpty()) {
+            Toast.makeText(this, "请填写拼写和释义", Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -195,6 +195,34 @@
             letter-spacing: 0.5px;
         }
 
+        /* 音频播放按钮 */
+        .audio-player {
+            margin: 20px 0;
+        }
+
+        .btn-audio {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        .btn-audio:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        .btn-audio:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* 章节 */
         .section {
             margin-bottom: 30px;
@@ -441,12 +469,21 @@ function displayWord(w) {
     }
     var partOfSpeechHtml = partOfSpeech ? '<div class="part-of-speech">' + partOfSpeech + '</div>' : '';
     
+    // 音频按钮HTML
+    var audioHtml = '';
+    if (w.wordPronunciation) {
+        audioHtml = '<div class="audio-player">' +
+            '<button class="btn-audio" onclick="playAudio(\'' + w.wordPronunciation.replace(/'/g, "\\'") + '\')">🔊 播放发音</button>' +
+            '</div>';
+    }
+    
     document.getElementById('page-title').textContent = '单词详情 - ' + (w.englishSpelling || w.spelling);
     document.getElementById('detail-content').innerHTML =
         '<div class="word-header">' +
             '<div class="word-name">' + (w.englishSpelling || w.spelling) + '</div>' +
             '<div class="phonetic">/' + (w.phoneticSymbol || w.phonetic || '') + '/</div>' +
             partOfSpeechHtml +
+            audioHtml +
         '</div>' +
         '<div class="section">' +
             '<div class="section-title"><span>📖</span> 中文释义</div>' +
@@ -474,6 +511,40 @@ function collectWord(wordId) {
             alert(r.message || '收藏失败');
         }
     });
+}
+
+// 播放音频
+let currentAudio = null;
+
+function playAudio(audioUrl) {
+    if (!audioUrl) {
+        alert('暂无发音资源');
+        return;
+    }
+    
+    // 如果正在播放，先停止
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+        return;
+    }
+    
+    currentAudio = new Audio(audioUrl);
+    currentAudio.play().catch(function(err) {
+        console.error('播放失败:', err);
+        alert('播放失败，请稍后重试');
+        currentAudio = null;
+    });
+    
+    currentAudio.onended = function() {
+        currentAudio = null;
+    };
+    
+    currentAudio.onerror = function() {
+        alert('音频加载失败');
+        currentAudio = null;
+    };
 }
 </script>
 </body>

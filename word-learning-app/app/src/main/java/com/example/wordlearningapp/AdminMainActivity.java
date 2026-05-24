@@ -37,19 +37,25 @@ public class AdminMainActivity extends AppCompatActivity {
             return;
         }
 
+        // Status bar color
+        getWindow().setStatusBarColor(0xFF318af8);
+        int statusBarH = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarH = getResources().getDimensionPixelSize(resId);
+
         // Root layout
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFFf2f8fc);
 
-        // ===== TOP BAR: 48px blue =====
+        // ===== TOP BAR: blue, extends behind status bar =====
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(0xFF318af8);
-        topBar.setPadding(dp(16), 0, dp(16), 0);
+        topBar.setPadding(dp(16), statusBarH + dp(8), dp(16), dp(8));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
         topBar.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(48) + statusBarH));
 
         TextView adminUser = new TextView(this);
         adminUser.setText("管理员：" + AuthManager.get().getUserId());
