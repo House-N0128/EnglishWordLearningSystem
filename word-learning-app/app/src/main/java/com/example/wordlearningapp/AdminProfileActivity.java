@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 public class AdminProfileActivity extends AppCompatActivity {
 
-    private TextView tvUserId, tvPhone, tvEmail, tvRole, tvCreateTime;
+    private TextView tvUserId, tvCreateTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,30 +119,9 @@ public class AdminProfileActivity extends AppCompatActivity {
         card.addView(cardTitle);
 
         tvUserId = addInfoRow(card, "账号");
-        tvPhone = addInfoRow(card, "手机号");
-        tvEmail = addInfoRow(card, "邮箱");
-        tvRole = addInfoRow(card, "角色");
         tvCreateTime = addInfoRow(card, "创建时间");
 
         main.addView(card);
-
-        // Edit profile button
-        TextView btnEdit = new TextView(this);
-        btnEdit.setText("编辑个人信息");
-        btnEdit.setTextSize(15);
-        btnEdit.setTextColor(0xFFFFFFFF);
-        btnEdit.setGravity(Gravity.CENTER);
-        btnEdit.setPadding(0, dp(13), 0, dp(13));
-        GradientDrawable editBg = new GradientDrawable();
-        editBg.setColor(0xFF318af8);
-        editBg.setCornerRadius(dp(22));
-        btnEdit.setBackground(editBg);
-        LinearLayout.LayoutParams ebp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ebp.setMargins(0, dp(22), 0, dp(10));
-        btnEdit.setLayoutParams(ebp);
-        btnEdit.setOnClickListener(v -> startActivity(new Intent(this, AdminEditProfileActivity.class)));
-        main.addView(btnEdit);
 
         // Change password button
         TextView btnPwd = new TextView(this);
@@ -330,9 +309,6 @@ public class AdminProfileActivity extends AppCompatActivity {
                     JsonObject data = res.getAsJsonObject("data");
                     runOnUiThread(() -> {
                         tvUserId.setText(getStr(data, "userId"));
-                        tvPhone.setText(getStr(data, "phoneNumber"));
-                        tvEmail.setText(getStr(data, "email"));
-                        tvRole.setText("管理员");
                         tvCreateTime.setText(trimDate(getStr(data, "createTime")));
                     });
                 }

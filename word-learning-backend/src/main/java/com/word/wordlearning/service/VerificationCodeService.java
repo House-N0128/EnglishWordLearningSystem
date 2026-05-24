@@ -35,7 +35,6 @@ public class VerificationCodeService {
         }
 
         String code = generateCode();
-        codeStore.put(contact, new CodeEntry(code, System.currentTimeMillis() + 5 * 60 * 1000));
 
         boolean success;
         if (contact.contains("@")) {
@@ -45,10 +44,12 @@ public class VerificationCodeService {
         }
 
         if (!success) {
-            log.warn("验证码发送失败，但已生成。contact={}, code={}", contact, code);
+            log.warn("验证码发送失败。contact={}", contact);
+            return "验证码发送失败，请稍后重试";
         }
 
-        log.info("验证码已生成: contact={}, code={}", contact, code);
+        codeStore.put(contact, new CodeEntry(code, System.currentTimeMillis() + 5 * 60 * 1000));
+        log.info("验证码已生成并发送: contact={}, code={}", contact, code);
         return null; // null means success
     }
 

@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 public class Adminstrator {
     private String userId;
     private String loginPassword;
-    private String phoneNumber;
-    private String email;
     private String accountStatus;
     private LocalDateTime createTime;
 }

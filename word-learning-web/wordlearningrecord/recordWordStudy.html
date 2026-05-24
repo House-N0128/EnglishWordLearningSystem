@@ -340,6 +340,13 @@
             cursor: not-allowed;
         }
 
+        /* 新增：已掌握状态的灰色样式 */
+        .btn-master.is-learned {
+            background: #ccc !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+        }
+
         /* 导航按钮 */
         .nav-section {
             display: flex;
@@ -591,7 +598,12 @@
                         <button class="btn-collect" :class="{collected: isCollected}" @click="toggleCollect">
                             {{ isCollected ? '❤️ 已收藏' : '⭐ 收藏单词' }}
                         </button>
-                        <button class="btn-master" @click="markLearned">✅ 标记已掌握</button>
+                        <button class="btn-master" 
+                                :class="{'is-learned': learnedSet.has(currentWord.wordId || currentWord.id)}" 
+                                @click="markLearned"
+                                :disabled="learnedSet.has(currentWord.wordId || currentWord.id)">
+                            {{ learnedSet.has(currentWord.wordId || currentWord.id) ? '✅ 已掌握' : '✅ 标记已掌握' }}
+                        </button>
                     </div>
                 </div>
 
@@ -831,10 +843,10 @@
                 const word = currentWord.value;
                 const wid = word.wordId || word.id;
                 if (!wid) return;
-                if (learnedSet.value.has(wid)) {
+                /*if (learnedSet.value.has(wid)) {
                     showMessage('该单词已经标记过了', true);
                     return;
-                }
+                }*/
                 try {
                     if (isCollected.value) {
                         const res = await apiDelete('/api/collections/remove', { wordId: wid });
@@ -913,7 +925,7 @@
                 resetAndRestudy, handleImageError,
                 audioPlaying,audioLoading,playAudio,
                 logout, goHome, goWordBooks, goSearch, goCollection,
-                goRecord, goProfile, goChangePwd, goCancel
+                goRecord, goProfile, goChangePwd, goCancel,learnedSet
             };
         }
     }).mount('#app');

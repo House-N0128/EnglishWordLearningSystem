@@ -178,43 +178,6 @@ public class AdminstratorController {
         }
     }
 
-    @PutMapping("/profile")
-    public Result<String> updateAdminProfile(
-            @RequestHeader("X-User-Id") String userId,
-            @RequestBody Map<String, String> body) {
-        String phoneNumber = body.get("phoneNumber");
-        String email = body.get("email");
-
-        if (phoneNumber != null && !phoneNumber.isEmpty() && !phoneNumber.matches("\\d{11}")) {
-            return Result.error(400, "请输入正确的11位手机号");
-        }
-        if (email != null && !email.isEmpty()) {
-            if (!email.contains("@")) {
-                return Result.error(400, "请输入正确的邮箱地址");
-            }
-            // 检查邮箱是否已被普通用户注册
-            if (userMapper.findByPhoneOrEmail(email) != null) {
-                return Result.error(400, "该邮箱已被用户注册");
-            }
-            // 检查邮箱是否已被其他管理员使用
-            if (adminstratorService.isEmailUsedByOtherAdmin(email, userId)) {
-                return Result.error(400, "该邮箱已被其他管理员使用");
-            }
-        }
-
-        com.word.wordlearning.entity.Adminstrator admin = new com.word.wordlearning.entity.Adminstrator();
-        admin.setUserId(userId);
-        admin.setPhoneNumber(phoneNumber);
-        admin.setEmail(email);
-
-        boolean success = adminstratorService.updateAdminProfile(admin);
-        if (success) {
-            return Result.success("个人信息更新成功");
-        } else {
-            return Result.error(500, "更新失败");
-        }
-    }
-
     @PostMapping("/changePassword")
     public Result<String> changePassword(
             @RequestHeader("X-User-Id") String userId,

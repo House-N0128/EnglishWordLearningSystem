@@ -120,14 +120,14 @@ public class BatchAddWordActivity extends AppCompatActivity {
         textModeLayout.setPadding(dp(16), dp(8), dp(16), dp(16));
 
         TextView hint = new TextView(this);
-        hint.setText("每行一个单词，格式：拼写,释义,音标,例句,音频链接,图片链接\n逗号分隔，后两项可选，单词ID自动生成");
+        hint.setText("每行一个单词，格式：拼写,词性,释义,音标,例句,音频链接,图片链接\n逗号分隔，词性及以后可选，单词ID自动生成");
         hint.setTextSize(13);
         hint.setTextColor(0xFF8899aa);
         hint.setPadding(0, 0, 0, dp(8));
         textModeLayout.addView(hint);
 
         etBatchInput = new EditText(this);
-        etBatchInput.setHint("hello,你好,/həˈloʊ/,Hello World!,http://audio.mp3,http://img.png\nworld,世界,/wɜːld/,Hello World!");
+        etBatchInput.setHint("hello,v.,你好,/həˈloʊ/,Hello World!,http://audio.mp3,http://img.png");
         etBatchInput.setTextSize(14);
         etBatchInput.setPadding(dp(16), dp(12), dp(16), dp(12));
         etBatchInput.setBackgroundColor(0xFFf6f8fc);
@@ -157,7 +157,7 @@ public class BatchAddWordActivity extends AppCompatActivity {
         excelModeLayout.setVisibility(View.GONE);
 
         TextView excelHint = new TextView(this);
-        excelHint.setText("Excel模板（第一行为表头）:\nspelling, definition, example_sentence, phonetic, pronunciation_url, image_url");
+        excelHint.setText("Excel模板（第一行为表头）:\nspelling, part_of_speech, definition, example_sentence, phonetic, pronunciation_url, image_url\n至少需要 spelling 和 definition 两列");
         excelHint.setTextSize(12);
         excelHint.setTextColor(0xFF8899aa);
         excelHint.setPadding(0, 0, 0, dp(12));
@@ -317,14 +317,15 @@ public class BatchAddWordActivity extends AppCompatActivity {
             line = line.trim();
             if (line.isEmpty()) continue;
             String[] parts = line.split(",");
-            if (parts.length < 2) continue;
+            if (parts.length < 3) continue;
             JsonObject word = new JsonObject();
             word.addProperty("englishSpelling", parts[0].trim());
-            word.addProperty("chineseDefinition", parts[1].trim());
-            if (parts.length > 2) word.addProperty("phoneticSymbol", parts[2].trim());
+            if (parts.length > 1) word.addProperty("partOfSpeech", parts[1].trim());
+            if (parts.length > 2) word.addProperty("chineseDefinition", parts[2].trim());
             if (parts.length > 3) word.addProperty("exampleSentence", parts[3].trim());
-            if (parts.length > 4) word.addProperty("wordPronunciation", parts[4].trim());
-            if (parts.length > 5) word.addProperty("wordImage", parts[5].trim());
+            if (parts.length > 4) word.addProperty("phoneticSymbol", parts[4].trim());
+            if (parts.length > 5) word.addProperty("wordPronunciation", parts[5].trim());
+            if (parts.length > 6) word.addProperty("wordImage", parts[6].trim());
             wordsArr.add(word);
         }
 
@@ -347,9 +348,26 @@ public class BatchAddWordActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     btnSubmit.setEnabled(true);
                     btnSubmit.setText("批量导入");
-                    String msg = result.has("message") ? result.get("message").getAsString() : "导入完成";
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-                    if (result.get("code").getAsInt() == 200) finish();
+                    if (result.get("code").getAsInt() == 200) {
+                        JsonObject data = result.getAsJsonObject("data");
+                        int nc = data.has("newCount") ? data.get("newCount").getAsInt() : 0;
+                        int sc = data.has("skippedCount") ? data.get("skippedCount").getAsInt() : 0;
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("新增 ").append(nc).append(" 个单词\n");
+                        if (sc > 0) {
+                            sb.append("跳过 ").append(sc).append(" 个已存在: ");
+                            JsonArray sw = data.getAsJsonArray("skippedWords");
+                            for (int i = 0; i < Math.min(sw.size(), 8); i++) {
+                                if (i > 0) sb.append(", ");
+                                sb.append(sw.get(i).getAsString());
+                            }
+                            if (sw.size() > 8) sb.append("...等");
+                        }
+                        Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        Toast.makeText(this, result.has("message") ? result.get("message").getAsString() : "导入失败", Toast.LENGTH_SHORT).show();
+                    }
                 });
             } catch (Exception e) {
                 runOnUiThread(() -> {
