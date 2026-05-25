@@ -9,11 +9,9 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,17 +22,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 public class BatchAddWordActivity extends AppCompatActivity {
 
     private static final int PICK_EXCEL_FILE = 1001;
 
-    private Spinner spBook;
     private EditText etBatchInput;
     private Button btnSubmit;
-    private List<String> bookIds = new ArrayList<>();
 
     private LinearLayout textModeLayout, excelModeLayout;
     private TextView tvSelectedFile, tvExcelResult;
@@ -93,26 +86,6 @@ public class BatchAddWordActivity extends AppCompatActivity {
         toggleRow.addView(btnText);
         toggleRow.addView(btnExcel);
         root.addView(toggleRow);
-
-        // Book selector (shared)
-        LinearLayout bookRow = new LinearLayout(this);
-        bookRow.setOrientation(LinearLayout.HORIZONTAL);
-        bookRow.setPadding(dp(16), dp(8), dp(16), dp(4));
-
-        TextView lblBook = new TextView(this);
-        lblBook.setText("目标词书:");
-        lblBook.setTextSize(14);
-        lblBook.setTextColor(0xFF8899aa);
-        lblBook.setGravity(Gravity.CENTER_VERTICAL);
-        lblBook.setPadding(0, 0, dp(8), 0);
-        bookRow.addView(lblBook);
-
-        spBook = new Spinner(this);
-        spBook.setPadding(dp(12), dp(8), dp(12), dp(8));
-        spBook.setBackgroundColor(0xFFf6f8fc);
-        spBook.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        bookRow.addView(spBook);
-        root.addView(bookRow);
 
         // ===== TEXT MODE =====
         textModeLayout = new LinearLayout(this);
@@ -227,7 +200,6 @@ public class BatchAddWordActivity extends AppCompatActivity {
             btnText.setBackgroundColor(0xFFe8ecf1);
         });
 
-        loadBooks();
     }
 
     private TextView makeToggleBtn(String text, boolean active) {
@@ -275,34 +247,6 @@ public class BatchAddWordActivity extends AppCompatActivity {
         }
     }
 
-    private void loadBooks() {
-        new Thread(() -> {
-            try {
-                JsonObject r = ApiClient.get().get("/api/wordbooks");
-                if (r.get("code").getAsInt() == 200) {
-                    JsonArray books = r.getAsJsonArray("data");
-                    List<String> names = new ArrayList<>();
-                    bookIds.clear();
-                    names.add("不指定词书（仅导入单词库）");
-                    bookIds.add("");
-                    for (int i = 0; i < books.size(); i++) {
-                        JsonObject b = books.get(i).getAsJsonObject();
-                        bookIds.add(b.get("wordBookId").getAsString());
-                        names.add(b.get("wordBookName").getAsString());
-                    }
-                    runOnUiThread(() -> spBook.setAdapter(new ArrayAdapter<>(this,
-                            android.R.layout.simple_spinner_item, names)));
-                }
-            } catch (Exception e) {}
-        }).start();
-    }
-
-    private String getSelectedBookId() {
-        if (spBook.getSelectedItemPosition() < 0 || bookIds.isEmpty()) return null;
-        String bid = bookIds.get(spBook.getSelectedItemPosition());
-        return (bid != null && !bid.isEmpty()) ? bid : null;
-    }
-
     // ===== 文本模式批量导入 =====
     private void doTextBatchAdd() {
         String input = etBatchInput.getText().toString().trim();
@@ -338,8 +282,6 @@ public class BatchAddWordActivity extends AppCompatActivity {
         btnSubmit.setText("导入中...");
 
         JsonObject body = new JsonObject();
-        String bookId = getSelectedBookId();
-        if (bookId != null) body.addProperty("wordBookId", bookId);
         body.add("words", wordsArr);
 
         new Thread(() -> {
@@ -396,8 +338,6 @@ public class BatchAddWordActivity extends AppCompatActivity {
                 InputStream is = getContentResolver().openInputStream(selectedFileUri);
 
                 java.util.Map<String, String> fields = new java.util.HashMap<>();
-                String bookId = getSelectedBookId();
-                if (bookId != null) fields.put("wordBookId", bookId);
 
                 JsonObject result = ApiClient.get().uploadFile(
                         "/api/words/batch/import", "file", "import.xlsx", is,
@@ -411,14 +351,12 @@ public class BatchAddWordActivity extends AppCompatActivity {
                     if (code == 200) {
                         JsonObject data = result.getAsJsonObject("data");
                         int newCount = data.has("newCount") ? data.get("newCount").getAsInt() : 0;
-                        int linkedCount = data.has("linkedCount") ? data.get("linkedCount").getAsInt() : 0;
                         int skippedCount = data.has("skippedCount") ? data.get("skippedCount").getAsInt() : 0;
                         int failCount = data.has("failCount") ? data.get("failCount").getAsInt() : 0;
 
                         StringBuilder sb = new StringBuilder();
                         sb.append("导入完成！\n");
                         sb.append("新增单词: ").append(newCount).append("个\n");
-                        if (bookId != null) sb.append("关联已有单词: ").append(linkedCount).append("个\n");
                         if (skippedCount > 0) {
                             sb.append("跳过(已存在): ").append(skippedCount).append("个\n");
                             if (data.has("skippedWords")) {
