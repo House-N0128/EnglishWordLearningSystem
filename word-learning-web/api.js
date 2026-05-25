@@ -1,5 +1,5 @@
 // ========== API 工具库 ==========
-var BASE_URL = 'http://localhost:8080';
+var BASE_URL = 'http://10.115.171.176:8080';
 
 function apiUrl(path) { return BASE_URL + path; }
 

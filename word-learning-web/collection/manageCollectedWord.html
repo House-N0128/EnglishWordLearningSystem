@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -329,7 +329,7 @@ async function loadCollections() {
     const listDiv = document.getElementById('list');
     
     try {
-        const res = await fetch('http://localhost:8080/api/collections', {
+        const res = await fetch('http://10.115.171.176:8080/api/collections', {
             headers: { 'X-User-Id': userId }
         });
         const data = await res.json();
@@ -338,7 +338,7 @@ async function loadCollections() {
             let html = '';
             for (const item of data.data) {
                 try {
-                    const wordRes = await fetch('http://localhost:8080/api/words/' + item.wordId, {
+                    const wordRes = await fetch('http://10.115.171.176:8080/api/words/' + item.wordId, {
                         headers: { 'X-User-Id': userId }
                     });
                     const wordData = await wordRes.json();
@@ -371,7 +371,7 @@ window.cancelCollect = async function(wordId) {
     
     const userId = getUserId();
     try {
-        const res = await fetch('http://localhost:8080/api/collections/remove', {
+        const res = await fetch('http://10.115.171.176:8080/api/collections/remove', {
             method: 'DELETE',
             headers: { 
                 'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
-// ========== 移动端 API 工具库 ==========
+﻿// ========== 移动端 API 工具库 ==========
 // 修改此地址指向你的后端服务器
-var BASE_URL = 'http://localhost:8080';
+var BASE_URL = 'http://10.115.171.176:8080';
 
 function apiUrl(path) { return BASE_URL + path; }
 

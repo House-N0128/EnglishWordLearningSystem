@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -427,7 +427,7 @@ async function startImport() {
         const formData = new FormData();
         formData.append("file", selectedFile);
         
-        const response = await fetch("http://localhost:8080/api/words/batch/import", {
+        const response = await fetch("http://10.115.171.176:8080/api/words/batch/import", {
             method: "POST",
             body: formData
         });

@@ -8,7 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 public class ViewBookWordsActivity extends AppCompatActivity {
 
     private LinearLayout listArea;
-    private EditText etAddWord;
     private String bookId, bookName;
 
     @Override
@@ -83,39 +82,6 @@ public class ViewBookWordsActivity extends AppCompatActivity {
         info.setPadding(0, 0, 0, dp(12));
         main.addView(info);
 
-        // Add word row
-        LinearLayout addRow = new LinearLayout(this);
-        addRow.setOrientation(LinearLayout.HORIZONTAL);
-        addRow.setPadding(0, 0, 0, dp(12));
-        addRow.setGravity(Gravity.CENTER_VERTICAL);
-
-        etAddWord = new EditText(this);
-        etAddWord.setHint("英文拼写");
-        etAddWord.setTextSize(14);
-        etAddWord.setSingleLine(true);
-        etAddWord.setPadding(dp(10), dp(8), dp(10), dp(8));
-        bg(etAddWord, 0xFFf6f8fc, dp(7), 1, 0xFFc7d9ee);
-        LinearLayout.LayoutParams edp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        edp.gravity = Gravity.CENTER_VERTICAL;
-        etAddWord.setLayoutParams(edp);
-        addRow.addView(etAddWord);
-
-        Button btnAdd = new Button(this);
-        btnAdd.setText("添加");
-        btnAdd.setTextColor(0xFFFFFFFF);
-        btnAdd.setTextSize(13);
-        btnAdd.setPadding(dp(12), dp(8), dp(12), dp(8));
-        GradientDrawable abBg = new GradientDrawable();
-        abBg.setColor(0xFF318af8);
-        abBg.setCornerRadius(dp(6));
-        btnAdd.setBackground(abBg);
-        LinearLayout.LayoutParams abp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        abp.setMargins(dp(8), 0, 0, 0);
-        btnAdd.setLayoutParams(abp);
-        btnAdd.setOnClickListener(v -> addWordToBook());
-        addRow.addView(btnAdd);
-        main.addView(addRow);
-
         listArea = new LinearLayout(this);
         listArea.setOrientation(LinearLayout.VERTICAL);
         main.addView(listArea);
@@ -131,27 +97,6 @@ public class ViewBookWordsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadWords();
-    }
-
-    private void addWordToBook() {
-        String spelling = etAddWord.getText().toString().trim();
-        if (spelling.isEmpty()) { Toast.makeText(this, "请输入拼写", Toast.LENGTH_SHORT).show(); return; }
-
-        new Thread(() -> {
-            try {
-                JsonObject body = new JsonObject();
-                body.addProperty("englishSpelling", spelling);
-                body.addProperty("chineseDefinition", spelling);
-                body.addProperty("wordBookId", bookId);
-                JsonObject r = ApiClient.get().post("/api/words", body);
-                runOnUiThread(() -> {
-                    Toast.makeText(this, r.has("message") ? r.get("message").getAsString() : "完成", Toast.LENGTH_SHORT).show();
-                    if (r.get("code").getAsInt() == 200) { etAddWord.setText(""); loadWords(); }
-                });
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
     }
 
     private void loadWords() {
