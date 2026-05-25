@@ -442,17 +442,21 @@
     <div>版权所有 © 2025 单词学习平台 | 让学习更简单</div>
 </footer>
 <script src="/api.js"></script>
+<script src="/api.js"></script>
+<script src="/api.js"></script>
 <script>
-// 设置用户信息
+// ==================== 设置用户信息（显示用户ID） ====================
 if (!localStorage.getItem('userId')) {
     localStorage.setItem('userId', '10010');
     localStorage.setItem('userRole', 'USER');
 }
 
 var userId = localStorage.getItem('userId') || '';
+
+// 直接显示 userId
 document.getElementById('display-name').textContent = '👤 ' + userId;
 
-// 统计数据
+// ==================== 统计数据 ====================
 apiGet('/api/records/stats').then(function(r) {
     if (r.code === 200) {
         document.getElementById('today-count').textContent = r.data.todayCount || 0;
@@ -461,7 +465,7 @@ apiGet('/api/records/stats').then(function(r) {
     }
 });
 
-// 词书列表
+// ==================== 词书列表 ====================
 apiGet('/api/wordbooks').then(function(r) {
     var container = document.getElementById('book-grid');
     if (r.code === 200 && r.data.length > 0) {
@@ -481,7 +485,7 @@ apiGet('/api/wordbooks').then(function(r) {
     }
 });
 
-// 最近学习
+// ==================== 最近学习 ====================
 async function loadRecentWords() {
     var container = document.getElementById('word-grid');
     container.innerHTML = '<div class="empty-hint">⏳ 加载中...</div>';
